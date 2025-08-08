@@ -1,0 +1,4 @@
+C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/miner.dir
+C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/INSTALL.dir
+C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/ZERO_CHECK.dir
