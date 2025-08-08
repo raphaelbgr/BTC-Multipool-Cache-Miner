@@ -2,6 +2,12 @@
 
 Research/education‑grade GPU miner that tests the same nonce across all active jobs per CUDA iteration, spanning multiple Stratum pools and a local node (GBT). Emphasizes deterministic normalization, in‑place hot‑swaps, mandatory per‑GPU VRAM cache (~85% utilization), and a safe predictability precompute worker.
 
+### Strategy: Solo‑Mining Hit with Cached Multipool
+- **Same‑nonce across all jobs** each CUDA batch to maximize coverage and minimize decision latency.
+- **VRAM‑resident normalized templates** reduce CPU jitter and make hot‑swaps cheap; only dirty slots copy.
+- **CPU verify before submit** routes shares to pools and blocks to a configured solo (GBT) endpoint (configurable fallback to pool).
+- Details: see `docs/STRATEGY.md`.
+
 ### Status
 Initial bootstrap complete with unit-tested core utilities.
 
@@ -24,6 +30,7 @@ Initial bootstrap complete with unit-tested core utilities.
 ### Docs
 - `docs/PRD.md` — Product Requirements
 - `docs/ARCHITECTURE.md` — Architecture
+- `docs/STRATEGY.md` — Solo‑hit strategy with cached multipool
 - `docs/PROJECT_BRIEF.md` — Project Brief
 - `docs/TESTING_OPS.md` — Testing & Operations
 - `docs/config-example.ini` — Example configuration
