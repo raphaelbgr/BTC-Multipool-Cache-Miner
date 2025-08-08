@@ -7,10 +7,15 @@
 
 ### Tests
 - Unit
-  - Header build (80B): version/prevhash/merkle_root/ntime/nbits/nonce composition; endian tests.
-  - SHA‑256d vectors; target comparison (LE u32[8]).
-  - Normalizer: coinbase assembly with segwit witness commitment; extranonce packing; rolling clamps.
-  - Midstate precompute correctness.
+  - Endianness helpers (swap, array round-trip)
+  - Compact target to LE `u32[8]` (genesis vector, zero mantissa)
+  - Registry `gen` bump semantics
+  - Logging JSON shape smoke test
+  - Metrics counters/gauges snapshot
+  - CPU `sha256`/`sha256d` vector and hash≤target compare
+  - Midstate (64-byte) finishing equivalence to full SHA-256 first round
+  - Merkle root computation (empty, two-leaf duplication rule)
+  - SubmitRouter verify-then-dispatch
 - Integration
   - Stratum adapters: varDiff handling, rolling/version/ntime caps, clean_jobs, submit schema.
   - GBT adapter: BIP22/23 with `rules=["segwit"]`; submitblock success; tip mismatch invalidation.

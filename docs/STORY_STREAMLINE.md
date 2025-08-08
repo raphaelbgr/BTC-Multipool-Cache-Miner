@@ -51,4 +51,25 @@
 - All unit tests green for the milestones above.
 - Code adheres to repo’s coding rules; no secret leakage in logs.
 
+### Progress Update (current)
+- Completed Milestone 0: Bootstrap + test harness (CMake, GoogleTest)
+- Completed Milestone 1: Observability (structured logger) and endianness helpers
+- Completed Milestone 2: Targets (compact nBits → LE u32[8]) with vectors
+- Completed Milestone 3: Work Source Registry skeleton with `gen` bump
+- Completed Milestone 4: CUDA engine stubs link cleanly when CUDA off
+- Completed Milestone 5: Config skeleton and defaults
+- Added Normalizer pieces: midstate utilities and Merkle root computation
+- Added Submit path: CPU SHA‑256/sha256d utilities and `SubmitRouter` that CPU‑verifies before routing
+- Tests: 15/15 green across endianness, targets, registry, logging shape, metrics, CPU verify, midstate, merkle, and submit router
+
+### Next Up
+- Adapters skeleton
+  - `AdapterBase` interface and `StratumAdapter` façade (no network yet)
+  - Basic state machine unit tests (connect → subscribe → authorize flow simulation)
+- Normalizer completion
+  - Coinbase assembly scaffold and witness commitment placeholder
+  - Rolling/ntime caps tests and extranonce packing tests
+- Registry integration
+  - Adapter → Normalizer → Registry update path with `gen` bump ordering tests
+
 

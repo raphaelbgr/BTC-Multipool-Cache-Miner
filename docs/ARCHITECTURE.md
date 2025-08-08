@@ -9,7 +9,7 @@
 - CacheManager (VRAM): dynamic per‑GPU cache targeting ~85% VRAM; maintains midstates, normalized templates/variants, per‑job dedup filters, and header‑variant staging. Watermarks and `min_free_mib` guard rails.
 - PredictabilityWorker (CUDA): low‑priority stream precomputing/warming cache pages with double‑buffer shadow pages and epoch swap on stable `gen`. Adaptive throttling based on VRAM and GPU util.
 - Adapters: `AdapterBase`, `StratumAdapter`, concrete `PoolAdapters/*`, and `GbtAdapter`. Convert external schemas to `RawJob` with policy metadata (rolling caps, extranonce constraints, submit schema).
-- Normalizer: converts `RawJob` → `WorkItem` + `GpuJobConst`; computes share and block targets; endian normalization; coinbase assembly with witness commitment; midstate precompute.
+- Normalizer: converts `RawJob` → `WorkItem` + `GpuJobConst`; computes share and block targets; endian normalization; coinbase assembly with witness commitment; midstate precompute; Merkle root.
 - WorkSourceRegistry: fixed‑size arrays for N sources tracking `WorkItem` and `GpuJobConst`. In‑place writes; `gen` bump last; `active` flags; `found_submitted` sticky until superseded.
 - CudaEngine: per‑nonce, cross‑job kernel. Grid y‑dim = job index; x‑dim = nonce offsets. Short micro‑batches (~0.5–3 ms). Emits hits into a lock‑free ring buffer per device.
 - Scheduler: fair, weighted policy. Backpressure against sources with rejects/latency. Tunes micro‑batch duration for responsiveness to hot‑swaps.
@@ -32,7 +32,7 @@ Aligned constants and precomputed midstates required for kernel header assembly.
 
 ### Normalization Pipeline
 1) Parse adapter `RawJob` → validate input bounds and policies.
-2) Coinbase assembly (address, extranonce sizes/packing) and merkle root with segwit commitment.
+2) Coinbase assembly (address, extranonce sizes/packing) and Merkle root with segwit commitment.
 3) Endianness normalization (LE for `prevhash`, `merkle_root`).
 4) Targets: compute `share_target` (varDiff) and `block_target` (from `nbits`) as LE `u32[8]`.
 5) Precompute midstates; produce compact `GpuJobConst`.
@@ -62,7 +62,7 @@ Aligned constants and precomputed midstates required for kernel header assembly.
 - Backpressure: reduce time slices for laggy/rejecting sources; dynamic micro‑batch sizing.
 
 ### Submission & Persistence
-- CPU verifies reconstructed header matches GPU result prior to submission.
+- CPU verifies reconstructed header matches GPU result prior to submission (also used by `SubmitRouter`).
 - Routes to correct adapter by slot index.
 - Ledger stores job key and timestamps; outbox replays pending hits post‑restart; dedup guarantees idempotency.
 
