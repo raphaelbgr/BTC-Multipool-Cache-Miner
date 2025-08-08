@@ -1,7 +1,6 @@
 #include "cuda/engine.h"
 #include "cuda/sha256d.cuh"
 
-#ifdef __CUDACC__
 #include <cuda_runtime.h>
 
 namespace cuda_engine {
@@ -17,6 +16,5 @@ void launchStub(const LaunchParams& params) {
 }
 
 }  // namespace cuda_engine
-#endif
 
 

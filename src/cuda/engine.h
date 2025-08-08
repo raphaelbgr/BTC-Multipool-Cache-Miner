@@ -17,10 +17,7 @@ inline bool isCudaAvailable() {
 #endif
 }
 
-inline void launchStub(const LaunchParams&) {
-  // No-op when CUDA is disabled.
-}
+// Implemented in engine.cu when CUDA is enabled
+void launchStub(const LaunchParams& params);
 
 }
-
-

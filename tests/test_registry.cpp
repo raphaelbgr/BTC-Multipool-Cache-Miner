@@ -5,7 +5,8 @@ TEST(Registry, SetGetAndGenBump) {
   registry::WorkSourceRegistry reg(2);
   registry::WorkItem item;
   item.work_id = 42;
-  reg.set(0, item);
+  registry::GpuJobConst jc{};
+  reg.set(0, item, jc);
 
   auto snap1 = reg.get(0);
   ASSERT_TRUE(snap1.has_value());
@@ -13,7 +14,7 @@ TEST(Registry, SetGetAndGenBump) {
   auto gen1 = snap1->gen;
 
   item.work_id = 43;
-  reg.set(0, item);
+  reg.set(0, item, jc);
   auto snap2 = reg.get(0);
   ASSERT_TRUE(snap2.has_value());
   EXPECT_EQ(snap2->item.work_id, 43u);

@@ -91,4 +91,15 @@ You are the implementation agent responsible for integrating CGMiner learnings i
 - Implement minimal skeleton: `src/config`, `src/obs/log`, `src/normalize/targets`, `src/registry`, CUDA `sha256d` stub + tests
 - Add regtest harness with one Stratum mock + local GBT; prove normalization + submit loop sans CUDA
 
+### Windows Build Instructions (Agent Notes)
+- Strictly require CUDA; no CPU fallback. Use VS 2022 x64 Developer Command Prompt.
+- Prefer Ninja generator to avoid VS solution flakiness; pin cl.exe from VS 2022 via environment.
+- One‑shot script:
+  - Run `cmd /c build_ninja_vs2022.bat` (activates VS env, sets CC/CXX=cl, configures with CUDA, builds, runs tests).
+- Manual alternative:
+  - From VS 2022 x64 Dev Prompt:
+    - `cmake -S . -B build -G Ninja -DENABLE_CUDA=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CUDA_COMPILER="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/nvcc.exe"`
+    - `cmake --build build -j 8`
+    - `ctest --test-dir build --output-on-failure`
+
 

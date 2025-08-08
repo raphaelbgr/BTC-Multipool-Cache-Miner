@@ -22,10 +22,10 @@ TEST(Merkle, TwoLeaves) {
 }
 
 TEST(SubmitRouter, VerifyAndDispatch) {
-  // Build an 80-byte header with tiny target so zero hash passes
+  // Build an 80-byte header and use a maximal target so any hash satisfies target
   uint8_t header[80] = {};
-  // For zero header, sha256d(header) yields deterministic value; choose a very large target
-  auto target = normalize::compactToTargetU32LE(0x1effffffu); // very high target
+  std::array<uint32_t, 8> target{};
+  for (auto &w : target) w = 0xFFFFFFFFu;
 
   bool called = false;
   submit::SubmitRouter router([&](const submit::HitRecord& rec){ called = true; (void)rec; });

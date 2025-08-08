@@ -28,16 +28,47 @@ Initial bootstrap complete with unit-tested core utilities.
 - `docs/TESTING_OPS.md` — Testing & Operations
 - `docs/config-example.ini` — Example configuration
 
-### Build & Test
-```powershell
-mkdir build
-cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DENABLE_CUDA=OFF
-cmake --build build --config Debug
-ctest --test-dir build -C Debug --output-on-failure
+### Build & Test (CUDA required)
+This project has no CPU fallback; NVIDIA CUDA Toolkit is required.
+
+If CUDA isn’t auto-detected, set it in `config/build.ini`:
+```
+cuda_root = C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9
+```
+Linux example:
+```
+cuda_root = /usr/local/cuda
+```
+
+#### Windows (recommended: VS 2022 + Ninja + CUDA)
+To avoid MSVC toolset mismatches in CLI builds, use the provided script which pins the VS 2022 environment for Ninja:
+
+```
+cmd /c build_ninja_vs2022.bat
+```
+
+What the script does:
+- Activates the Visual Studio 2022 x64 Developer Command Prompt
+- Sets `CC=CXX=cl`
+- Configures CMake with `-G Ninja`, CUDA ON, and your `nvcc.exe`
+- Builds and runs tests (ctest)
+
+Manual alternative (from the VS 2022 x64 Developer Command Prompt):
+```
+cmake -S . -B build -G Ninja -DENABLE_CUDA=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CUDA_COMPILER="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/nvcc.exe"
+cmake --build build -j 8
+ctest --test-dir build --output-on-failure
+```
+
+#### Linux
+```
+cmake -S . -B build -G Ninja -DENABLE_CUDA=ON -DCMAKE_BUILD_TYPE=Debug
+cmake --build build -j 8
+ctest --test-dir build --output-on-failure
 ```
 
 ### Quick Start (regtest/signet)
-1) CUDA optional for now; CPU path compiles without CUDA.
+1) CUDA is required; ensure Toolkit is installed.
 2) Prepare config based on `docs/config-example.ini`.
 3) Use local pools or `bitcoind` GBT for integration when adapters are added.
 
