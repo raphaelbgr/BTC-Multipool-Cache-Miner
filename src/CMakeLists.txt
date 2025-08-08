@@ -3,9 +3,12 @@ add_library(miner_core
   obs/metrics.cc
   normalize/endianness.cc
   normalize/targets.cc
+  normalize/merkle.cc
+  normalize/midstate.cc
   registry/work_source_registry.cc
   config/config.cc
   submit/cpu_verify.cc
+  submit/submit_router.cc
 )
 
 target_include_directories(miner_core PUBLIC ${CMAKE_CURRENT_LIST_DIR})

@@ -35,6 +35,8 @@ add_executable(unit_tests
   tests/test_log.cpp
   tests/test_headers_build.cpp
   tests/test_metrics_and_cpuverify.cpp
+  tests/test_midstate.cpp
+  tests/test_merkle_and_submit.cpp
 )
 target_link_libraries(unit_tests
   PRIVATE
