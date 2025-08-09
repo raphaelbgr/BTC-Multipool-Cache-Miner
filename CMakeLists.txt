@@ -72,6 +72,7 @@ add_executable(unit_tests
   tests/test_cache_manager.cpp
   tests/test_predict_worker.cpp
   tests/test_cuda_auto_tune.cpp
+  tests/test_hit_ring.cpp
   # cache tests TBD
 )
 target_link_libraries(unit_tests
