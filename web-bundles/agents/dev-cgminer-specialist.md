@@ -34,11 +34,11 @@ You are the implementation agent responsible for integrating CGMiner learnings i
    - [x] Config loader for INI (`docs/config-example.ini` parity) and structured logging
    - [x] Define core types: `WorkItem`, `GpuJobConst`, `HitRecord`
 2) Adapters
-   - [x] `AdapterBase` interface; `StratumAdapter` (generic) façade; `GbtAdapter` (TBD)
+   - [x] `AdapterBase` interface; `StratumAdapter` façade with state machine; `GbtAdapter` skeleton
    - [ ] Implement varDiff tracking, rolling/version/ntime caps, `clean_jobs` handling
-   - [ ] Map RawJob → Normalizer inputs (+ policy metadata)
+   - [x] Map RawJob → Normalizer inputs (+ policy metadata)
 3) Normalizer & Registry
-   - [ ] Coinbase assembly with witness commitment
+   - [x] Coinbase assembly scaffold with witness commitment placeholder
    - [x] Merkle computation
    - [x] Targets (share/block) to LE `u32[8]`; endianness normalization; midstate precompute
    - [x] `WorkSourceRegistry` in‑place updates; async device slot copy (TBD); `gen` bump last

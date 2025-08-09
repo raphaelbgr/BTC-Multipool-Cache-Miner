@@ -62,15 +62,15 @@
 - [x] Submit path: CPU SHA‑256/sha256d utilities and `SubmitRouter` that CPU‑verifies before routing
 - [x] Persistence scaffolding: in‑memory Ledger + Outbox; SubmitRouter hooks
 - [x] Tests green: endianness, targets, registry, logging, metrics, CPU verify, midstate, merkle, submit router
+- [x] Adapters skeleton: `AdapterBase`, `StratumAdapter` façade with basic state machine and ingest/poll
+- [x] GBT skeleton: `GbtAdapter` ingest/poll queue
+- [x] Normalizer completion scaffolds: coinbase assembly + witness commitment placeholder; rolling/ntime caps and extranonce packing tests
+- [x] Registry integration: adapter → normalizer → registry path covered by unit test
 
 ### Next Up
-- Adapters skeleton
-  - `AdapterBase` interface and `StratumAdapter` façade (no network yet)
-  - Basic state machine unit tests (connect → subscribe → authorize flow simulation)
-- Normalizer completion
-  - Coinbase assembly scaffold and witness commitment placeholder
-  - Rolling/ntime caps tests and extranonce packing tests
-- Registry integration
-  - Adapter → Normalizer → Registry update path with `gen` bump ordering tests
+- Multipool strategy scaffolding (round robin/failover) at adapter router level
+- SubmitRouter: Outbox/Ledger persistence wiring (file/DB placeholder)
+- CUDA engine: multi-job launch (y=jobs, x=nonce range) and micro-batch auto-tune stubs
+- VRAM CacheManager scaffold and PredictabilityWorker placeholder
 
 
