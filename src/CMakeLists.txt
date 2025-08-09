@@ -6,6 +6,9 @@ add_library(miner_core
   normalize/merkle.cc
   normalize/midstate.cc
   normalize/normalizer.cc
+  normalize/coinbase.cc
+  store/ledger.h
+  store/outbox.h
   registry/work_source_registry.cc
   config/config.cc
   submit/cpu_verify.cc

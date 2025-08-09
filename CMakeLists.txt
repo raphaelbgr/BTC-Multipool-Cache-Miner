@@ -63,6 +63,7 @@ add_executable(unit_tests
   tests/test_midstate.cpp
   tests/test_merkle_and_submit.cpp
   tests/test_adapters_compile.cpp
+  tests/test_normalizer_caps_and_extranonce.cpp
 )
 target_link_libraries(unit_tests
   PRIVATE
