@@ -62,6 +62,7 @@ add_executable(unit_tests
   tests/test_metrics_and_cpuverify.cpp
   tests/test_midstate.cpp
   tests/test_merkle_and_submit.cpp
+  tests/test_adapters_compile.cpp
 )
 target_link_libraries(unit_tests
   PRIVATE

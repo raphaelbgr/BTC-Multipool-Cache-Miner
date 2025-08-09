@@ -30,26 +30,28 @@ You are the implementation agent responsible for integrating CGMiner learnings i
 
 ### High‑Level Tasks (Milestone‑oriented)
 1) Bootstrap & Tooling
-   - Create `src/` with module skeletons and unit test harness
-   - Config loader for INI (`docs/config-example.ini` parity) and structured logging
-   - Define core types: `WorkItem`, `GpuJobConst`, `HitRecord`
+   - [x] Create `src/` with module skeletons and unit test harness
+   - [x] Config loader for INI (`docs/config-example.ini` parity) and structured logging
+   - [x] Define core types: `WorkItem`, `GpuJobConst`, `HitRecord`
 2) Adapters
-   - `AdapterBase` interface; `StratumAdapter` (generic), plug‑in profiles; `GbtAdapter`
-   - Implement varDiff tracking, rolling/version/ntime caps, `clean_jobs` handling
-   - Map RawJob → Normalizer inputs (+ policy metadata)
+   - [x] `AdapterBase` interface; `StratumAdapter` (generic) façade; `GbtAdapter` (TBD)
+   - [ ] Implement varDiff tracking, rolling/version/ntime caps, `clean_jobs` handling
+   - [ ] Map RawJob → Normalizer inputs (+ policy metadata)
 3) Normalizer & Registry
-   - Coinbase assembly with witness commitment; merkle computation
-   - Targets (share/block) to LE `u32[8]`; endianness normalization; midstate precompute
-   - `WorkSourceRegistry` in‑place updates; async device slot copy; `gen` bump last
+   - [ ] Coinbase assembly with witness commitment
+   - [x] Merkle computation
+   - [x] Targets (share/block) to LE `u32[8]`; endianness normalization; midstate precompute
+   - [x] `WorkSourceRegistry` in‑place updates; async device slot copy (TBD); `gen` bump last
 4) CUDA Engine & Submit
-   - Multi‑job kernel launch config (y=jobs, x=nonce range); micro‑batch auto‑tune
-   - Ring buffer for hits; CPU verify header + SHA‑256d before submit; route to adapter
+   - [ ] Multi‑job kernel launch config (y=jobs, x=nonce range); micro‑batch auto‑tune
+   - [ ] Ring buffer for hits
+   - [x] CPU verify header + SHA‑256d before submit; route to adapter
 5) Cache & PredictabilityWorker
-   - VRAM cache controller (watermarks, page MiB, min_free_mib safety); per‑GPU
-   - PredictabilityWorker: shadow pages, epoch‑safe swap; throttle on util/watermarks
+   - [ ] VRAM cache controller (watermarks, page MiB, min_free_mib safety); per‑GPU
+   - [ ] PredictabilityWorker: shadow pages, epoch‑safe swap; throttle on util/watermarks
 6) Persistence & Observability
-   - Ledger (mmap snapshot O(1) lookup) and Outbox (append‑only replay)
-   - Metrics (per PRD) + structured JSON logs with per‑hit trace
+   - [x] Ledger and Outbox scaffolding (in‑memory; persistence wiring TBD)
+   - [x] Metrics (per PRD) + structured JSON logs with per‑hit trace
 
 ### Concrete Deliverables (by directory)
 - `src/adapters/`: `adapter_base.h/.cc`, `stratum_adapter.h/.cc`, `pool_profiles/*.cc`, `gbt_adapter.h/.cc`

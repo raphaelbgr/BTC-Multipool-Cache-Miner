@@ -52,15 +52,16 @@
 - Code adheres to repo’s coding rules; no secret leakage in logs.
 
 ### Progress Update (current)
-- Completed Milestone 0: Bootstrap + test harness (CMake, GoogleTest)
-- Completed Milestone 1: Observability (structured logger) and endianness helpers
-- Completed Milestone 2: Targets (compact nBits → LE u32[8]) with vectors
-- Completed Milestone 3: Work Source Registry skeleton with `gen` bump
-- Completed Milestone 4: CUDA engine stubs link cleanly when CUDA off
-- Completed Milestone 5: Config skeleton and defaults
-- Added Normalizer pieces: midstate utilities and Merkle root computation
-- Added Submit path: CPU SHA‑256/sha256d utilities and `SubmitRouter` that CPU‑verifies before routing
-- Tests: 15/15 green across endianness, targets, registry, logging shape, metrics, CPU verify, midstate, merkle, and submit router
+- [x] Milestone 0: Bootstrap + test harness (CMake, GoogleTest)
+- [x] Milestone 1: Observability (structured logger) and endianness helpers
+- [x] Milestone 2: Targets (compact nBits → LE u32[8]) with vectors
+- [x] Milestone 3: Work Source Registry skeleton with `gen` bump
+- [x] Milestone 4: CUDA engine stubs link cleanly when CUDA off
+- [x] Milestone 5: Config skeleton and defaults
+- [x] Normalizer pieces: midstate utilities and Merkle root computation
+- [x] Submit path: CPU SHA‑256/sha256d utilities and `SubmitRouter` that CPU‑verifies before routing
+- [x] Persistence scaffolding: in‑memory Ledger + Outbox; SubmitRouter hooks
+- [x] Tests green: endianness, targets, registry, logging, metrics, CPU verify, midstate, merkle, submit router
 
 ### Next Up
 - Adapters skeleton
