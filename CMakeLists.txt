@@ -66,6 +66,8 @@ add_executable(unit_tests
   tests/test_normalizer_caps_and_extranonce.cpp
   tests/test_gbt_adapter.cpp
   tests/test_pool_router.cpp
+  tests/test_store_persistence.cpp
+  tests/test_cuda_launch_plan.cpp
 )
 target_link_libraries(unit_tests
   PRIVATE
