@@ -16,6 +16,8 @@ add_library(miner_core
   adapters/stratum_adapter.cc
   adapters/gbt_adapter.cc
   adapters/pool_router.cc
+  cache/vram_pages.cc
+  cache/cache_manager.cc
 )
 
 target_include_directories(miner_core PUBLIC ${CMAKE_CURRENT_LIST_DIR})
