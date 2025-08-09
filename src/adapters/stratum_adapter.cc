@@ -38,6 +38,18 @@ void StratumAdapter::ingestJob(const normalize::RawJobInputs& inputs) {
   q_.push(*out);
 }
 
+void StratumAdapter::ingestJobWithPolicy(normalize::RawJobInputs inputs) {
+  std::lock_guard<std::mutex> lock(mu_);
+  if (policy_share_nbits_) inputs.share_nbits = policy_share_nbits_;
+  if (policy_vmask_) inputs.vmask = policy_vmask_;
+  if (policy_ntime_min_) inputs.ntime_min = policy_ntime_min_;
+  if (policy_ntime_max_) inputs.ntime_max = policy_ntime_max_;
+  inputs.clean_jobs = policy_clean_jobs_;
+  auto out = normalize::normalizeJob(inputs);
+  if (!out.has_value()) return;
+  q_.push(*out);
+}
+
 void StratumAdapter::connect() {
   std::lock_guard<std::mutex> lock(mu_);
   state_ = State::kConnecting;

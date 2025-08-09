@@ -66,15 +66,19 @@
 - [x] GBT skeleton: `GbtAdapter` ingest/poll queue
 - [x] Normalizer completion scaffolds: coinbase assembly + witness commitment placeholder; rolling/ntime caps and extranonce packing tests
 - [x] Registry integration: adapter → normalizer → registry path covered by unit test
+ - [x] Adapter policies: varDiff share target, version mask, ntime caps, `clean_jobs` handling (applied in `ingestJobWithPolicy`)
  - [x] Multipool strategy router (failover, round-robin) with tests
  - [x] Persistence helpers: Ledger JSONL save/load, Outbox binary append/load with tests
  - [x] CUDA engine planning: multi-job launch plan helpers + tests
+ - [x] Cache: `CacheManager` and `VramPages` scaffolds with tests
+ - [x] PredictabilityWorker: decision engine with tests
 
 ### Next Up
 - Multipool strategy scaffolding (round robin/failover) at adapter router level
 - SubmitRouter: Outbox/Ledger persistence wiring (file/DB placeholder)
 - CUDA engine: multi-job launch (y=jobs, x=nonce range) and micro-batch auto-tune stubs
 - VRAM CacheManager scaffold and PredictabilityWorker placeholder
- - VRAM CacheManager scaffold and PredictabilityWorker placeholder (CacheManager scaffold added)
+ - CUDA engine: micro-batch auto-tune stubs and tests
+ - CUDA engine: ring buffer for hits (next)
 
 
