@@ -15,6 +15,7 @@ add_library(miner_core
   submit/submit_router.cc
   adapters/stratum_adapter.cc
   adapters/gbt_adapter.cc
+  adapters/pool_router.cc
 )
 
 target_include_directories(miner_core PUBLIC ${CMAKE_CURRENT_LIST_DIR})
