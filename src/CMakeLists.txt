@@ -13,11 +13,15 @@ add_library(miner_core
   config/config.cc
   submit/cpu_verify.cc
   submit/submit_router.cc
+  submit/stratum_submitter.h
   adapters/stratum_adapter.cc
   adapters/gbt_adapter.cc
   adapters/pool_router.cc
+  adapters/pool_profiles.cc
+  adapters/stratum_runner.cc
   cache/vram_pages.cc
   cache/cache_manager.cc
+  net/stratum_client.cc
 )
 
 target_include_directories(miner_core PUBLIC ${CMAKE_CURRENT_LIST_DIR})
@@ -48,5 +52,15 @@ endif()
 target_include_directories(miner_cuda PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(miner_core PUBLIC miner_cuda)
 message(STATUS "CUDA enabled and required")
+
+add_executable(stratum_probe
+  tools/stratum_probe.cpp
+)
+target_link_libraries(stratum_probe PRIVATE miner_core)
+
+add_executable(stratum_registry_runner
+  tools/stratum_registry_runner.cpp
+)
+target_link_libraries(stratum_registry_runner PRIVATE miner_core)
 
 

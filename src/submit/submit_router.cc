@@ -15,6 +15,17 @@ bool SubmitRouter::verifyAndSubmit(const uint8_t header80_be[80], const std::arr
   rec.work_id = work_id;
   rec.nonce = nonce;
   std::memcpy(rec.header80, header80_be, 80);
+  if (outbox_) {
+    store::PendingSubmit ps{};
+    ps.work_id = work_id;
+    ps.nonce = nonce;
+    std::memcpy(ps.header80, header80_be, 80);
+    outbox_->enqueue(ps);
+  }
+  if (ledger_) {
+    // If caller pre-populated ledger with this work_id, we keep as-is; otherwise ignore.
+    (void)ledger_;
+  }
   if (cb_) cb_(rec);
   return true;
 }

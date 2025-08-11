@@ -2,6 +2,8 @@
 
 #include <chrono>
 #include <iostream>
+#include <cstdlib>
+#include <fstream>
 
 namespace obs {
 
@@ -15,6 +17,20 @@ const char* ToString(LogLevel level) {
     case LogLevel::kError: return "error";
   }
   return "info";
+}
+}
+
+namespace {
+std::ofstream& FileSink() {
+  static std::ofstream ofs;
+  static bool initialized = false;
+  if (!initialized) {
+    initialized = true;
+    if (const char* path = std::getenv("BMAD_LOG_FILE")) {
+      ofs.open(path, std::ios::out | std::ios::app);
+    }
+  }
+  return ofs;
 }
 }
 
@@ -33,7 +49,13 @@ void Logger::log(LogLevel level, std::string_view message, const nlohmann::json&
   if (!fields.is_null() && !fields.empty()) {
     j["fields"] = fields;
   }
-  std::cout << j.dump() << std::endl;
+  const std::string line = j.dump();
+  std::cout << line << std::endl;
+  std::ofstream& ofs = FileSink();
+  if (ofs.is_open()) {
+    ofs << line << '\n';
+    ofs.flush();
+  }
 }
 
 void Logger::info(std::string_view message, const nlohmann::json& fields) {

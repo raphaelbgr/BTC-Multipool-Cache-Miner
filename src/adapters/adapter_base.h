@@ -7,6 +7,7 @@
 
 #include "registry/types.h"
 
+
 namespace adapters {
 
 // Minimal RawJob placeholder; real implementations will flesh this out

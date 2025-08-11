@@ -1,0 +1,15 @@
+{"component":"stratum","fields":{"host":"pool.ckpool.org","port":3333},"level":"info","msg":"connected","ts_ms":1754924707920}
+{"component":"stratum","fields":{"extranonce1":"ce588b69","extranonce2_size":8},"level":"info","msg":"subscribed","ts_ms":1754924708120}
+{"component":"stratum","fields":{"diff":10000.0,"share_nbits_hex":520159231},"level":"info","msg":"set_difficulty","ts_ms":1754924708121}
+{"component":"stratum","fields":{"diff":10000.0,"share_nbits_hex":520159231},"level":"info","msg":"set_difficulty","ts_ms":1754924708321}
+{"component":"stratum","fields":{"ok":true},"level":"info","msg":"authorize","ts_ms":1754924708321}
+{"component":"stratum","fields":{"host":"pool.ckpool.org","port":3333},"level":"info","msg":"connected","ts_ms":1754925652443}
+{"component":"stratum","fields":{"extranonce1":"0db58b69","extranonce2_size":8},"level":"info","msg":"subscribed","ts_ms":1754925652637}
+{"component":"stratum","fields":{"diff":10000.0,"share_nbits_hex":520159231},"level":"info","msg":"set_difficulty","ts_ms":1754925652637}
+{"component":"stratum","fields":{"diff":10000.0,"share_nbits_hex":520159231},"level":"info","msg":"set_difficulty","ts_ms":1754925652831}
+{"component":"stratum","fields":{"ok":true},"level":"info","msg":"authorize","ts_ms":1754925652831}
+{"component":"stratum","fields":{"host":"pool.ckpool.org","port":3333},"level":"info","msg":"connected","ts_ms":1754926227073}
+{"component":"stratum","fields":{"extranonce1":"53ed8b69","extranonce2_size":8},"level":"info","msg":"subscribed","ts_ms":1754926227264}
+{"component":"stratum","fields":{"diff":10000.0,"share_nbits_hex":520159231},"level":"info","msg":"set_difficulty","ts_ms":1754926227264}
+{"component":"stratum","fields":{"diff":10000.0,"share_nbits_hex":520159231},"level":"info","msg":"set_difficulty","ts_ms":1754926227455}
+{"component":"stratum","fields":{"ok":true},"level":"info","msg":"authorize","ts_ms":1754926227455}

@@ -35,6 +35,8 @@ C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/_deps/nlohmann_json-build/CMa
 C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/_deps/nlohmann_json-build/CMakeFiles/install/local.dir
 C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/src/CMakeFiles/miner_core.dir
 C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/src/CMakeFiles/miner_cuda.dir
+C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/src/CMakeFiles/stratum_probe.dir
+C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/src/CMakeFiles/stratum_registry_runner.dir
 C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/src/CMakeFiles/test.dir
 C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/src/CMakeFiles/edit_cache.dir
 C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/src/CMakeFiles/rebuild_cache.dir

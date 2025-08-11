@@ -74,7 +74,7 @@
  - [x] PredictabilityWorker: decision engine with tests
 
 ### Next Up
-- Multipool strategy scaffolding (round robin/failover) at adapter router level
+- Multipool strategy scaffolding (round robin/failovwhat do you think its b
 - SubmitRouter: Outbox/Ledger persistence wiring (file/DB placeholder)
 - CUDA engine: multi-job launch (y=jobs, x=nonce range) and micro-batch auto-tune stubs
 - VRAM CacheManager scaffold and PredictabilityWorker placeholder

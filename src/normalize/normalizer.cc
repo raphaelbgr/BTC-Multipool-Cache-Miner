@@ -23,11 +23,11 @@ std::optional<NormalizerResult> normalizeJob(const RawJobInputs& in) {
   r.item.share_target_le = normalize::compactToTargetU32LE(in.share_nbits);
 
   // Policy defaults
-  r.item.vmask = 0;
-  r.item.ntime_min = r.item.ntime;
-  r.item.ntime_max = r.item.ntime;
-  r.item.extranonce2_size = 0;
-  r.item.clean_jobs = true;
+  r.item.vmask = in.vmask;
+  r.item.ntime_min = in.ntime_min ? in.ntime_min : r.item.ntime;
+  r.item.ntime_max = in.ntime_max ? in.ntime_max : r.item.ntime;
+  r.item.extranonce2_size = in.extranonce2_size;
+  r.item.clean_jobs = in.clean_jobs;
   r.item.active = true;
   r.item.found_submitted = false;
 

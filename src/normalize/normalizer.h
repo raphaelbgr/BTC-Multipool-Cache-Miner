@@ -27,6 +27,12 @@ struct RawJobInputs {
   uint8_t merkle_root_be[32]{};
   uint8_t header_first64[64]{}; // for midstate (version..merkle_root)
   uint32_t share_nbits{0}; // varDiff share target compact
+  // Policy metadata from adapter/source
+  uint32_t vmask{0};
+  uint32_t ntime_min{0};
+  uint32_t ntime_max{0};
+  uint8_t extranonce2_size{0};
+  bool clean_jobs{true};
 };
 
 std::optional<NormalizerResult> normalizeJob(const RawJobInputs& in);

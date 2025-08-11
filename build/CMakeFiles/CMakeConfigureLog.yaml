@@ -95,6 +95,8 @@ events:
       - "C:/Program Files/nodejs/"
       - "C:/Program Files/PostgreSQL/16/bin/"
       - "C:/Program Files/PostgreSQL/17/bin/"
+      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python311/Scripts/"
+      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python311/"
       - "C:/Users/rbgnr/.lmstudio/bin/"
       - "C:/Users/rbgnr/AppData/Local/Programs/Ollama/"
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/"
@@ -650,7 +652,6 @@ events:
     search_context:
       ENV{PATH}:
         - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
-        - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow"
@@ -720,6 +721,8 @@ events:
         - "C:\\Program Files\\nodejs\\"
         - "C:\\Program Files\\PostgreSQL\\16\\bin"
         - "C:\\Program Files\\PostgreSQL\\17\\bin"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\"
         - "C:\\Users\\rbgnr\\.local\\bin"
@@ -745,22 +748,27 @@ events:
   -
     kind: "find-v1"
     backtrace:
-      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompiler.cmake:115 (find_program)"
-      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCXXCompiler.cmake:71 (_cmake_find_compiler_path)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompiler.cmake:63 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCXXCompiler.cmake:69 (_cmake_find_compiler)"
       - "CMakeLists.txt:27 (project)"
     mode: "program"
-    variable: "CMAKE_CXX_COMPILER_WITH_PATH"
-    description: "Path to a program."
+    variable: "CMAKE_CXX_COMPILER"
+    description: "CXX compiler"
     settings:
       SearchFramework: "NEVER"
       SearchAppBundle: "NEVER"
-      CMAKE_FIND_USE_CMAKE_PATH: true
-      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
-      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: false
       CMAKE_FIND_USE_INSTALL_PREFIX: true
     names:
+      - "c++"
+      - "g++"
       - "cl"
+      - "bcc"
+      - "icx"
+      - "clang++"
     candidate_directories:
       - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/"
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/"
@@ -828,6 +836,8 @@ events:
       - "C:/Program Files/nodejs/"
       - "C:/Program Files/PostgreSQL/16/bin/"
       - "C:/Program Files/PostgreSQL/17/bin/"
+      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python311/Scripts/"
+      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python311/"
       - "C:/Users/rbgnr/.lmstudio/bin/"
       - "C:/Users/rbgnr/AppData/Local/Programs/Ollama/"
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/"
@@ -835,14 +845,34 @@ events:
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/VC/Linux/bin/ConnectionManagerExe/"
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/vcpkg/"
     searched_directories:
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/c++.com"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/c++.exe"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/c++"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/g++.com"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/g++.exe"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/g++"
       - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/cl.com"
       - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/cl.exe"
       - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/cl"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/bcc.com"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/bcc.exe"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/bcc"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/icx.com"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/icx.exe"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/icx"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/clang++.com"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/clang++.exe"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/clang++"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/c++.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/c++.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/c++"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/g++.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/g++.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/g++"
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.com"
     found: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe"
     search_context:
       ENV{PATH}:
-        - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages"
@@ -913,6 +943,8 @@ events:
         - "C:\\Program Files\\nodejs\\"
         - "C:\\Program Files\\PostgreSQL\\16\\bin"
         - "C:\\Program Files\\PostgreSQL\\17\\bin"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\"
         - "C:\\Users\\rbgnr\\.local\\bin"
@@ -963,7 +995,6 @@ events:
     search_context:
       ENV{PATH}:
         - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
-        - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow"
@@ -1033,6 +1064,8 @@ events:
         - "C:\\Program Files\\nodejs\\"
         - "C:\\Program Files\\PostgreSQL\\16\\bin"
         - "C:\\Program Files\\PostgreSQL\\17\\bin"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\"
         - "C:\\Users\\rbgnr\\.local\\bin"
@@ -1199,6 +1232,8 @@ events:
       - "C:/Program Files/nodejs/"
       - "C:/Program Files/PostgreSQL/16/bin/"
       - "C:/Program Files/PostgreSQL/17/bin/"
+      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python311/Scripts/"
+      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python311/"
       - "C:/Users/rbgnr/.lmstudio/bin/"
       - "C:/Users/rbgnr/AppData/Local/Programs/Ollama/"
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/"
@@ -1210,7 +1245,6 @@ events:
     found: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/link.exe"
     search_context:
       ENV{PATH}:
-        - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages"
@@ -1281,6 +1315,8 @@ events:
         - "C:\\Program Files\\nodejs\\"
         - "C:\\Program Files\\PostgreSQL\\16\\bin"
         - "C:\\Program Files\\PostgreSQL\\17\\bin"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\"
         - "C:\\Users\\rbgnr\\.local\\bin"
@@ -1391,6 +1427,8 @@ events:
       - "C:/Program Files/nodejs/"
       - "C:/Program Files/PostgreSQL/16/bin/"
       - "C:/Program Files/PostgreSQL/17/bin/"
+      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python311/Scripts/"
+      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python311/"
       - "C:/Users/rbgnr/.lmstudio/bin/"
       - "C:/Users/rbgnr/AppData/Local/Programs/Ollama/"
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/"
@@ -1429,7 +1467,6 @@ events:
     found: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/Llvm/x64/bin/lld-link.exe"
     search_context:
       ENV{PATH}:
-        - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages"
@@ -1500,6 +1537,8 @@ events:
         - "C:\\Program Files\\nodejs\\"
         - "C:\\Program Files\\PostgreSQL\\16\\bin"
         - "C:\\Program Files\\PostgreSQL\\17\\bin"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\"
         - "C:\\Users\\rbgnr\\.local\\bin"
@@ -1608,6 +1647,8 @@ events:
       - "C:/Program Files/nodejs/"
       - "C:/Program Files/PostgreSQL/16/bin/"
       - "C:/Program Files/PostgreSQL/17/bin/"
+      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python311/Scripts/"
+      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python311/"
       - "C:/Users/rbgnr/.lmstudio/bin/"
       - "C:/Users/rbgnr/AppData/Local/Programs/Ollama/"
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/"
@@ -1619,7 +1660,6 @@ events:
     found: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/link.exe"
     search_context:
       ENV{PATH}:
-        - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages"
@@ -1690,6 +1730,8 @@ events:
         - "C:\\Program Files\\nodejs\\"
         - "C:\\Program Files\\PostgreSQL\\16\\bin"
         - "C:\\Program Files\\PostgreSQL\\17\\bin"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\"
         - "C:\\Users\\rbgnr\\.local\\bin"
@@ -1798,6 +1840,8 @@ events:
       - "C:/Program Files/nodejs/"
       - "C:/Program Files/PostgreSQL/16/bin/"
       - "C:/Program Files/PostgreSQL/17/bin/"
+      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python311/Scripts/"
+      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python311/"
       - "C:/Users/rbgnr/.lmstudio/bin/"
       - "C:/Users/rbgnr/AppData/Local/Programs/Ollama/"
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/"
@@ -1839,7 +1883,6 @@ events:
     found: "C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/mt.exe"
     search_context:
       ENV{PATH}:
-        - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages"
@@ -1910,6 +1953,8 @@ events:
         - "C:\\Program Files\\nodejs\\"
         - "C:\\Program Files\\PostgreSQL\\16\\bin"
         - "C:\\Program Files\\PostgreSQL\\17\\bin"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\"
         - "C:\\Users\\rbgnr\\.local\\bin"
@@ -2018,6 +2063,8 @@ events:
       - "C:/Program Files/nodejs/"
       - "C:/Program Files/PostgreSQL/16/bin/"
       - "C:/Program Files/PostgreSQL/17/bin/"
+      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python311/Scripts/"
+      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python311/"
       - "C:/Users/rbgnr/.lmstudio/bin/"
       - "C:/Users/rbgnr/AppData/Local/Programs/Ollama/"
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/"
@@ -2029,7 +2076,6 @@ events:
     found: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/lib.exe"
     search_context:
       ENV{PATH}:
-        - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages"
@@ -2100,6 +2146,8 @@ events:
         - "C:\\Program Files\\nodejs\\"
         - "C:\\Program Files\\PostgreSQL\\16\\bin"
         - "C:\\Program Files\\PostgreSQL\\17\\bin"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\"
         - "C:\\Users\\rbgnr\\.local\\bin"
@@ -2164,7 +2212,6 @@ events:
     search_context:
       ENV{PATH}:
         - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
-        - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow"
@@ -2234,6 +2281,8 @@ events:
         - "C:\\Program Files\\nodejs\\"
         - "C:\\Program Files\\PostgreSQL\\16\\bin"
         - "C:\\Program Files\\PostgreSQL\\17\\bin"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\"
         - "C:\\Users\\rbgnr\\.local\\bin"
@@ -2282,7 +2331,7 @@ events:
       The output was:
       0
       nvcc warning : Support for offline compilation for architectures prior to '<compute/sm/lto>_75' will be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).
-      #$ PATH=C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.8 Tools\\x64\\;C:\\Program Files (x86)\\HTML Help Workshop;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp;C:\\Python313\\Scripts\\;C:\\Python313\\;C:\\Program Files\\Microsoft MPI\\Bin\\;C:\\Program Files\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Android\\Sdk\\platform-tools;c:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\Program Files\\Java\\jdk-21\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files\\Bitcoin\\daemon;C:\\ProgramData\\chocolatey\\bin;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2025.2.1\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Program Files\\dotnet\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin;C:\\Program Files\\Redis\\;C:\\Program Files\\Mullvad VPN\\resources;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\CMake\\bin;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;C:\\Program Files\\Wireshark;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Strawberry\\c\\bin;C:\\Strawberry\\perl\\site\\bin;C:\\Strawberry\\perl\\bin;C:\\Program Files\\nodejs\\;;C:\\Program Files\\PostgreSQL\\16\\bin;;C:\\Program Files\\PostgreSQL\\17\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;;C:\\Program Files\\Wireshark;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\.lmstudio\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Ollama;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg
+      #$ PATH=C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.8 Tools\\x64\\;C:\\Program Files (x86)\\HTML Help Workshop;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp;C:\\Python313\\Scripts\\;C:\\Python313\\;C:\\Program Files\\Microsoft MPI\\Bin\\;C:\\Program Files\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Android\\Sdk\\platform-tools;c:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\Program Files\\Java\\jdk-21\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files\\Bitcoin\\daemon;C:\\ProgramData\\chocolatey\\bin;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2025.2.1\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Program Files\\dotnet\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin;C:\\Program Files\\Redis\\;C:\\Program Files\\Mullvad VPN\\resources;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\CMake\\bin;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;C:\\Program Files\\Wireshark;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Strawberry\\c\\bin;C:\\Strawberry\\perl\\site\\bin;C:\\Strawberry\\perl\\bin;C:\\Program Files\\nodejs\\;;C:\\Program Files\\PostgreSQL\\16\\bin;;C:\\Program Files\\PostgreSQL\\17\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;;C:\\Program Files\\Wireshark;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\.lmstudio\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Ollama;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg
       #$ _NVVM_BRANCH_=nvvm
       #$ _SPACE_= 
       #$ _CUDART_=cudart
@@ -2295,7 +2344,7 @@ events:
       #$ TOP=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/..
       #$ CICC_PATH=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../nvvm/bin
       #$ NVVMIR_LIBRARY_DIR=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../nvvm/libdevice
-      #$ PATH=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../nvvm/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../lib;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.8 Tools\\x64\\;C:\\Program Files (x86)\\HTML Help Workshop;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp;C:\\Python313\\Scripts\\;C:\\Python313\\;C:\\Program Files\\Microsoft MPI\\Bin\\;C:\\Program Files\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Android\\Sdk\\platform-tools;c:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\Program Files\\Java\\jdk-21\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files\\Bitcoin\\daemon;C:\\ProgramData\\chocolatey\\bin;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2025.2.1\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Program Files\\dotnet\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin;C:\\Program Files\\Redis\\;C:\\Program Files\\Mullvad VPN\\resources;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\CMake\\bin;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;C:\\Program Files\\Wireshark;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Strawberry\\c\\bin;C:\\Strawberry\\perl\\site\\bin;C:\\Strawberry\\perl\\bin;C:\\Program Files\\nodejs\\;;C:\\Program Files\\PostgreSQL\\16\\bin;;C:\\Program Files\\PostgreSQL\\17\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;;C:\\Program Files\\Wireshark;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\.lmstudio\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Ollama;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg
+      #$ PATH=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../nvvm/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../lib;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.8 Tools\\x64\\;C:\\Program Files (x86)\\HTML Help Workshop;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp;C:\\Python313\\Scripts\\;C:\\Python313\\;C:\\Program Files\\Microsoft MPI\\Bin\\;C:\\Program Files\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Android\\Sdk\\platform-tools;c:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\Program Files\\Java\\jdk-21\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files\\Bitcoin\\daemon;C:\\ProgramData\\chocolatey\\bin;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2025.2.1\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Program Files\\dotnet\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin;C:\\Program Files\\Redis\\;C:\\Program Files\\Mullvad VPN\\resources;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\CMake\\bin;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;C:\\Program Files\\Wireshark;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Strawberry\\c\\bin;C:\\Strawberry\\perl\\site\\bin;C:\\Strawberry\\perl\\bin;C:\\Program Files\\nodejs\\;;C:\\Program Files\\PostgreSQL\\16\\bin;;C:\\Program Files\\PostgreSQL\\17\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;;C:\\Program Files\\Wireshark;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\.lmstudio\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Ollama;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg
       #$ INCLUDES="-IC:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../include"  
       #$ LIBRARIES=  "/LIBPATH:C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../lib/x64"
       #$ CUDAFE_FLAGS=
@@ -2368,12 +2417,12 @@ events:
       - "CMakeLists.txt:27 (project)"
     message: |
       Parsed CUDA nvcc implicit link information:
-        found 'PATH=' string: [C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.8 Tools\\x64\\;C:\\Program Files (x86)\\HTML Help Workshop;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp;C:\\Python313\\Scripts\\;C:\\Python313\\;C:\\Program Files\\Microsoft MPI\\Bin\\;C:\\Program Files\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Android\\Sdk\\platform-tools;c:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\Program Files\\Java\\jdk-21\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files\\Bitcoin\\daemon;C:\\ProgramData\\chocolatey\\bin;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2025.2.1\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Program Files\\dotnet\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin;C:\\Program Files\\Redis\\;C:\\Program Files\\Mullvad VPN\\resources;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\CMake\\bin;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;C:\\Program Files\\Wireshark;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Strawberry\\c\\bin;C:\\Strawberry\\perl\\site\\bin;C:\\Strawberry\\perl\\bin;C:\\Program Files\\nodejs\\;;C:\\Program Files\\PostgreSQL\\16\\bin;;C:\\Program Files\\PostgreSQL\\17\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;;C:\\Program Files\\Wireshark;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\.lmstudio\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Ollama;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg]
+        found 'PATH=' string: [C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.8 Tools\\x64\\;C:\\Program Files (x86)\\HTML Help Workshop;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp;C:\\Python313\\Scripts\\;C:\\Python313\\;C:\\Program Files\\Microsoft MPI\\Bin\\;C:\\Program Files\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Android\\Sdk\\platform-tools;c:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\Program Files\\Java\\jdk-21\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files\\Bitcoin\\daemon;C:\\ProgramData\\chocolatey\\bin;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2025.2.1\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Program Files\\dotnet\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin;C:\\Program Files\\Redis\\;C:\\Program Files\\Mullvad VPN\\resources;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\CMake\\bin;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;C:\\Program Files\\Wireshark;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Strawberry\\c\\bin;C:\\Strawberry\\perl\\site\\bin;C:\\Strawberry\\perl\\bin;C:\\Program Files\\nodejs\\;;C:\\Program Files\\PostgreSQL\\16\\bin;;C:\\Program Files\\PostgreSQL\\17\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;;C:\\Program Files\\Wireshark;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\.lmstudio\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Ollama;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg]
         found 'LIBRARIES=' string: ["/LIBPATH:C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../lib/x64"]
         found 'INCLUDES=' string: ["-IC:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../include"  ]
         no 'SYSTEM_INCLUDES=' string found in nvcc output:
           nvcc warning : Support for offline compilation for architectures prior to '<compute/sm/lto>_75' will be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).
-          #$ PATH=C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.8 Tools\\x64\\;C:\\Program Files (x86)\\HTML Help Workshop;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp;C:\\Python313\\Scripts\\;C:\\Python313\\;C:\\Program Files\\Microsoft MPI\\Bin\\;C:\\Program Files\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Android\\Sdk\\platform-tools;c:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\Program Files\\Java\\jdk-21\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files\\Bitcoin\\daemon;C:\\ProgramData\\chocolatey\\bin;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2025.2.1\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Program Files\\dotnet\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin;C:\\Program Files\\Redis\\;C:\\Program Files\\Mullvad VPN\\resources;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\CMake\\bin;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;C:\\Program Files\\Wireshark;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Strawberry\\c\\bin;C:\\Strawberry\\perl\\site\\bin;C:\\Strawberry\\perl\\bin;C:\\Program Files\\nodejs\\;;C:\\Program Files\\PostgreSQL\\16\\bin;;C:\\Program Files\\PostgreSQL\\17\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;;C:\\Program Files\\Wireshark;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\.lmstudio\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Ollama;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg
+          #$ PATH=C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.8 Tools\\x64\\;C:\\Program Files (x86)\\HTML Help Workshop;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp;C:\\Python313\\Scripts\\;C:\\Python313\\;C:\\Program Files\\Microsoft MPI\\Bin\\;C:\\Program Files\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Android\\Sdk\\platform-tools;c:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\Program Files\\Java\\jdk-21\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files\\Bitcoin\\daemon;C:\\ProgramData\\chocolatey\\bin;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2025.2.1\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Program Files\\dotnet\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin;C:\\Program Files\\Redis\\;C:\\Program Files\\Mullvad VPN\\resources;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\CMake\\bin;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;C:\\Program Files\\Wireshark;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Strawberry\\c\\bin;C:\\Strawberry\\perl\\site\\bin;C:\\Strawberry\\perl\\bin;C:\\Program Files\\nodejs\\;;C:\\Program Files\\PostgreSQL\\16\\bin;;C:\\Program Files\\PostgreSQL\\17\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;;C:\\Program Files\\Wireshark;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\.lmstudio\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Ollama;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg
           #$ _NVVM_BRANCH_=nvvm
           #$ _SPACE_= 
           #$ _CUDART_=cudart
@@ -2386,7 +2435,7 @@ events:
           #$ TOP=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/..
           #$ CICC_PATH=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../nvvm/bin
           #$ NVVMIR_LIBRARY_DIR=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../nvvm/libdevice
-          #$ PATH=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../nvvm/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../lib;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.8 Tools\\x64\\;C:\\Program Files (x86)\\HTML Help Workshop;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp;C:\\Python313\\Scripts\\;C:\\Python313\\;C:\\Program Files\\Microsoft MPI\\Bin\\;C:\\Program Files\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Android\\Sdk\\platform-tools;c:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\Program Files\\Java\\jdk-21\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files\\Bitcoin\\daemon;C:\\ProgramData\\chocolatey\\bin;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2025.2.1\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Program Files\\dotnet\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin;C:\\Program Files\\Redis\\;C:\\Program Files\\Mullvad VPN\\resources;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\CMake\\bin;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;C:\\Program Files\\Wireshark;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Strawberry\\c\\bin;C:\\Strawberry\\perl\\site\\bin;C:\\Strawberry\\perl\\bin;C:\\Program Files\\nodejs\\;;C:\\Program Files\\PostgreSQL\\16\\bin;;C:\\Program Files\\PostgreSQL\\17\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;;C:\\Program Files\\Wireshark;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\.lmstudio\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Ollama;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg
+          #$ PATH=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../nvvm/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../lib;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.8 Tools\\x64\\;C:\\Program Files (x86)\\HTML Help Workshop;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp;C:\\Python313\\Scripts\\;C:\\Python313\\;C:\\Program Files\\Microsoft MPI\\Bin\\;C:\\Program Files\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Android\\Sdk\\platform-tools;c:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\Program Files\\Java\\jdk-21\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files\\Bitcoin\\daemon;C:\\ProgramData\\chocolatey\\bin;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2025.2.1\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Program Files\\dotnet\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin;C:\\Program Files\\Redis\\;C:\\Program Files\\Mullvad VPN\\resources;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\CMake\\bin;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;C:\\Program Files\\Wireshark;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Strawberry\\c\\bin;C:\\Strawberry\\perl\\site\\bin;C:\\Strawberry\\perl\\bin;C:\\Program Files\\nodejs\\;;C:\\Program Files\\PostgreSQL\\16\\bin;;C:\\Program Files\\PostgreSQL\\17\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;;C:\\Program Files\\Wireshark;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\.lmstudio\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Ollama;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg
           #$ INCLUDES="-IC:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../include"  
           #$ LIBRARIES=  "/LIBPATH:C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../lib/x64"
           #$ CUDAFE_FLAGS=
@@ -2477,12 +2526,12 @@ events:
       - "CMakeLists.txt:27 (project)"
     message: |
       Parsed CUDA nvcc include information:
-        found 'PATH=' string: [C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.8 Tools\\x64\\;C:\\Program Files (x86)\\HTML Help Workshop;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp;C:\\Python313\\Scripts\\;C:\\Python313\\;C:\\Program Files\\Microsoft MPI\\Bin\\;C:\\Program Files\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Android\\Sdk\\platform-tools;c:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\Program Files\\Java\\jdk-21\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files\\Bitcoin\\daemon;C:\\ProgramData\\chocolatey\\bin;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2025.2.1\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Program Files\\dotnet\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin;C:\\Program Files\\Redis\\;C:\\Program Files\\Mullvad VPN\\resources;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\CMake\\bin;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;C:\\Program Files\\Wireshark;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Strawberry\\c\\bin;C:\\Strawberry\\perl\\site\\bin;C:\\Strawberry\\perl\\bin;C:\\Program Files\\nodejs\\;;C:\\Program Files\\PostgreSQL\\16\\bin;;C:\\Program Files\\PostgreSQL\\17\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;;C:\\Program Files\\Wireshark;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\.lmstudio\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Ollama;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg]
+        found 'PATH=' string: [C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.8 Tools\\x64\\;C:\\Program Files (x86)\\HTML Help Workshop;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp;C:\\Python313\\Scripts\\;C:\\Python313\\;C:\\Program Files\\Microsoft MPI\\Bin\\;C:\\Program Files\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Android\\Sdk\\platform-tools;c:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\Program Files\\Java\\jdk-21\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files\\Bitcoin\\daemon;C:\\ProgramData\\chocolatey\\bin;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2025.2.1\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Program Files\\dotnet\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin;C:\\Program Files\\Redis\\;C:\\Program Files\\Mullvad VPN\\resources;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\CMake\\bin;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;C:\\Program Files\\Wireshark;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Strawberry\\c\\bin;C:\\Strawberry\\perl\\site\\bin;C:\\Strawberry\\perl\\bin;C:\\Program Files\\nodejs\\;;C:\\Program Files\\PostgreSQL\\16\\bin;;C:\\Program Files\\PostgreSQL\\17\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;;C:\\Program Files\\Wireshark;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\.lmstudio\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Ollama;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg]
         found 'LIBRARIES=' string: ["/LIBPATH:C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../lib/x64"]
         found 'INCLUDES=' string: ["-IC:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../include"  ]
         no 'SYSTEM_INCLUDES=' string found in nvcc output:
           nvcc warning : Support for offline compilation for architectures prior to '<compute/sm/lto>_75' will be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).
-          #$ PATH=C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.8 Tools\\x64\\;C:\\Program Files (x86)\\HTML Help Workshop;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp;C:\\Python313\\Scripts\\;C:\\Python313\\;C:\\Program Files\\Microsoft MPI\\Bin\\;C:\\Program Files\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Android\\Sdk\\platform-tools;c:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\Program Files\\Java\\jdk-21\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files\\Bitcoin\\daemon;C:\\ProgramData\\chocolatey\\bin;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2025.2.1\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Program Files\\dotnet\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin;C:\\Program Files\\Redis\\;C:\\Program Files\\Mullvad VPN\\resources;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\CMake\\bin;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;C:\\Program Files\\Wireshark;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Strawberry\\c\\bin;C:\\Strawberry\\perl\\site\\bin;C:\\Strawberry\\perl\\bin;C:\\Program Files\\nodejs\\;;C:\\Program Files\\PostgreSQL\\16\\bin;;C:\\Program Files\\PostgreSQL\\17\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;;C:\\Program Files\\Wireshark;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\.lmstudio\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Ollama;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg
+          #$ PATH=C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.8 Tools\\x64\\;C:\\Program Files (x86)\\HTML Help Workshop;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp;C:\\Python313\\Scripts\\;C:\\Python313\\;C:\\Program Files\\Microsoft MPI\\Bin\\;C:\\Program Files\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Android\\Sdk\\platform-tools;c:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\Program Files\\Java\\jdk-21\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files\\Bitcoin\\daemon;C:\\ProgramData\\chocolatey\\bin;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2025.2.1\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Program Files\\dotnet\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin;C:\\Program Files\\Redis\\;C:\\Program Files\\Mullvad VPN\\resources;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\CMake\\bin;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;C:\\Program Files\\Wireshark;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Strawberry\\c\\bin;C:\\Strawberry\\perl\\site\\bin;C:\\Strawberry\\perl\\bin;C:\\Program Files\\nodejs\\;;C:\\Program Files\\PostgreSQL\\16\\bin;;C:\\Program Files\\PostgreSQL\\17\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;;C:\\Program Files\\Wireshark;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\.lmstudio\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Ollama;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg
           #$ _NVVM_BRANCH_=nvvm
           #$ _SPACE_= 
           #$ _CUDART_=cudart
@@ -2495,7 +2544,7 @@ events:
           #$ TOP=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/..
           #$ CICC_PATH=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../nvvm/bin
           #$ NVVMIR_LIBRARY_DIR=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../nvvm/libdevice
-          #$ PATH=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../nvvm/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../lib;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.8 Tools\\x64\\;C:\\Program Files (x86)\\HTML Help Workshop;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp;C:\\Python313\\Scripts\\;C:\\Python313\\;C:\\Program Files\\Microsoft MPI\\Bin\\;C:\\Program Files\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Android\\Sdk\\platform-tools;c:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\Program Files\\Java\\jdk-21\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files\\Bitcoin\\daemon;C:\\ProgramData\\chocolatey\\bin;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2025.2.1\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Program Files\\dotnet\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin;C:\\Program Files\\Redis\\;C:\\Program Files\\Mullvad VPN\\resources;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\CMake\\bin;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;C:\\Program Files\\Wireshark;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Strawberry\\c\\bin;C:\\Strawberry\\perl\\site\\bin;C:\\Strawberry\\perl\\bin;C:\\Program Files\\nodejs\\;;C:\\Program Files\\PostgreSQL\\16\\bin;;C:\\Program Files\\PostgreSQL\\17\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;;C:\\Program Files\\Wireshark;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\.lmstudio\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Ollama;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg
+          #$ PATH=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../nvvm/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../lib;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.8 Tools\\x64\\;C:\\Program Files (x86)\\HTML Help Workshop;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp;C:\\Python313\\Scripts\\;C:\\Python313\\;C:\\Program Files\\Microsoft MPI\\Bin\\;C:\\Program Files\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Android\\Sdk\\platform-tools;c:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\Program Files\\Java\\jdk-21\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files\\Bitcoin\\daemon;C:\\ProgramData\\chocolatey\\bin;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2025.2.1\\;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Program Files\\dotnet\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin;C:\\Program Files\\Redis\\;C:\\Program Files\\Mullvad VPN\\resources;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\CMake\\bin;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;C:\\Program Files\\Wireshark;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Strawberry\\c\\bin;C:\\Strawberry\\perl\\site\\bin;C:\\Strawberry\\perl\\bin;C:\\Program Files\\nodejs\\;;C:\\Program Files\\PostgreSQL\\16\\bin;;C:\\Program Files\\PostgreSQL\\17\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\;C:\\Users\\rbgnr\\.local\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\rbgnr\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\My Binaries;C:\\Users\\rbgnr\\AppData\\Local\\nvm;C:\\nvm4w\\nodejs;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;C:\\Users\\rbgnr\\.dotnet\\tools;C:\\Users\\rbgnr\\AppData\\Roaming\\Python\\Python313\\Scripts;;C:\\Program Files\\Wireshark;C:\\Users\\rbgnr\\AppData\\Roaming\\npm;C:\\Users\\rbgnr\\.lmstudio\\bin;C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Ollama;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg
           #$ INCLUDES="-IC:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../include"  
           #$ LIBRARIES=  "/LIBPATH:C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/../lib/x64"
           #$ CUDAFE_FLAGS=
@@ -2667,6 +2716,8 @@ events:
       - "C:/Program Files/nodejs/"
       - "C:/Program Files/PostgreSQL/16/bin/"
       - "C:/Program Files/PostgreSQL/17/bin/"
+      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python311/Scripts/"
+      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python311/"
       - "C:/Users/rbgnr/.lmstudio/bin/"
       - "C:/Users/rbgnr/AppData/Local/Programs/Ollama/"
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/"
@@ -2721,7 +2772,6 @@ events:
     search_context:
       ENV{PATH}:
         - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
-        - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow"
@@ -2791,6 +2841,8 @@ events:
         - "C:\\Program Files\\nodejs\\"
         - "C:\\Program Files\\PostgreSQL\\16\\bin"
         - "C:\\Program Files\\PostgreSQL\\17\\bin"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\"
         - "C:\\Users\\rbgnr\\.local\\bin"
@@ -2828,8 +2880,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-dru82i"
-      binary: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-dru82i"
+      source: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-13kwef"
+      binary: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-13kwef"
     cmakeVariables:
       CMAKE_CUDA_ARCHITECTURES: "52"
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
@@ -2840,11 +2892,11 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-dru82i'
+        Change Dir: 'C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-13kwef'
         
-        Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_9e5c0
-        [1/2] C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP   /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_9e5c0.dir\\CMakeCXXCompilerABI.cpp.obj /FdCMakeFiles\\cmTC_9e5c0.dir\\ /FS -c "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCXXCompilerABI.cpp"
-        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_9e5c0.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_9e5c0.dir\\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_9e5c0.exe /implib:cmTC_9e5c0.lib /pdb:cmTC_9e5c0.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_b083b
+        [1/2] C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP   /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_b083b.dir\\CMakeCXXCompilerABI.cpp.obj /FdCMakeFiles\\cmTC_b083b.dir\\ /FS -c "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCXXCompilerABI.cpp"
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_b083b.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_b083b.dir\\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_b083b.exe /implib:cmTC_b083b.lib /pdb:cmTC_b083b.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
         
       exitCode: 0
   -
@@ -2884,8 +2936,8 @@ events:
     checks:
       - "Detecting CUDA compiler ABI info"
     directories:
-      source: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-bmyhv3"
-      binary: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-bmyhv3"
+      source: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-ne2beb"
+      binary: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-ne2beb"
     cmakeVariables:
       CMAKE_CUDA_ARCHITECTURES: "52"
       CMAKE_CUDA_FLAGS: "-D_WINDOWS -Xcompiler=\" /EHsc\""
@@ -2896,10 +2948,10 @@ events:
       variable: "CMAKE_CUDA_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-bmyhv3'
+        Change Dir: 'C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-ne2beb'
         
-        Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_1d4d7
-        [1/2] C:\\PROGRA~1\\NVIDIA~2\\CUDA\\v12.9\\bin\\nvcc.exe -forward-unknown-to-host-compiler   -D_WINDOWS -Xcompiler=" /EHsc"  -Xcompiler=" -Zi -Ob0 -Od /RTC1" "--generate-code=arch=compute_52,code=[compute_52,sm_52]" -Xcompiler=-MDd   -Xcompiler=-v -MD -MT CMakeFiles\\cmTC_1d4d7.dir\\CMakeCUDACompilerABI.cu.obj -MF CMakeFiles\\cmTC_1d4d7.dir\\CMakeCUDACompilerABI.cu.obj.d -x cu -c "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCUDACompilerABI.cu" -o CMakeFiles\\cmTC_1d4d7.dir\\CMakeCUDACompilerABI.cu.obj -Xcompiler=-FdCMakeFiles\\cmTC_1d4d7.dir\\,-FS
+        Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_d7817
+        [1/2] C:\\PROGRA~1\\NVIDIA~2\\CUDA\\v12.9\\bin\\nvcc.exe -forward-unknown-to-host-compiler   -D_WINDOWS -Xcompiler=" /EHsc"  -Xcompiler=" -Zi -Ob0 -Od /RTC1" "--generate-code=arch=compute_52,code=[compute_52,sm_52]" -Xcompiler=-MDd   -Xcompiler=-v -MD -MT CMakeFiles\\cmTC_d7817.dir\\CMakeCUDACompilerABI.cu.obj -MF CMakeFiles\\cmTC_d7817.dir\\CMakeCUDACompilerABI.cu.obj.d -x cu -c "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCUDACompilerABI.cu" -o CMakeFiles\\cmTC_d7817.dir\\CMakeCUDACompilerABI.cu.obj -Xcompiler=-FdCMakeFiles\\cmTC_d7817.dir\\,-FS
         cl : Command line warning D9002 : ignoring unknown option '-v'
         CMakeCUDACompilerABI.cu
         cl : Command line warning D9002 : ignoring unknown option '-v'
@@ -2907,9 +2959,9 @@ events:
         nvcc warning : Support for offline compilation for architectures prior to '<compute/sm/lto>_75' will be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).
         CMakeCUDACompilerABI.cu
         cl : Command line warning D9002 : ignoring unknown option '-v'
-        tmpxft_0000cf4c_00000000-7_CMakeCUDACompilerABI.cudafe1.cpp\x0d
+        tmpxft_00000e74_00000000-7_CMakeCUDACompilerABI.cudafe1.cpp\x0d
         C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCompilerCUDAArch.h(10): warning C4305: 'return': truncation from 'int' to 'bool'\x0d
-        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_1d4d7.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_1d4d7.dir\\CMakeCUDACompilerABI.cu.obj  /out:cmTC_1d4d7.exe /implib:cmTC_1d4d7.lib /pdb:cmTC_1d4d7.pdb /version:0.0 /machine:x64 -v /debug /INCREMENTAL  cudadevrt.lib  cudart_static.lib -LIBPATH:"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/lib/x64" && cd ."
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_d7817.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_d7817.dir\\CMakeCUDACompilerABI.cu.obj  /out:cmTC_d7817.exe /implib:cmTC_d7817.lib /pdb:cmTC_d7817.pdb /version:0.0 /machine:x64 -v /debug /INCREMENTAL  cudadevrt.lib  cudart_static.lib -LIBPATH:"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/lib/x64" && cd ."
         
       exitCode: 0
   -
@@ -2933,10 +2985,10 @@ events:
       Parsed CUDA implicit link information:
         link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
         linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?))("|,| |$)]
-        ignore line: [Change Dir: 'C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-bmyhv3']
+        ignore line: [Change Dir: 'C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-ne2beb']
         ignore line: []
-        ignore line: [Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_1d4d7]
-        ignore line: [[1/2] C:\\PROGRA~1\\NVIDIA~2\\CUDA\\v12.9\\bin\\nvcc.exe -forward-unknown-to-host-compiler   -D_WINDOWS -Xcompiler=" /EHsc"  -Xcompiler=" -Zi -Ob0 -Od /RTC1" "--generate-code=arch=compute_52 code=[compute_52 sm_52]" -Xcompiler=-MDd   -Xcompiler=-v -MD -MT CMakeFiles\\cmTC_1d4d7.dir\\CMakeCUDACompilerABI.cu.obj -MF CMakeFiles\\cmTC_1d4d7.dir\\CMakeCUDACompilerABI.cu.obj.d -x cu -c "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCUDACompilerABI.cu" -o CMakeFiles\\cmTC_1d4d7.dir\\CMakeCUDACompilerABI.cu.obj -Xcompiler=-FdCMakeFiles\\cmTC_1d4d7.dir\\ -FS]
+        ignore line: [Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_d7817]
+        ignore line: [[1/2] C:\\PROGRA~1\\NVIDIA~2\\CUDA\\v12.9\\bin\\nvcc.exe -forward-unknown-to-host-compiler   -D_WINDOWS -Xcompiler=" /EHsc"  -Xcompiler=" -Zi -Ob0 -Od /RTC1" "--generate-code=arch=compute_52 code=[compute_52 sm_52]" -Xcompiler=-MDd   -Xcompiler=-v -MD -MT CMakeFiles\\cmTC_d7817.dir\\CMakeCUDACompilerABI.cu.obj -MF CMakeFiles\\cmTC_d7817.dir\\CMakeCUDACompilerABI.cu.obj.d -x cu -c "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCUDACompilerABI.cu" -o CMakeFiles\\cmTC_d7817.dir\\CMakeCUDACompilerABI.cu.obj -Xcompiler=-FdCMakeFiles\\cmTC_d7817.dir\\ -FS]
         ignore line: [cl : Command line warning D9002 : ignoring unknown option '-v']
         ignore line: [CMakeCUDACompilerABI.cu]
         ignore line: [cl : Command line warning D9002 : ignoring unknown option '-v']
@@ -2944,9 +2996,9 @@ events:
         ignore line: [nvcc warning : Support for offline compilation for architectures prior to '<compute/sm/lto>_75' will be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).]
         ignore line: [CMakeCUDACompilerABI.cu]
         ignore line: [cl : Command line warning D9002 : ignoring unknown option '-v']
-        ignore line: [tmpxft_0000cf4c_00000000-7_CMakeCUDACompilerABI.cudafe1.cpp\x0d]
+        ignore line: [tmpxft_00000e74_00000000-7_CMakeCUDACompilerABI.cudafe1.cpp\x0d]
         ignore line: [C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCompilerCUDAArch.h(10): warning C4305: 'return': truncation from 'int' to 'bool'\x0d]
-        ignore line: [[2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_1d4d7.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_1d4d7.dir\\CMakeCUDACompilerABI.cu.obj  /out:cmTC_1d4d7.exe /implib:cmTC_1d4d7.lib /pdb:cmTC_1d4d7.pdb /version:0.0 /machine:x64 -v /debug /INCREMENTAL  cudadevrt.lib  cudart_static.lib -LIBPATH:"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/lib/x64" && cd ."]
+        ignore line: [[2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_d7817.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_d7817.dir\\CMakeCUDACompilerABI.cu.obj  /out:cmTC_d7817.exe /implib:cmTC_d7817.lib /pdb:cmTC_d7817.pdb /version:0.0 /machine:x64 -v /debug /INCREMENTAL  cudadevrt.lib  cudart_static.lib -LIBPATH:"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/lib/x64" && cd ."]
         ignore line: []
         ignore line: []
         linker tool for 'CUDA': C:/PROGRA~1/MICROS~2/2022/COMMUN~1/VC/Tools/MSVC/1444~1.352/bin/Hostx64/x64/link.exe
@@ -2970,12 +3022,12 @@ events:
   -
     kind: "find-v1"
     backtrace:
-      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompiler.cmake:115 (find_program)"
-      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCCompiler.cmake:67 (_cmake_find_compiler_path)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompiler.cmake:54 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCCompiler.cmake:64 (_cmake_find_compiler)"
       - "build/_deps/googletest-src/CMakeLists.txt:6 (project)"
     mode: "program"
-    variable: "CMAKE_C_COMPILER_WITH_PATH"
-    description: "Path to a program."
+    variable: "CMAKE_C_COMPILER"
+    description: "C compiler"
     settings:
       SearchFramework: "NEVER"
       SearchAppBundle: "NEVER"
@@ -2985,93 +3037,36 @@ events:
       CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
       CMAKE_FIND_USE_INSTALL_PREFIX: true
     names:
+      - "cc"
+      - "gcc"
       - "cl"
+      - "bcc"
+      - "xlc"
+      - "icx"
+      - "clang"
     candidate_directories:
       - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/"
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/"
-      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/VC/vcpackages/"
-      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/TestWindow/"
-      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/TeamFoundation/Team Explorer/"
-      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/Roslyn/"
-      - "C:/Program Files (x86)/Microsoft SDKs/Windows/v10.0A/bin/NETFX 4.8 Tools/x64/"
-      - "C:/Program Files (x86)/HTML Help Workshop/"
-      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Team Tools/DiagnosticsHub/Collector/"
-      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/Llvm/x64/bin/"
       - "C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/"
-      - "C:/Program Files (x86)/Windows Kits/10/bin/x64/"
-      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/"
-      - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
-      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/"
-      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/Tools/"
-      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/libnvvp/"
-      - "C:/Python313/Scripts/"
-      - "C:/Python313/"
-      - "C:/Program Files/Microsoft MPI/Bin/"
-      - "C:/Program Files/Common Files/Oracle/Java/javapath/"
-      - "C:/Windows/System32/"
-      - "C:/Windows/"
-      - "C:/Windows/System32/wbem/"
-      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
-      - "C:/Windows/System32/OpenSSH/"
-      - "C:/Program Files/NVIDIA Corporation/NVIDIA app/NvDLISR/"
-      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
-      - "C:/Program Files/Docker/Docker/resources/bin/"
-      - "C:/Users/rbgnr/AppData/Local/Android/Sdk/platform-tools/"
-      - "C:/Users/rbgnr/AppData/Local/Programs/cursor/resources/app/bin/"
-      - "C:/Program Files/Java/jdk-21/bin/"
-      - "C:/Program Files/PuTTY/"
-      - "C:/Program Files/Bitcoin/daemon/"
-      - "C:/ProgramData/chocolatey/bin/"
-      - "C:/Users/rbgnr/AppData/Local/nvm/"
-      - "C:/nvm4w/nodejs/"
-      - "C:/Program Files/NVIDIA Corporation/Nsight Compute 2025.2.1/"
-      - "C:/Program Files (x86)/GnuWin32/bin/"
-      - "C:/Program Files/dotnet/"
-      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python310/Scripts/"
-      - "C:/Users/rbgnr/AppData/Local/Programs/Python/Python310/"
-      - "C:/Users/rbgnr/.local/bin/"
-      - "C:/Users/rbgnr/AppData/Local/Microsoft/WindowsApps/"
-      - "C:/Users/rbgnr/AppData/Local/JetBrains/Toolbox/scripts/"
-      - "C:/My Binaries/"
-      - "C:/Users/rbgnr/AppData/Roaming/npm/"
-      - "C:/Users/rbgnr/AppData/Local/Programs/Microsoft VS Code/bin/"
-      - "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/"
-      - "C:/Users/rbgnr/.dotnet/tools/"
-      - "C:/Program Files/MySQL/MySQL Server 8.4/bin/"
-      - "C:/Program Files/Redis/"
-      - "C:/Program Files/Mullvad VPN/resources/"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
-      - "C:/Program Files/CMake/bin/"
-      - "C:/Users/rbgnr/AppData/Roaming/Python/Python313/Scripts/"
-      - "C:/Program Files/Wireshark/"
-      - "C:/Program Files/Git/cmd/"
-      - "C:/Program Files/Git/mingw64/bin/"
-      - "C:/Program Files/Git/usr/bin/"
-      - "C:/Strawberry/c/bin/"
-      - "C:/Strawberry/perl/site/bin/"
-      - "C:/Strawberry/perl/bin/"
-      - "C:/Program Files/nodejs/"
-      - "C:/Program Files/PostgreSQL/16/bin/"
-      - "C:/Program Files/PostgreSQL/17/bin/"
-      - "C:/Users/rbgnr/.lmstudio/bin/"
-      - "C:/Users/rbgnr/AppData/Local/Programs/Ollama/"
-      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/"
-      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/"
-      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/VC/Linux/bin/ConnectionManagerExe/"
-      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/vcpkg/"
-      - "C:/Program Files/bin/"
-      - "C:/Program Files/sbin/"
-      - "C:/Program Files/"
-      - "C:/Program Files (x86)/bin/"
-      - "C:/Program Files (x86)/sbin/"
-      - "C:/Program Files (x86)/"
-      - "C:/Program Files/CMake/bin/"
-      - "C:/Program Files/CMake/sbin/"
-      - "C:/Program Files/CMake/"
-      - "C:/Program Files (x86)/MyCustomBTCMiner/bin/"
-      - "C:/Program Files (x86)/MyCustomBTCMiner/sbin/"
-      - "C:/Program Files (x86)/MyCustomBTCMiner/"
     searched_directories:
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/cc.com"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/cc.exe"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/cc"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cc.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cc.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cc"
+      - "C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/cc.com"
+      - "C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/cc.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/cc"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/gcc.com"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/gcc.exe"
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/gcc"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/gcc.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/gcc.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/gcc"
+      - "C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/gcc.com"
+      - "C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/gcc.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/gcc"
       - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/cl.com"
       - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/cl.exe"
       - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin/cl"
@@ -3079,7 +3074,6 @@ events:
     found: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe"
     search_context:
       ENV{PATH}:
-        - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages"
@@ -3150,6 +3144,8 @@ events:
         - "C:\\Program Files\\nodejs\\"
         - "C:\\Program Files\\PostgreSQL\\16\\bin"
         - "C:\\Program Files\\PostgreSQL\\17\\bin"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\"
         - "C:\\Users\\rbgnr\\.local\\bin"
@@ -3206,7 +3202,6 @@ events:
     search_context:
       ENV{PATH}:
         - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
-        - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow"
@@ -3276,6 +3271,8 @@ events:
         - "C:\\Program Files\\nodejs\\"
         - "C:\\Program Files\\PostgreSQL\\16\\bin"
         - "C:\\Program Files\\PostgreSQL\\17\\bin"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\"
         - "C:\\Users\\rbgnr\\.local\\bin"
@@ -3369,8 +3366,8 @@ events:
     checks:
       - "Detecting C compiler ABI info"
     directories:
-      source: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-e8y2ta"
-      binary: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-e8y2ta"
+      source: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-nb4rdw"
+      binary: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-nb4rdw"
     cmakeVariables:
       CMAKE_CUDA_ARCHITECTURES: "52"
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
@@ -3380,11 +3377,11 @@ events:
       variable: "CMAKE_C_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-e8y2ta'
+        Change Dir: 'C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-nb4rdw'
         
-        Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_40aba
-        [1/2] C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_40aba.dir\\CMakeCCompilerABI.c.obj /FdCMakeFiles\\cmTC_40aba.dir\\ /FS -c "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCCompilerABI.c"
-        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_40aba.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_40aba.dir\\CMakeCCompilerABI.c.obj  /out:cmTC_40aba.exe /implib:cmTC_40aba.lib /pdb:cmTC_40aba.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_6137a
+        [1/2] C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_6137a.dir\\CMakeCCompilerABI.c.obj /FdCMakeFiles\\cmTC_6137a.dir\\ /FS -c "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCCompilerABI.c"
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_6137a.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_6137a.dir\\CMakeCCompilerABI.c.obj  /out:cmTC_6137a.exe /implib:cmTC_6137a.lib /pdb:cmTC_6137a.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
         
       exitCode: 0
   -
@@ -3611,7 +3608,6 @@ events:
     search_context:
       ENV{PATH}:
         - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
-        - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow"
@@ -3681,6 +3677,8 @@ events:
         - "C:\\Program Files\\nodejs\\"
         - "C:\\Program Files\\PostgreSQL\\16\\bin"
         - "C:\\Program Files\\PostgreSQL\\17\\bin"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\"
         - "C:\\Users\\rbgnr\\.local\\bin"
@@ -4048,7 +4046,6 @@ events:
     search_context:
       ENV{PATH}:
         - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
-        - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow"
@@ -4118,6 +4115,8 @@ events:
         - "C:\\Program Files\\nodejs\\"
         - "C:\\Program Files\\PostgreSQL\\16\\bin"
         - "C:\\Program Files\\PostgreSQL\\17\\bin"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\"
         - "C:\\Users\\rbgnr\\.local\\bin"
@@ -4184,7 +4183,6 @@ events:
     search_context:
       ENV{PATH}:
         - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
-        - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/bin"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages"
         - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow"
@@ -4254,6 +4252,8 @@ events:
         - "C:\\Program Files\\nodejs\\"
         - "C:\\Program Files\\PostgreSQL\\16\\bin"
         - "C:\\Program Files\\PostgreSQL\\17\\bin"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\"
+        - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python311\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\Scripts\\"
         - "C:\\Users\\rbgnr\\AppData\\Local\\Programs\\Python\\Python310\\"
         - "C:\\Users\\rbgnr\\.local\\bin"
@@ -4294,8 +4294,8 @@ events:
     checks:
       - "Performing Test CMAKE_HAVE_LIBC_PTHREAD"
     directories:
-      source: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-glxmbn"
-      binary: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-glxmbn"
+      source: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-50wdrl"
+      binary: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-50wdrl"
     cmakeVariables:
       CMAKE_CUDA_ARCHITECTURES: "52"
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
@@ -4305,13 +4305,13 @@ events:
       variable: "CMAKE_HAVE_LIBC_PTHREAD"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-glxmbn'
+        Change Dir: 'C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-50wdrl'
         
-        Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_105c4
-        [1/2] C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\cl.exe  /nologo -DCMAKE_HAVE_LIBC_PTHREAD  /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_105c4.dir\\src.c.obj /FdCMakeFiles\\cmTC_105c4.dir\\ /FS -c C:\\Users\\rbgnr\\git\\My-Custom-BTC-Cache-Miner\\build\\CMakeFiles\\CMakeScratch\\TryCompile-glxmbn\\src.c
-        FAILED: CMakeFiles/cmTC_105c4.dir/src.c.obj 
-        C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\cl.exe  /nologo -DCMAKE_HAVE_LIBC_PTHREAD  /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_105c4.dir\\src.c.obj /FdCMakeFiles\\cmTC_105c4.dir\\ /FS -c C:\\Users\\rbgnr\\git\\My-Custom-BTC-Cache-Miner\\build\\CMakeFiles\\CMakeScratch\\TryCompile-glxmbn\\src.c
-        C:\\Users\\rbgnr\\git\\My-Custom-BTC-Cache-Miner\\build\\CMakeFiles\\CMakeScratch\\TryCompile-glxmbn\\src.c(1): fatal error C1083: Cannot open include file: 'pthread.h': No such file or directory
+        Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_7e8eb
+        [1/2] C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\cl.exe  /nologo -DCMAKE_HAVE_LIBC_PTHREAD  /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_7e8eb.dir\\src.c.obj /FdCMakeFiles\\cmTC_7e8eb.dir\\ /FS -c C:\\Users\\rbgnr\\git\\My-Custom-BTC-Cache-Miner\\build\\CMakeFiles\\CMakeScratch\\TryCompile-50wdrl\\src.c
+        FAILED: CMakeFiles/cmTC_7e8eb.dir/src.c.obj 
+        C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\cl.exe  /nologo -DCMAKE_HAVE_LIBC_PTHREAD  /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_7e8eb.dir\\src.c.obj /FdCMakeFiles\\cmTC_7e8eb.dir\\ /FS -c C:\\Users\\rbgnr\\git\\My-Custom-BTC-Cache-Miner\\build\\CMakeFiles\\CMakeScratch\\TryCompile-50wdrl\\src.c
+        C:\\Users\\rbgnr\\git\\My-Custom-BTC-Cache-Miner\\build\\CMakeFiles\\CMakeScratch\\TryCompile-50wdrl\\src.c(1): fatal error C1083: Cannot open include file: 'pthread.h': No such file or directory
         ninja: build stopped: subcommand failed.
         
       exitCode: 1
@@ -4326,8 +4326,8 @@ events:
     checks:
       - "Looking for pthread_create in pthreads"
     directories:
-      source: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-9lorla"
-      binary: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-9lorla"
+      source: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-xzyjoe"
+      binary: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-xzyjoe"
     cmakeVariables:
       CMAKE_CUDA_ARCHITECTURES: "52"
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
@@ -4337,14 +4337,14 @@ events:
       variable: "CMAKE_HAVE_PTHREADS_CREATE"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-9lorla'
+        Change Dir: 'C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-xzyjoe'
         
-        Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_6d342
-        [1/2] C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS -DCHECK_FUNCTION_EXISTS=pthread_create /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_6d342.dir\\CheckFunctionExists.c.obj /FdCMakeFiles\\cmTC_6d342.dir\\ /FS -c C:\\Users\\rbgnr\\git\\My-Custom-BTC-Cache-Miner\\build\\CMakeFiles\\CMakeScratch\\TryCompile-9lorla\\CheckFunctionExists.c
-        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_6d342.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_6d342.dir\\CheckFunctionExists.c.obj  /out:cmTC_6d342.exe /implib:cmTC_6d342.lib /pdb:cmTC_6d342.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthreads.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
-        FAILED: cmTC_6d342.exe 
-        C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_6d342.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_6d342.dir\\CheckFunctionExists.c.obj  /out:cmTC_6d342.exe /implib:cmTC_6d342.lib /pdb:cmTC_6d342.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthreads.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
-        LINK Pass 1: command "C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_6d342.dir\\CheckFunctionExists.c.obj /out:cmTC_6d342.exe /implib:cmTC_6d342.lib /pdb:cmTC_6d342.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_6d342.dir/intermediate.manifest CMakeFiles\\cmTC_6d342.dir/manifest.res" failed (exit code 1104) with the following output:\x0d
+        Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_dabc8
+        [1/2] C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS -DCHECK_FUNCTION_EXISTS=pthread_create /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_dabc8.dir\\CheckFunctionExists.c.obj /FdCMakeFiles\\cmTC_dabc8.dir\\ /FS -c C:\\Users\\rbgnr\\git\\My-Custom-BTC-Cache-Miner\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xzyjoe\\CheckFunctionExists.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_dabc8.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_dabc8.dir\\CheckFunctionExists.c.obj  /out:cmTC_dabc8.exe /implib:cmTC_dabc8.lib /pdb:cmTC_dabc8.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthreads.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        FAILED: cmTC_dabc8.exe 
+        C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_dabc8.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_dabc8.dir\\CheckFunctionExists.c.obj  /out:cmTC_dabc8.exe /implib:cmTC_dabc8.lib /pdb:cmTC_dabc8.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthreads.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        LINK Pass 1: command "C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_dabc8.dir\\CheckFunctionExists.c.obj /out:cmTC_dabc8.exe /implib:cmTC_dabc8.lib /pdb:cmTC_dabc8.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_dabc8.dir/intermediate.manifest CMakeFiles\\cmTC_dabc8.dir/manifest.res" failed (exit code 1104) with the following output:\x0d
         LINK : fatal error LNK1104: cannot open file 'pthreads.lib'\x0d\x0d
         ninja: build stopped: subcommand failed.
         
@@ -4360,8 +4360,8 @@ events:
     checks:
       - "Looking for pthread_create in pthread"
     directories:
-      source: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-2bubbt"
-      binary: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-2bubbt"
+      source: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-ho7ym6"
+      binary: "C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-ho7ym6"
     cmakeVariables:
       CMAKE_CUDA_ARCHITECTURES: "52"
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
@@ -4371,14 +4371,14 @@ events:
       variable: "CMAKE_HAVE_PTHREAD_CREATE"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-2bubbt'
+        Change Dir: 'C:/Users/rbgnr/git/My-Custom-BTC-Cache-Miner/build/CMakeFiles/CMakeScratch/TryCompile-ho7ym6'
         
-        Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_d54e8
-        [1/2] C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS -DCHECK_FUNCTION_EXISTS=pthread_create /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_d54e8.dir\\CheckFunctionExists.c.obj /FdCMakeFiles\\cmTC_d54e8.dir\\ /FS -c C:\\Users\\rbgnr\\git\\My-Custom-BTC-Cache-Miner\\build\\CMakeFiles\\CMakeScratch\\TryCompile-2bubbt\\CheckFunctionExists.c
-        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_d54e8.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_d54e8.dir\\CheckFunctionExists.c.obj  /out:cmTC_d54e8.exe /implib:cmTC_d54e8.lib /pdb:cmTC_d54e8.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthread.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
-        FAILED: cmTC_d54e8.exe 
-        C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_d54e8.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_d54e8.dir\\CheckFunctionExists.c.obj  /out:cmTC_d54e8.exe /implib:cmTC_d54e8.lib /pdb:cmTC_d54e8.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthread.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
-        LINK Pass 1: command "C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_d54e8.dir\\CheckFunctionExists.c.obj /out:cmTC_d54e8.exe /implib:cmTC_d54e8.lib /pdb:cmTC_d54e8.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_d54e8.dir/intermediate.manifest CMakeFiles\\cmTC_d54e8.dir/manifest.res" failed (exit code 1104) with the following output:\x0d
+        Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_2fe64
+        [1/2] C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS -DCHECK_FUNCTION_EXISTS=pthread_create /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_2fe64.dir\\CheckFunctionExists.c.obj /FdCMakeFiles\\cmTC_2fe64.dir\\ /FS -c C:\\Users\\rbgnr\\git\\My-Custom-BTC-Cache-Miner\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ho7ym6\\CheckFunctionExists.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_2fe64.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_2fe64.dir\\CheckFunctionExists.c.obj  /out:cmTC_2fe64.exe /implib:cmTC_2fe64.lib /pdb:cmTC_2fe64.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthread.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        FAILED: cmTC_2fe64.exe 
+        C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_2fe64.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_2fe64.dir\\CheckFunctionExists.c.obj  /out:cmTC_2fe64.exe /implib:cmTC_2fe64.lib /pdb:cmTC_2fe64.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthread.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        LINK Pass 1: command "C:\\PROGRA~1\\MICROS~2\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_2fe64.dir\\CheckFunctionExists.c.obj /out:cmTC_2fe64.exe /implib:cmTC_2fe64.lib /pdb:cmTC_2fe64.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_2fe64.dir/intermediate.manifest CMakeFiles\\cmTC_2fe64.dir/manifest.res" failed (exit code 1104) with the following output:\x0d
         LINK : fatal error LNK1104: cannot open file 'pthread.lib'\x0d\x0d
         ninja: build stopped: subcommand failed.
         
