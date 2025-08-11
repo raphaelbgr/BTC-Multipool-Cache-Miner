@@ -63,7 +63,7 @@
 - [x] Persistence scaffolding: in‑memory Ledger + Outbox; SubmitRouter hooks
 - [x] Tests green: endianness, targets, registry, logging, metrics, CPU verify, midstate, merkle, submit router
 - [x] Adapters skeleton: `AdapterBase`, `StratumAdapter` façade with basic state machine and ingest/poll
-- [x] GBT skeleton: `GbtAdapter` ingest/poll queue
+ - [x] GBT path: `GbtAdapter` ingest/poll queue and `GbtRunner` that polls `getblocktemplate` with `rules=["segwit"]` using cookie auth by default
 - [x] Normalizer completion scaffolds: coinbase assembly + witness commitment placeholder; rolling/ntime caps and extranonce packing tests
 - [x] Registry integration: adapter → normalizer → registry path covered by unit test
  - [x] Adapter policies: varDiff share target, version mask, ntime caps, `clean_jobs` handling (applied in `ingestJobWithPolicy`)

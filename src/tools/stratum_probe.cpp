@@ -48,9 +48,9 @@ int main(int argc, char** argv) {
   }
   // Read a few lines
   for (int i = 0; i < 5; ++i) {
-    auto line = c.recvLine();
-    if (!line.has_value()) break;
-    std::cout << *line << "\n";
+    auto [status, line] = c.recvLine();
+    if (status != net::StratumClient::RecvStatus::kLine) break;
+    std::cout << line << "\n";
   }
   c.close();
   return 0;

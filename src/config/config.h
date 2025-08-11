@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -24,6 +25,23 @@ struct PoolEntry {
   std::string worker;   // optional suffix
   std::string password; // x/123, etc.
   std::vector<Endpoint> endpoints;
+  // Optional Bitcoin Core RPC (for GBT)
+  struct RpcConfig {
+    std::string url;     // e.g., http://127.0.0.1:8332
+    bool use_tls{false};
+    std::string auth;    // "cookie" or "userpass"
+    std::string username;
+    std::string password;
+  };
+  std::optional<RpcConfig> rpc;
+
+  // Optional GBT tuning
+  struct GbtConfig {
+    int poll_ms{2000};
+    std::vector<std::string> rules; // e.g., ["segwit"]
+    std::string cb_tag;             // coinbase tag string, informational
+  };
+  std::optional<GbtConfig> gbt;
 };
 
 struct AppConfig {
@@ -33,6 +51,9 @@ struct AppConfig {
 
 // Load from JSON file (e.g., config/pools.json). Returns empty config if file missing/invalid.
 AppConfig loadFromJsonFile(const std::string& path);
+
+  // Minimal default config used by header build tests.
+  AppConfig loadDefault();
 
 }
 

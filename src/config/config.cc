@@ -35,9 +35,43 @@ AppConfig loadFromJsonFile(const std::string& path) {
           e.endpoints.push_back(ed);
         }
       }
+      if (p.contains("rpc") && p["rpc"].is_object()) {
+        PoolEntry::RpcConfig rc;
+        const auto& r = p["rpc"];
+        if (r.contains("url")) rc.url = r["url"].get<std::string>();
+        if (r.contains("use_tls")) rc.use_tls = r["use_tls"].get<bool>();
+        if (r.contains("auth")) rc.auth = r["auth"].get<std::string>();
+        if (r.contains("username")) rc.username = r["username"].get<std::string>();
+        if (r.contains("password")) rc.password = r["password"].get<std::string>();
+        e.rpc = rc;
+      }
+      if (p.contains("gbt") && p["gbt"].is_object()) {
+        PoolEntry::GbtConfig gc;
+        const auto& g = p["gbt"];
+        if (g.contains("poll_ms")) gc.poll_ms = g["poll_ms"].get<int>();
+        if (g.contains("rules") && g["rules"].is_array()) {
+          for (const auto& r : g["rules"]) gc.rules.push_back(r.get<std::string>());
+        }
+        if (g.contains("cb_tag")) gc.cb_tag = g["cb_tag"].get<std::string>();
+        e.gbt = gc;
+      }
       cfg.pools.push_back(std::move(e));
     }
   }
+  return cfg;
+}
+
+AppConfig loadDefault() {
+  AppConfig cfg;
+  PoolEntry e;
+  e.name = "dummy";
+  e.profile = "generic";
+  e.cred_mode = CredMode::WalletAsUser;
+  e.wallet = "bc1qexample";
+  e.worker = "w";
+  e.password = "x";
+  Endpoint ep; ep.host = "localhost"; ep.port = 3333; ep.use_tls = false; e.endpoints.push_back(ep);
+  cfg.pools.push_back(e);
   return cfg;
 }
 

@@ -14,6 +14,7 @@
    - Spin up `bitcoind` regtest
    - Mock Stratum servers (or containers)
    - Run adapters, registry, submit router tests
+   - Smoke run `stratum_registry_runner` with `BMAD_POOL=mynode-gbt` to verify GBT polling path
 
 3) Build (CUDA)
    - Install CUDA toolkit

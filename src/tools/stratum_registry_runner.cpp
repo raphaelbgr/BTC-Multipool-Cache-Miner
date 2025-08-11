@@ -13,6 +13,8 @@
 #include "adapters/pool_profiles.h"
 #include "adapters/stratum_adapter.h"
 #include "adapters/stratum_runner.h"
+#include "adapters/gbt_adapter.h"
+#include "adapters/gbt_runner.h"
 #include "net/stratum_client.h"
 #include "registry/work_source_registry.h"
 #include "submit/stratum_submitter.h"
@@ -106,9 +108,31 @@ int main(int argc, char** argv) {
   // Registry with one slot
   registry::WorkSourceRegistry reg(1);
   adapters::StratumAdapter adapter("stratum");
-  adapters::StratumRunner runner(&adapter, host, port, user, pass, use_tls);
-  runner.start();
-  submit::StratumSubmitter submitter(&runner, user);
+  adapters::StratumRunner* stratum_runner_ptr = nullptr;
+  std::unique_ptr<adapters::StratumRunner> stratum_runner;
+  std::unique_ptr<adapters::GbtAdapter> gbt_adapter;
+  std::unique_ptr<adapters::GbtRunner> gbt_runner;
+
+  // If selected profile is GBT, start GBT runner; else Stratum
+  bool use_gbt = false;
+  if (!used_legacy) {
+    auto cfg = config::loadFromJsonFile("config/pools.json");
+    std::string choice; if (const char* env = std::getenv("BMAD_POOL")) choice = env;
+    const config::PoolEntry* sel = nullptr;
+    for (const auto& p : cfg.pools) { if (choice.empty() || p.name == choice) { sel = &p; if (!choice.empty()) break; } }
+    if (sel && sel->profile == "gbt") {
+      use_gbt = true;
+      gbt_adapter = std::make_unique<adapters::GbtAdapter>("gbt");
+      gbt_runner = std::make_unique<adapters::GbtRunner>(gbt_adapter.get(), *sel);
+      gbt_runner->start();
+    }
+  }
+  if (!use_gbt) {
+    stratum_runner = std::make_unique<adapters::StratumRunner>(&adapter, host, port, user, pass, use_tls);
+    stratum_runner_ptr = stratum_runner.get();
+    stratum_runner->start();
+  }
+  submit::StratumSubmitter submitter(stratum_runner_ptr, user);
 
   uint64_t last_gen = 0;
   std::string last_ntime_hex;
@@ -149,7 +173,9 @@ int main(int argc, char** argv) {
   while (!g_stop.load()) {
     // Drain full results and set registry
     while (true) {
-      auto full = adapter.pollNormalizedFull();
+      std::optional<normalize::NormalizerResult> full;
+      if (use_gbt) full = gbt_adapter->pollNormalizedFull();
+      else full = adapter.pollNormalizedFull();
       if (!full.has_value()) break;
       reg.set(0, full->item, full->job_const);
     }
@@ -209,10 +235,10 @@ int main(int argc, char** argv) {
       }
     }
     // Passive rotation: advance endpoint if repeated failures/disconnects
-    if (!used_legacy) {
-      if (runner.connectFailures() >= 3 || runner.quickDisconnects() >= 3) {
-        runner.stop();
-        runner.resetCounters();
+    if (!used_legacy && !use_gbt) {
+      if (stratum_runner->connectFailures() >= 3 || stratum_runner->quickDisconnects() >= 3) {
+        stratum_runner->stop();
+        stratum_runner->resetCounters();
         // advance to next endpoint
         auto cfg = config::loadFromJsonFile("config/pools.json");
         // re-find selected pool and bump index
@@ -224,8 +250,9 @@ int main(int argc, char** argv) {
           size_t next = (cur + 1) % sel->endpoints.size();
           host = sel->endpoints[next].host; port = sel->endpoints[next].port; use_tls = sel->endpoints[next].use_tls;
           // reinitialize runner in-place by constructing a new one on the same storage
-          new (&runner) adapters::StratumRunner(&adapter, host, port, user, pass, use_tls);
-          runner.start();
+          stratum_runner.reset();
+          stratum_runner = std::make_unique<adapters::StratumRunner>(&adapter, host, port, user, pass, use_tls);
+          stratum_runner->start();
         }
       }
     }
@@ -233,7 +260,8 @@ int main(int argc, char** argv) {
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
   }
 
-  runner.stop();
+  if (use_gbt) { if (gbt_runner) gbt_runner->stop(); }
+  else { if (stratum_runner) stratum_runner->stop(); }
   return 0;
 }
 

@@ -16,12 +16,14 @@ add_library(miner_core
   submit/stratum_submitter.h
   adapters/stratum_adapter.cc
   adapters/gbt_adapter.cc
+  adapters/gbt_runner.cc
   adapters/pool_router.cc
   adapters/pool_profiles.cc
   adapters/stratum_runner.cc
   cache/vram_pages.cc
   cache/cache_manager.cc
   net/stratum_client.cc
+  net/rpc_client.cc
 )
 
 # OS-specific socket backends
@@ -68,10 +70,13 @@ target_include_directories(miner_cuda PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(miner_core PUBLIC miner_cuda)
 message(STATUS "CUDA enabled and required")
 
-add_executable(stratum_probe
-  tools/stratum_probe.cpp
-)
-target_link_libraries(stratum_probe PRIVATE miner_core)
+option(BUILD_TOOLS "Build optional CLI tools (diagnostics)" OFF)
+if(BUILD_TOOLS)
+  add_executable(stratum_probe
+    tools/stratum_probe.cpp
+  )
+  target_link_libraries(stratum_probe PRIVATE miner_core)
+endif()
 
 add_executable(stratum_registry_runner
   tools/stratum_registry_runner.cpp
