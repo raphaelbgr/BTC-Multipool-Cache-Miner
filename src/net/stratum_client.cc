@@ -1,101 +1,34 @@
 #include "net/stratum_client.h"
+#include "net/socket.h"
 
 #include <cstring>
 #include <string>
 
-#ifdef _WIN32
-#  include <winsock2.h>
-#  include <ws2tcpip.h>
-#  pragma comment(lib, "Ws2_32.lib")
-#else
-#  include <arpa/inet.h>
-#  include <netdb.h>
-#  include <netinet/in.h>
-#  include <sys/socket.h>
-#  include <unistd.h>
-#endif
-
 namespace net {
 
-static bool initSockets() {
-#ifdef _WIN32
-  WSADATA wsaData;
-  return WSAStartup(MAKEWORD(2, 2), &wsaData) == 0;
-#else
-  return true;
-#endif
-}
-
-static void cleanupSockets() {
-#ifdef _WIN32
-  WSACleanup();
-#endif
-}
-
 bool StratumClient::connect() {
-  if (!initSockets()) return false;
-
-  struct addrinfo hints;
-  std::memset(&hints, 0, sizeof(hints));
-  hints.ai_family = AF_UNSPEC;
-  hints.ai_socktype = SOCK_STREAM;
-  hints.ai_protocol = IPPROTO_TCP;
-
-  struct addrinfo* result = nullptr;
-  char portStr[16];
-  std::snprintf(portStr, sizeof(portStr), "%u", static_cast<unsigned>(port_));
-  if (getaddrinfo(host_.c_str(), portStr, &hints, &result) != 0) {
-    cleanupSockets();
-    return false;
-  }
-
-  int sockfd = -1;
-  for (auto* ptr = result; ptr != nullptr; ptr = ptr->ai_next) {
-    sockfd = static_cast<int>(::socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol));
-    if (sockfd < 0) continue;
-    if (::connect(sockfd, ptr->ai_addr, static_cast<int>(ptr->ai_addrlen)) == 0) {
-      break; // success
+  if (use_tls_) {
+    sock_ = MakeTlsSocket();
+    if (!sock_) {
+      // Fallback to plain if TLS backend unavailable
+      sock_ = MakePlainSocket();
     }
-#ifdef _WIN32
-    closesocket(sockfd);
-#else
-    close(sockfd);
-#endif
-    sockfd = -1;
+  } else {
+    sock_ = MakePlainSocket();
   }
-  freeaddrinfo(result);
-  if (sockfd < 0) {
-    cleanupSockets();
-    return false;
-  }
-  sock_ = sockfd;
-  return true;
+  return sock_->connect(host_, port_, 5000);
 }
 
-void StratumClient::close() {
-  if (sock_ >= 0) {
-#ifdef _WIN32
-    closesocket(sock_);
-#else
-    ::close(sock_);
-#endif
-    sock_ = -1;
-  }
-  cleanupSockets();
-}
+void StratumClient::close() { if (sock_) { sock_->close(); sock_.reset(); } }
 
 bool StratumClient::sendJson(const nlohmann::json& j) {
-  if (sock_ < 0) return false;
+  if (!sock_) return false;
   std::string line = j.dump();
   line.push_back('\n');
   const char* data = line.c_str();
   size_t remaining = line.size();
   while (remaining > 0) {
-#ifdef _WIN32
-    int sent = ::send(sock_, data, static_cast<int>(remaining), 0);
-#else
-    ssize_t sent = ::send(sock_, data, remaining, 0);
-#endif
+    int sent = sock_->send(reinterpret_cast<const uint8_t*>(data), remaining);
     if (sent <= 0) return false;
     data += sent;
     remaining -= static_cast<size_t>(sent);
@@ -131,24 +64,21 @@ bool StratumClient::sendSubmit(std::string_view worker_name,
   return sendJson(j);
 }
 
-std::optional<std::string> StratumClient::recvLine() {
-  if (sock_ < 0) return std::nullopt;
+std::pair<StratumClient::RecvStatus, std::string> StratumClient::recvLine() {
+  if (!sock_) return {RecvStatus::kClosed, {}};
   std::string line;
   char ch;
   while (true) {
-#ifdef _WIN32
-    int recvd = ::recv(sock_, &ch, 1, 0);
-#else
-    ssize_t recvd = ::recv(sock_, &ch, 1, 0);
-#endif
+    int recvd = sock_->recv(reinterpret_cast<uint8_t*>(&ch), 1, 5000);
     if (recvd <= 0) {
-      if (line.empty()) return std::nullopt;
+      if (recvd == -2) return {RecvStatus::kTimeout, {}};
+      if (line.empty()) return {RecvStatus::kClosed, {}};
       break;
     }
     if (ch == '\n') break;
     line.push_back(ch);
   }
-  return line;
+  return {RecvStatus::kLine, line};
 }
 
 }  // namespace net

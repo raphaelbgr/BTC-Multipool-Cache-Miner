@@ -14,9 +14,10 @@ namespace adapters {
 
 StratumRunner::StratumRunner(StratumAdapter* adapter,
                              std::string host, uint16_t port,
-                             std::string username, std::string password)
+                             std::string username, std::string password,
+                             bool use_tls)
     : adapter_(adapter), host_(std::move(host)), port_(port),
-      username_(std::move(username)), password_(std::move(password)) {}
+      username_(std::move(username)), password_(std::move(password)), use_tls_(use_tls) {}
 
 StratumRunner::~StratumRunner() { stop(); }
 
@@ -41,22 +42,34 @@ static uint32_t compactFromDifficulty(double diff) {
 
 void StratumRunner::runLoop() {
   obs::Logger log("stratum");
-  client_ = std::make_unique<net::StratumClient>(host_, port_, username_, password_);
+  client_ = std::make_unique<net::StratumClient>(host_, port_, username_, password_, use_tls_);
+  int attempt = 0;
   while (!stop_flag_.load()) {
+    log.info("connecting", {{"host", host_}, {"port", port_}, {"attempt", attempt + 1}});
     if (!client_->connect()) {
-      log.warn("connect_failed", {{"host", host_}, {"port", port_}});
-      std::this_thread::sleep_for(std::chrono::seconds(2));
+      int backoff_s = std::min(30, 1 << std::min(attempt, 4)); // 1,2,4,8,16, then cap
+      log.warn("connect_failed", {{"host", host_}, {"port", port_}, {"backoff_s", backoff_s}});
+      consecutive_connect_failures_.fetch_add(1);
+      std::this_thread::sleep_for(std::chrono::seconds(backoff_s));
+      attempt++;
       continue;
     }
+    consecutive_connect_failures_.store(0);
+    attempt = 0;
     log.info("connected", {{"host", host_}, {"port", port_}});
     client_->sendSubscribe();
     client_->sendAuthorize();
     adapter_->connect();
 
+    // If a server drops immediately after TCP connect (e.g., proxy), loop will reconnect.
     while (!stop_flag_.load()) {
-      auto line = client_->recvLine();
-      if (!line.has_value()) break;
-      nlohmann::json j = nlohmann::json::parse(*line, nullptr, false);
+      auto [status, line] = client_->recvLine();
+      if (status == net::StratumClient::RecvStatus::kTimeout) {
+        // Periodic heartbeat; continue waiting for data
+        continue;
+      }
+      if (status == net::StratumClient::RecvStatus::kClosed) break;
+      nlohmann::json j = nlohmann::json::parse(line, nullptr, false);
       if (j.is_discarded()) continue;
       if (j.contains("result") && j["id"] == 1) {
         // subscribe result: [ [ [sub_details], extranonce1, extranonce2_size ], session_id ]
@@ -73,6 +86,23 @@ void StratumRunner::runLoop() {
         try {
           bool ok = j["result"].get<bool>();
           log.info("authorize", {{"ok", ok}});
+        } catch (...) {}
+        continue;
+      }
+      if (j.contains("id") && j["id"] == 3) {
+        // mining.submit response
+        try {
+          if (j.contains("result")) {
+            bool ok = j["result"].get<bool>();
+            log.info("submit_result", {{"accepted", ok}});
+          } else if (j.contains("error") && !j["error"].is_null()) {
+            // error format: [code, message, data]
+            auto err = j["error"];
+            int code = 0; std::string msg;
+            try { code = err[0].get<int>(); } catch (...) {}
+            try { msg = err[1].get<std::string>(); } catch (...) {}
+            log.warn("submit_error", {{"code", code}, {"message", msg}});
+          }
         } catch (...) {}
         continue;
       }
@@ -125,6 +155,7 @@ void StratumRunner::runLoop() {
     }
     client_->close();
     log.warn("disconnected_retry", {{"host", host_}, {"port", port_}});
+    consecutive_quick_disconnects_.fetch_add(1);
     std::this_thread::sleep_for(std::chrono::seconds(2));
   }
 }

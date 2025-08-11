@@ -4,15 +4,17 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <memory>
 
 #include <nlohmann/json.hpp>
+#include "net/socket.h"
 
 namespace net {
 
 class StratumClient {
  public:
-  StratumClient(std::string host, uint16_t port, std::string username, std::string password)
-      : host_(std::move(host)), port_(port), username_(std::move(username)), password_(std::move(password)) {}
+  StratumClient(std::string host, uint16_t port, std::string username, std::string password, bool use_tls = false)
+      : host_(std::move(host)), port_(port), username_(std::move(username)), password_(std::move(password)), use_tls_(use_tls) {}
 
   bool connect();
   void close();
@@ -27,8 +29,9 @@ class StratumClient {
                   std::string_view ntime_hex,
                   std::string_view nonce_hex);
 
-  // Returns one JSON message string if available from socket, else empty.
-  std::optional<std::string> recvLine();
+  enum class RecvStatus { kLine, kTimeout, kClosed };
+  // Blocking read with socket timeout. Returns status and, if kLine, the line.
+  std::pair<RecvStatus, std::string> recvLine();
 
   // Utility to send an arbitrary JSON object with a newline.
   bool sendJson(const nlohmann::json& j);
@@ -39,7 +42,8 @@ class StratumClient {
   std::string username_;
   std::string password_;
 
-  int sock_{-1};
+  bool use_tls_{false};
+  std::unique_ptr<class ISocket> sock_;
 };
 
 }  // namespace net

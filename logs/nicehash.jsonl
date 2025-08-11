@@ -1,0 +1,5 @@
+{"component":"stratum","fields":{"attempt":1,"host":"sha256.auto.nicehash.com","port":443},"level":"info","msg":"connecting","ts_ms":1754952392199}
+{"component":"stratum","fields":{"host":"sha256.auto.nicehash.com","port":443},"level":"info","msg":"connected","ts_ms":1754952392259}
+{"component":"stratum","fields":{"extranonce1":"220482d7b7f350ab3e","extranonce2_size":3},"level":"info","msg":"subscribed","ts_ms":1754952392435}
+{"component":"stratum","fields":{"ok":true},"level":"info","msg":"authorize","ts_ms":1754952392435}
+{"component":"stratum","fields":{"diff":32768.0,"share_nbits_hex":520159231},"level":"info","msg":"set_difficulty","ts_ms":1754952392570}

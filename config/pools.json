@@ -1,0 +1,82 @@
+{
+  "log_level": 2,
+  "pools": [
+    {
+      "name": "viabtc",
+      "profile": "viabtc",
+      "cred_mode": "account_worker",
+      "account": "raphaelbgr",
+      "worker": "001",
+      "password": "123",
+      "endpoints": [
+        { "host": "btc.viabtc.io", "port": 443,  "use_tls": true  },
+        { "host": "btc.viabtc.io", "port": 3333, "use_tls": false },
+        { "host": "btc.viabtc.io", "port": 25,   "use_tls": false }
+      ]
+    },
+    {
+      "name": "f2pool",
+      "profile": "f2pool",
+      "cred_mode": "account_worker",
+      "account": "raphaelbgr",
+      "worker": "001",
+      "password": "21235365876986800",
+      "endpoints": [
+        { "host": "btcssl.f2pool.com",   "port": 1300, "use_tls": true  },
+        { "host": "btc.f2pool.com",      "port": 1314, "use_tls": false },
+        { "host": "btc-asia.f2pool.com", "port": 1314, "use_tls": false },
+        { "host": "btc-euro.f2pool.com", "port": 1314, "use_tls": false }
+      ]
+    },
+    {
+      "name": "ckpool-solo",
+      "profile": "ckpool",
+      "cred_mode": "wallet_as_user",
+      "wallet": "bc1qsrxcqc4xtlr57dq6npjy8hgwhpkkryzhvq7nd2",
+      "worker": "001",
+      "password": "x",
+      "endpoints": [
+        { "host": "solo.ckpool.org",  "port": 3333, "use_tls": false },
+        { "host": "solo.ckpool.org",  "port": 4334, "use_tls": false },
+        { "host": "solo4.ckpool.org", "port": 3333, "use_tls": false },
+        { "host": "solo6.ckpool.org", "port": 3333, "use_tls": false },
+        { "host": "eusolo.ckpool.org","port": 3333, "use_tls": false },
+        { "host": "ausolo.ckpool.org","port": 3333, "use_tls": false }
+      ]
+    },
+    {
+      "name": "nicehash",
+      "profile": "nicehash",
+      "cred_mode": "wallet_as_user",
+      "wallet": "NHbQFQ2cHcGQv1vmsFUvRVBPD2eJypCa2w8c",
+      "worker": "thatWorker",
+      "password": "x",
+      "endpoints": [
+        { "host": "sha256.auto.nicehash.com", "port": 443,  "use_tls": true  },
+        { "host": "sha256.auto.nicehash.com", "port": 9200, "use_tls": false },
+        { "host": "sha256.usa.nicehash.com",  "port": 443,  "use_tls": true  },
+        { "host": "sha256.eu.nicehash.com",   "port": 443,  "use_tls": true  }
+      ]
+    },
+    {
+      "name": "mynode-gbt",
+      "profile": "gbt",
+      "cred_mode": "wallet_as_user",
+      "wallet": "bc1qsrxcqc4xtlr57dq6npjy8hgwhpkkryzhvq7nd2",
+      "worker": "local001",
+      "password": "x",
+      "rpc": {
+        "url": "http://127.0.0.1:8332",
+        "use_tls": false,
+        "auth": "cookie"
+      },
+      "gbt": {
+        "poll_ms": 2000,
+        "rules": ["segwit"],
+        "cb_tag": "/MCBM/"
+      }
+    }
+  ]
+}
+
+

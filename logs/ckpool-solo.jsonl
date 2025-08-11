@@ -1,0 +1,6 @@
+{"component":"stratum","fields":{"attempt":1,"host":"solo.ckpool.org","port":3333},"level":"info","msg":"connecting","ts_ms":1754952380182}
+{"component":"stratum","fields":{"host":"solo.ckpool.org","port":3333},"level":"info","msg":"connected","ts_ms":1754952380637}
+{"component":"stratum","fields":{"extranonce1":"17409669","extranonce2_size":8},"level":"info","msg":"subscribed","ts_ms":1754952380838}
+{"component":"stratum","fields":{"diff":10000.0,"share_nbits_hex":520159231},"level":"info","msg":"set_difficulty","ts_ms":1754952380838}
+{"component":"stratum","fields":{"diff":10000.0,"share_nbits_hex":520159231},"level":"info","msg":"set_difficulty","ts_ms":1754952381037}
+{"component":"stratum","fields":{"ok":true},"level":"info","msg":"authorize","ts_ms":1754952381038}

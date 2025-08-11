@@ -17,7 +17,8 @@ class StratumRunner {
  public:
   StratumRunner(StratumAdapter* adapter,
                 std::string host, uint16_t port,
-                std::string username, std::string password);
+                std::string username, std::string password,
+                bool use_tls = false);
   ~StratumRunner();
 
   void start();
@@ -28,6 +29,10 @@ class StratumRunner {
                    const std::string& ntime_hex,
                    const std::string& nonce_hex);
 
+  int connectFailures() const { return consecutive_connect_failures_.load(); }
+  int quickDisconnects() const { return consecutive_quick_disconnects_.load(); }
+  void resetCounters() { consecutive_connect_failures_.store(0); consecutive_quick_disconnects_.store(0); }
+
  private:
   void runLoop();
 
@@ -36,6 +41,7 @@ class StratumRunner {
   uint16_t port_;
   std::string username_;
   std::string password_;
+  bool use_tls_{false};
 
   std::atomic<bool> stop_flag_{false};
   std::thread th_;
@@ -45,6 +51,9 @@ class StratumRunner {
   std::string last_job_id_;
   std::string extranonce1_;
   uint8_t extranonce2_size_{0};
+
+  std::atomic<int> consecutive_connect_failures_{0};
+  std::atomic<int> consecutive_quick_disconnects_{0};
 };
 
 }  // namespace adapters

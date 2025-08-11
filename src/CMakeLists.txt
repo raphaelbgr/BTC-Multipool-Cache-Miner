@@ -24,9 +24,24 @@ add_library(miner_core
   net/stratum_client.cc
 )
 
+# OS-specific socket backends
+if (WIN32)
+  target_sources(miner_core PRIVATE net/socket_win.cc)
+else()
+  target_sources(miner_core PRIVATE net/socket_posix.cc)
+endif()
+
 target_include_directories(miner_core PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 target_link_libraries(miner_core PUBLIC nlohmann_json::nlohmann_json)
+
+# Optional OpenSSL TLS backend (POSIX)
+find_package(OpenSSL QUIET)
+if(OpenSSL_FOUND)
+  target_sources(miner_core PRIVATE net/socket_openssl.cc)
+  target_compile_definitions(miner_core PRIVATE USE_OPENSSL)
+  target_link_libraries(miner_core PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+endif()
 
 if(NOT ENABLE_CUDA)
   message(FATAL_ERROR "ENABLE_CUDA is OFF but this project requires CUDA. Set -DENABLE_CUDA=ON and ensure CUDA toolkit is installed.")

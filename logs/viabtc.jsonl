@@ -1,0 +1,11 @@
+{"component":"stratum","fields":{"attempt":1,"host":"btc.viabtc.io","port":443},"level":"info","msg":"connecting","ts_ms":1754952356114}
+{"component":"stratum","fields":{"backoff_s":1,"host":"btc.viabtc.io","port":443},"level":"warn","msg":"connect_failed","ts_ms":1754952356454}
+{"component":"stratum","fields":{"attempt":2,"host":"btc.viabtc.io","port":443},"level":"info","msg":"connecting","ts_ms":1754952357469}
+{"component":"stratum","fields":{"backoff_s":2,"host":"btc.viabtc.io","port":443},"level":"warn","msg":"connect_failed","ts_ms":1754952357774}
+{"component":"stratum","fields":{"attempt":3,"host":"btc.viabtc.io","port":443},"level":"info","msg":"connecting","ts_ms":1754952359778}
+{"component":"stratum","fields":{"backoff_s":4,"host":"btc.viabtc.io","port":443},"level":"warn","msg":"connect_failed","ts_ms":1754952360197}
+{"component":"stratum","fields":{"attempt":1,"host":"btc.viabtc.io","port":3333},"level":"info","msg":"connecting","ts_ms":1754952364206}
+{"component":"stratum","fields":{"host":"btc.viabtc.io","port":3333},"level":"info","msg":"connected","ts_ms":1754952364217}
+{"component":"stratum","fields":{"extranonce1":"9af60d5e","extranonce2_size":8},"level":"info","msg":"subscribed","ts_ms":1754952364502}
+{"component":"stratum","fields":{"ok":true},"level":"info","msg":"authorize","ts_ms":1754952364503}
+{"component":"stratum","fields":{"diff":16384.0,"share_nbits_hex":520159231},"level":"info","msg":"set_difficulty","ts_ms":1754952364503}
