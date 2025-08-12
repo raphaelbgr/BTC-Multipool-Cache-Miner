@@ -42,6 +42,8 @@ static __device__ unsigned int g_hit_write_idx = 0;
 static HitRecordDevice* g_hit_buf = nullptr;
 static unsigned int g_hit_cap = 0;
 static DeviceJob* g_jobs = nullptr;
+static __device__ __constant__ DeviceJob g_jobs_const[64];
+static __device__ unsigned int g_jobs_const_size = 0;
 static unsigned int g_num_jobs = 0;
 
 __global__ void kernel_init_hit_buf(HitRecordDevice* buf, unsigned int cap) {
@@ -72,13 +74,14 @@ __global__ void kernel_mine_stub(unsigned int num_jobs, unsigned int nonce_base)
   if (threadIdx.x == 0 && blockIdx.x == 0 && g_jobs && g_hit_buf && g_hit_cap) {
     // Assemble 80-byte big-endian header from DeviceJob (scaffold)
     unsigned char header[80];
+    const DeviceJob* J = (j < g_jobs_const_size) ? &g_jobs_const[j] : &g_jobs[j];
     // version
-    header[0] = (g_jobs[j].version >> 24) & 0xFF; header[1] = (g_jobs[j].version >> 16) & 0xFF;
-    header[2] = (g_jobs[j].version >> 8) & 0xFF;  header[3] = (g_jobs[j].version) & 0xFF;
+    header[0] = (J->version >> 24) & 0xFF; header[1] = (J->version >> 16) & 0xFF;
+    header[2] = (J->version >> 8) & 0xFF;  header[3] = (J->version) & 0xFF;
     // prevhash (convert LE words to BE bytes)
     #pragma unroll
     for (int w = 0; w < 8; ++w) {
-      unsigned int v = g_jobs[j].prevhash_le[w];
+      unsigned int v = J->prevhash_le[w];
       header[4 + w*4 + 0] = (v >> 24) & 0xFF;
       header[4 + w*4 + 1] = (v >> 16) & 0xFF;
       header[4 + w*4 + 2] = (v >> 8) & 0xFF;
@@ -87,20 +90,20 @@ __global__ void kernel_mine_stub(unsigned int num_jobs, unsigned int nonce_base)
     // merkle root
     #pragma unroll
     for (int w = 0; w < 8; ++w) {
-      unsigned int v = g_jobs[j].merkle_root_le[w];
+      unsigned int v = J->merkle_root_le[w];
       header[36 + w*4 + 0] = (v >> 24) & 0xFF;
       header[36 + w*4 + 1] = (v >> 16) & 0xFF;
       header[36 + w*4 + 2] = (v >> 8) & 0xFF;
       header[36 + w*4 + 3] = (v) & 0xFF;
     }
     // ntime clamp within [ntime_min, ntime_max]
-    unsigned int ntime = g_jobs[j].ntime;
-    if (g_jobs[j].ntime_min && ntime < g_jobs[j].ntime_min) ntime = g_jobs[j].ntime_min;
-    if (g_jobs[j].ntime_max && ntime > g_jobs[j].ntime_max) ntime = g_jobs[j].ntime_max;
+    unsigned int ntime = J->ntime;
+    if (J->ntime_min && ntime < J->ntime_min) ntime = J->ntime_min;
+    if (J->ntime_max && ntime > J->ntime_max) ntime = J->ntime_max;
     header[68] = (ntime >> 24) & 0xFF; header[69] = (ntime >> 16) & 0xFF;
     header[70] = (ntime >> 8) & 0xFF;  header[71] = (ntime) & 0xFF;
     // nbits
-    unsigned int nbits = g_jobs[j].nbits;
+    unsigned int nbits = J->nbits;
     header[72] = (nbits >> 24) & 0xFF; header[73] = (nbits >> 16) & 0xFF;
     header[74] = (nbits >> 8) & 0xFF;  header[75] = (nbits) & 0xFF;
     // nonce
@@ -113,12 +116,12 @@ __global__ void kernel_mine_stub(unsigned int num_jobs, unsigned int nonce_base)
     bool used_midstate = false;
     // If any word of midstate is non-zero, assume a valid midstate was provided
     #pragma unroll
-    for (int i=0;i<8;++i) { if (g_jobs[j].midstate_le[i] != 0u) { used_midstate = true; break; } }
+    for (int i=0;i<8;++i) { if (J->midstate_le[i] != 0u) { used_midstate = true; break; } }
     if (used_midstate) {
       // Compute SHA256(header) using provided midstate for first 64 bytes
       unsigned int st[8];
       #pragma unroll
-      for (int i=0;i<8;++i) st[i] = g_jobs[j].midstate_le[i];
+      for (int i=0;i<8;++i) st[i] = J->midstate_le[i];
       // Prepare second block words (16 words, BE) for bytes 64..79 + padding + len=640 bits
       unsigned int w0_15[16];
       // bytes 64..79 are header[64..79]
@@ -170,14 +173,14 @@ __global__ void kernel_mine_stub(unsigned int num_jobs, unsigned int nonce_base)
     bool leq = true;
     #pragma unroll
     for (int i=0;i<32;++i) {
-      unsigned char t = g_jobs[j].share_target_be[i];
+      unsigned char t = J->share_target_be[i];
       if (digest[i] < t) { leq = true; break; }
       if (digest[i] > t) { leq = false; break; }
     }
     if (leq) {
       unsigned int idx = atomicInc(&g_hit_write_idx, 0xFFFFFFFFu);
       unsigned int slot = (g_hit_cap == 0) ? 0u : (idx % g_hit_cap);
-      g_hit_buf[slot].work_id = g_jobs[j].work_id;
+      g_hit_buf[slot].work_id = J->work_id;
       g_hit_buf[slot].nonce = nonce;
     }
   }
@@ -425,6 +428,9 @@ bool cuda_engine::uploadDeviceJobs(const DeviceJob* jobs_host, uint32_t num_jobs
   if (g_jobs) cudaFree(g_jobs);
   cudaMalloc(&g_jobs, sizeof(DeviceJob) * num_jobs);
   cudaMemcpy(g_jobs, jobs_host, sizeof(DeviceJob) * num_jobs, cudaMemcpyHostToDevice);
+  unsigned int cnum = (num_jobs > 64u) ? 64u : num_jobs;
+  cudaMemcpyToSymbol(g_jobs_const, jobs_host, sizeof(DeviceJob) * cnum, 0, cudaMemcpyHostToDevice);
+  cudaMemcpyToSymbol(g_jobs_const_size, &cnum, sizeof(unsigned int), 0, cudaMemcpyHostToDevice);
   g_num_jobs = num_jobs;
   return true;
 #endif

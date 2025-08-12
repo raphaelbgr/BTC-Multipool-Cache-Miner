@@ -67,6 +67,9 @@ bool launchMineWithPlanBatch(uint32_t num_jobs,
                              uint32_t nonce_base,
                              uint32_t nonces_per_thread);
 
+// Host-side hint whether jobs are stored in constant memory (fast path)
+bool usingConstJobs();
+
 // Compute SHA-256d(header80) on device for a given uploaded job and nonce; writes 32-byte BE digest to out32_host
 bool computeDeviceHashForJob(uint32_t job_index, uint32_t nonce, unsigned char out32_host[32]);
 
