@@ -23,6 +23,7 @@
 #include "cuda/launch_plan.h"
 #include "submit/stratum_submitter.h"
 #include "submit/submit_router.h"
+#include "submit/cpu_verify.h"
 #include "config/config.h"
 #include "cuda/hit_ring.h"
 #include "cuda/engine.h"
@@ -36,6 +37,13 @@ static void on_sigint(int) { g_stop.store(true); }
 int main(int argc, char** argv) {
   // Simple scheduler state: per-source weights and a tick for fair selection
   scheduler::SchedulerState scheduler;
+  // Load scheduler source weights from config (by pool index mapping to source_id)
+  auto cfg_weights = config::loadFromJsonFile("config/pools.json");
+  for (size_t sid = 0; sid < cfg_weights.pools.size(); ++sid) {
+    int w = cfg_weights.pools[sid].weight;
+    if (w <= 0) w = 1;
+    scheduler.source_weight[static_cast<uint32_t>(sid)] = static_cast<uint32_t>(w);
+  }
 
   std::signal(SIGINT, on_sigint);
   std::string host;
@@ -126,6 +134,7 @@ int main(int argc, char** argv) {
   std::unique_ptr<adapters::GbtRunner> gbt_runner;
   std::unique_ptr<submit::SubmitRouter> submit_router;
   std::unique_ptr<submit::StratumSubmitter> stratum_submitter;
+  std::unique_ptr<submit::GbtSubmitter> gbt_submitter;
 
   // If selected profile is GBT, start GBT runner; else Stratum
   bool use_gbt = false;
@@ -160,6 +169,13 @@ int main(int argc, char** argv) {
     });
   }
   submit::StratumSubmitter submitter(stratum_runner_ptr, user);
+  // Initialize GBT submitter if config has RPC
+  if (!used_legacy) {
+    auto cfg = config::loadFromJsonFile("config/pools.json");
+    for (const auto& p : cfg.pools) {
+      if (p.profile == "gbt" && p.rpc.has_value()) { gbt_submitter = std::make_unique<submit::GbtSubmitter>(*p.rpc); break; }
+    }
+  }
 
   uint64_t last_gen = 0;
   std::string last_ntime_hex;
@@ -203,6 +219,8 @@ int main(int argc, char** argv) {
   // Initialize device hit buffer (scaffold)
   cuda_engine::initDeviceHitBuffer(1024);
   uint32_t nonce_base = 0; // same nonce across jobs per iteration
+  // Metrics
+  obs::MetricsRegistry metrics;
 
   while (!g_stop.load()) {
     // Drain full results and set registry
@@ -280,6 +298,13 @@ int main(int argc, char** argv) {
         } else {
           scheduler.source_penalty[0] = 0;
         }
+        // Also penalize when avg submit latency is high
+        auto cfg = config::loadFromJsonFile("config/pools.json");
+        int penalty_ms = cfg.scheduler.latency_penalty_ms;
+        if (penalty_ms <= 0) penalty_ms = 1500;
+        if (stratum_runner_ptr->avgSubmitMs() > penalty_ms) {
+          scheduler.source_penalty[0] = 2;
+        }
       }
       auto selected_ids = scheduler.select(active_ids, id_to_snap, 64);
       // Mining stub using uploaded jobs (same nonce across jobs)
@@ -287,6 +312,7 @@ int main(int argc, char** argv) {
       nonce_base += 1; // advance to keep testing new nonce across all jobs
       cuda_engine::HitRecord out[64]; uint32_t n = 0;
       if (submit_router && cuda_engine::drainDeviceHits(out, 64, &n) && n > 0) {
+        metrics.increment("device.hits", n);
         for (uint32_t i = 0; i < n; ++i) {
           auto it = id_to_snap.find(out[i].work_id);
           if (it == id_to_snap.end()) continue;
@@ -308,7 +334,18 @@ int main(int argc, char** argv) {
           store_u32_be(&header[68], ss.item.ntime);
           store_u32_be(&header[72], ss.item.nbits);
           store_u32_be(&header[76], out[i].nonce);
-          submit_router->verifyAndSubmit(header, ss.item.share_target_le, out[i].work_id, out[i].nonce);
+          // Classify block hit (CPU hash <= block target) for logging/routing policies
+          uint8_t h1[32]; submit::sha256(header, 80, h1);
+          uint8_t h2[32]; submit::sha256(h1, 32, h2);
+          bool is_block = submit::isHashLEQTarget(h2, ss.item.block_target_le);
+          if (is_block && gbt_submitter) {
+            // Prefer solo (GBT) for block hits
+            gbt_submitter->submitHeader(header);
+            metrics.increment("submit.blocks_gbt", 1);
+          } else {
+            submit_router->verifyAndSubmit(header, ss.item.share_target_le, out[i].work_id, out[i].nonce);
+            metrics.increment("submit.shares", 1);
+          }
         }
       }
     }
@@ -385,6 +422,13 @@ int main(int argc, char** argv) {
       }
     }
 
+    // Periodically dump metrics snapshot
+    static uint64_t last_metrics_ms = 0;
+    auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+    if (now_ms - last_metrics_ms > 2000) {
+      std::cout << metrics.snapshot().dump() << std::endl;
+      last_metrics_ms = now_ms;
+    }
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
   }
 

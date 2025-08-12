@@ -120,6 +120,15 @@ void StratumRunner::runLoop() {
             bool ok = j["result"].get<bool>();
             log.info("submit_result", {{"accepted", ok}});
             if (ok) accepted_submits_.fetch_add(1); else rejected_submits_.fetch_add(1);
+            if (last_submit_sent_.time_since_epoch().count() != 0) {
+              auto now = std::chrono::steady_clock::now();
+              int ms = static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(now - last_submit_sent_).count());
+              // simple EWMA
+              int prev = avg_submit_ms_.load();
+              int ewma = (prev == 0) ? ms : (prev * 7 + ms) / 8;
+              avg_submit_ms_.store(ewma);
+              last_submit_sent_ = {};
+            }
           } else if (j.contains("error") && !j["error"].is_null()) {
             // error format: [code, message, data]
             auto err = j["error"];
@@ -128,6 +137,14 @@ void StratumRunner::runLoop() {
             try { msg = err[1].get<std::string>(); } catch (...) {}
             log.warn("submit_error", {{"code", code}, {"message", msg}});
             rejected_submits_.fetch_add(1);
+            if (last_submit_sent_.time_since_epoch().count() != 0) {
+              auto now = std::chrono::steady_clock::now();
+              int ms = static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(now - last_submit_sent_).count());
+              int prev = avg_submit_ms_.load();
+              int ewma = (prev == 0) ? ms : (prev * 7 + ms) / 8;
+              avg_submit_ms_.store(ewma);
+              last_submit_sent_ = {};
+            }
           }
         } catch (...) {}
         continue;

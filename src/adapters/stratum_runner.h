@@ -6,6 +6,7 @@
 #include <thread>
 #include <memory>
 #include <mutex>
+#include <chrono>
 
 #include "adapters/stratum_adapter.h"
 
@@ -35,6 +36,7 @@ class StratumRunner {
 
   int acceptedSubmits() const { return accepted_submits_.load(); }
   int rejectedSubmits() const { return rejected_submits_.load(); }
+  int avgSubmitMs() const { return avg_submit_ms_.load(); }
 
  private:
   void runLoop();
@@ -59,6 +61,8 @@ class StratumRunner {
   std::atomic<int> consecutive_quick_disconnects_{0};
   std::atomic<int> accepted_submits_{0};
   std::atomic<int> rejected_submits_{0};
+  std::atomic<int> avg_submit_ms_{0};
+  std::chrono::steady_clock::time_point last_submit_sent_{};
 };
 
 }  // namespace adapters

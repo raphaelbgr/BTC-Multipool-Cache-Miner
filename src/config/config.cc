@@ -16,12 +16,18 @@ AppConfig loadFromJsonFile(const std::string& path) {
   if (!ifs.good()) return cfg;
   nlohmann::json j; try { ifs >> j; } catch (...) { return cfg; }
   if (j.contains("log_level")) cfg.log_level = j["log_level"].get<int>();
+  if (j.contains("scheduler") && j["scheduler"].is_object()) {
+    const auto& s = j["scheduler"];
+    if (s.contains("latency_penalty_ms")) cfg.scheduler.latency_penalty_ms = s["latency_penalty_ms"].get<int>();
+    if (s.contains("max_weight")) cfg.scheduler.max_weight = s["max_weight"].get<int>();
+  }
   if (j.contains("pools") && j["pools"].is_array()) {
     for (const auto& p : j["pools"]) {
       PoolEntry e;
       if (p.contains("name")) e.name = p["name"].get<std::string>();
       if (p.contains("profile")) e.profile = p["profile"].get<std::string>();
       if (p.contains("cred_mode")) e.cred_mode = parseCredMode(p["cred_mode"].get<std::string>());
+      if (p.contains("weight")) e.weight = p["weight"].get<int>();
       if (p.contains("wallet")) e.wallet = p["wallet"].get<std::string>();
       if (p.contains("account")) e.account = p["account"].get<std::string>();
       if (p.contains("worker")) e.worker = p["worker"].get<std::string>();

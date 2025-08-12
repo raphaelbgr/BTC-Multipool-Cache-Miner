@@ -19,6 +19,7 @@ struct PoolEntry {
   std::string name;
   std::string profile;  // viabtc, f2pool, ckpool, etc.
   CredMode cred_mode{CredMode::WalletAsUser};
+  int weight{1};        // scheduler weight hint
   // Credentials (one of the following used based on cred_mode)
   std::string wallet;   // for wallet_as_user
   std::string account;  // for account_worker
@@ -47,6 +48,11 @@ struct PoolEntry {
 struct AppConfig {
   int log_level{2}; // 0-trace,1-debug,2-info,3-warn,4-error
   std::vector<PoolEntry> pools;
+  // Scheduler tuning
+  struct SchedulerCfg {
+    int latency_penalty_ms{1500}; // apply penalty if avg submit latency exceeds this
+    int max_weight{4};            // cap per-source weight replication
+  } scheduler;
 };
 
 // Load from JSON file (e.g., config/pools.json). Returns empty config if file missing/invalid.

@@ -10,7 +10,7 @@ struct LaunchParams {
 };
 
 // Minimal per-job data for device header assembly scaffolding
-struct DeviceJob {
+struct alignas(64) DeviceJob {
   uint32_t version{0};
   uint32_t ntime{0};
   uint32_t nbits{0};
