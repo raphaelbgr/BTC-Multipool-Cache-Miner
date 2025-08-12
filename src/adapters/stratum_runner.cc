@@ -173,15 +173,46 @@ void StratumRunner::runLoop() {
             in.job.version = std::stoul(params[8].get<std::string>(), nullptr, 16);
             in.job.nbits = std::stoul(params[9].get<std::string>(), nullptr, 16);
             in.job.ntime = std::stoul(params[10].get<std::string>(), nullptr, 16);
-            // prevhash, merkle_root from notify params
+            // prevhash and merkle path: params[1]=prevhash, params[2]=coinb1, params[3]=coinb2, params[4]=merkle_branch[]
             auto prevhash_hex = params[1].get<std::string>();
-            auto mr_hex = params[2].get<std::string>();
-            // fill BE bytes from hex (minimal, no validation)
+            auto coinb1_hex = params[2].get<std::string>();
+            auto coinb2_hex = params[3].get<std::string>();
+            std::vector<std::string> merkle_branch_hex;
+            try { for (const auto& mb : params[4]) merkle_branch_hex.push_back(mb.get<std::string>()); } catch (...) {}
             auto hexToBytes = [](const std::string& hex, uint8_t* out, size_t out_len){
               size_t n = std::min(hex.size()/2, out_len);
               for (size_t i=0;i<n;i++){ unsigned int v; sscanf(hex.c_str()+2*i, "%02x", &v); out[i]=static_cast<uint8_t>(v);} };
             hexToBytes(prevhash_hex, in.prevhash_be, 32);
-            hexToBytes(mr_hex, in.merkle_root_be, 32);
+            // Build coinbase from parts + extranonces
+            std::string en1;
+            uint8_t en2_size = 0;
+            {
+              std::lock_guard<std::mutex> lk(mu_);
+              en1 = extranonce1_;
+              en2_size = extranonce2_size_;
+            }
+            std::vector<uint8_t> coinb1, coinb2;
+            coinb1.reserve(coinb1_hex.size()/2); coinb2.reserve(coinb2_hex.size()/2);
+            for (size_t i=0;i<coinb1_hex.size()/2;i++){ unsigned int v; sscanf(coinb1_hex.c_str()+2*i, "%02x", &v); coinb1.push_back(static_cast<uint8_t>(v)); }
+            for (size_t i=0;i<coinb2_hex.size()/2;i++){ unsigned int v; sscanf(coinb2_hex.c_str()+2*i, "%02x", &v); coinb2.push_back(static_cast<uint8_t>(v)); }
+            std::vector<uint8_t> en2_zero(static_cast<size_t>(en2_size), 0);
+            normalize::CoinbaseParts cbp; cbp.prefix = coinb1; cbp.suffix = coinb2;
+            auto coinbase = normalize::assembleCoinbaseTx(cbp, en1, en2_zero);
+            // Compute coinbase txid (BE) and merkle root
+            uint8_t coinbase_txid_be[32];
+            {
+              uint8_t h1[32]; submit::sha256(coinbase.data(), coinbase.size(), h1);
+              uint8_t h2[32]; submit::sha256(h1, 32, h2);
+              for (int i=0;i<32;++i) coinbase_txid_be[i] = h2[31 - i];
+            }
+            std::vector<std::array<uint8_t,32>> branch;
+            branch.reserve(1 + merkle_branch_hex.size());
+            std::array<uint8_t,32> cbtx{}; std::memcpy(cbtx.data(), coinbase_txid_be, 32); branch.push_back(cbtx);
+            for (const auto& h : merkle_branch_hex) {
+              std::array<uint8_t,32> e{}; for (size_t i=0;i<32;i++){ unsigned int v; sscanf(h.c_str()+2*i, "%02x", &v); e[i]=static_cast<uint8_t>(v);} branch.push_back(e);
+            }
+            uint8_t mr_be[32]; normalize::compute_merkle_root_be(branch, mr_be);
+            std::memcpy(in.merkle_root_be, mr_be, 32);
             // clean_jobs flag (param index 7 per Stratum V1)
             bool clean = false;
             try { clean = params[7].get<bool>(); } catch (...) { clean = false; }
@@ -199,7 +230,9 @@ void StratumRunner::runLoop() {
             // Ensure share target is set from current varDiff policy if present
             // (Stratum set_difficulty event updates adapter policy already)
             // header_first64 for midstate: version..merkle_root (64 bytes)
-            // Here we leave zeros as placeholder; midstate still computed over zeros.
+            std::memcpy(in.header_first64 + 0,  &in.job.version, 4);
+            std::memcpy(in.header_first64 + 4, in.prevhash_be, 32);
+            std::memcpy(in.header_first64 + 36, in.merkle_root_be, 28);
             adapter_->ingestJobWithPolicy(in);
             auto shortHex = [](const std::string& h){ return h.size()>16 ? h.substr(0,16) : h; };
             log.info("notify", {{"job_id", job_id},
