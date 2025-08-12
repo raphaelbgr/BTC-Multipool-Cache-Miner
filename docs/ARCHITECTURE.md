@@ -60,7 +60,7 @@ Aligned constants and precomputed midstates required for kernel header assembly.
 ### Scheduler & Backpressure
 - Weighted fairness across sources; optional bias for local node.
 - Backpressure: reduce time slices for laggy/rejecting sources; dynamic micro‑batch sizing.
-- Current: runner iterates fairly over active jobs with a common nonce base; scheduler weights/backpressure hooks to be integrated into launch loop.
+- Current: runner iterates fairly over active jobs with a common nonce base; scheduler module provides per‑source weight replication (unit‑tested). Backpressure based on rejects/latency to be wired next.
 
 ### Submission & Persistence
 - CPU verifies reconstructed header matches GPU result prior to submission (also used by `SubmitRouter`).

@@ -57,7 +57,7 @@ Research/education‑grade Bitcoin SHA‑256d GPU miner that maximizes effective
 5) Scheduler
 - All sources active; weighted fairness (configurable per source; optional solo bias).
 - Backpressure reduces slices for laggy/rejecting sources; micro‑batch duration auto‑tuned for throughput vs responsiveness.
-- Current status: runner demonstrates fair iteration over active jobs with a shared nonce base increment per loop; simple scheduler stub to weight/filter sources by health (rejects/latency) in progress.
+- Current status: runner demonstrates fair iteration over active jobs with a shared nonce base increment per loop; scheduler module added with basic per‑source weights (unit‑tested). Backpressure hooks (rejects/latency) to be integrated next.
 
 6) CacheManager (VRAM mandatory)
    - Per‑GPU dynamic target ≈ 85% available VRAM; respect `min_free_mib`; watermarks trigger async promote/evict by page size (MiB).
