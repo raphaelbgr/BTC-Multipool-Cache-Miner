@@ -308,6 +308,11 @@ int main(int argc, char** argv) {
     metrics_http = std::make_unique<obs::MetricsHttpServer>(&metrics, mcfg.metrics.http_host.c_str(), mcfg.metrics.http_port);
     metrics_http->start();
   }
+  // Per-source backpressure tracking
+  std::unordered_map<uint32_t, int> last_acc, last_rej;
+  std::unordered_map<uint32_t, int> src_penalty;
+  const int latency_penalty_ms = std::max(0, cfg_all.scheduler.latency_penalty_ms);
+  uint64_t last_backpressure_ms = 0;
 
   while (!g_stop.load()) {
     // Drain full results and set registry
@@ -401,7 +406,30 @@ int main(int argc, char** argv) {
         jobs.push_back(dj);
       }
       cuda_engine::uploadDeviceJobs(jobs.data(), static_cast<uint32_t>(jobs.size()));
-      // Apply scheduler weighting (basic: set weights from config; penalties TBD per-source)
+      // Apply scheduler weighting with per-source backpressure
+      auto now_bp_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::steady_clock::now().time_since_epoch()).count();
+      if (now_bp_ms - last_backpressure_ms > 2000) {
+        for (uint32_t sid = 0; sid < sources.size(); ++sid) {
+          int p = 0;
+          if (sources[sid].kind == SourceKind::Stratum && sources[sid].stratum_runner) {
+            int acc = sources[sid].stratum_runner->acceptedSubmits();
+            int rej = sources[sid].stratum_runner->rejectedSubmits();
+            int lat = sources[sid].stratum_runner->avgSubmitMs();
+            int dacc = acc - last_acc[sid];
+            int drej = rej - last_rej[sid];
+            last_acc[sid] = acc; last_rej[sid] = rej;
+            if (drej > dacc) p += 1;              // recent rejects > accepts
+            if (latency_penalty_ms > 0 && lat > latency_penalty_ms) p += 1; // slow submits
+          }
+          // Decay previous penalty if conditions improved
+          int prev = src_penalty[sid];
+          if (p == 0 && prev > 0) prev -= 1; else if (p > 0) prev = std::min(prev + p, 3);
+          src_penalty[sid] = prev;
+          scheduler.source_penalty[sid] = static_cast<uint32_t>(prev);
+        }
+        last_backpressure_ms = now_bp_ms;
+      }
       auto selected_ids = scheduler.select(active_ids, id_to_snap, 64);
       // Mining stub using uploaded jobs (same nonce across jobs) and measure kernel time
       auto t0 = std::chrono::steady_clock::now();
