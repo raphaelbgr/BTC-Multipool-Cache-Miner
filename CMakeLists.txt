@@ -69,6 +69,7 @@ add_executable(unit_tests
   tests/test_adapters_policy.cpp
   tests/test_store_persistence.cpp
   tests/test_cuda_launch_plan.cpp
+  tests/test_cuda_device_hash.cpp
   tests/test_cache_manager.cpp
   tests/test_predict_worker.cpp
   tests/test_cuda_auto_tune.cpp

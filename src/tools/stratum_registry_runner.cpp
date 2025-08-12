@@ -27,6 +27,7 @@
 #include "cuda/hit_ring.h"
 #include "cuda/engine.h"
 #include "scheduler/scheduler.h"
+#include "normalize/endianness.h"
 
 static std::atomic<bool> g_stop{false};
 
@@ -248,9 +249,41 @@ int main(int argc, char** argv) {
       id_to_snap.emplace(s->item.work_id, *s);
     }
     if (!active_ids.empty()) {
+      // Prepare DeviceJob table (scaffold) for the active set
+      std::vector<cuda_engine::DeviceJob> jobs;
+      jobs.reserve(active_ids.size());
+      for (auto wid : active_ids) {
+        const auto& ss = id_to_snap[wid];
+        cuda_engine::DeviceJob dj{};
+        dj.version = ss.item.version;
+        dj.ntime = ss.item.ntime;
+        dj.nbits = ss.item.nbits;
+        dj.vmask = ss.item.vmask;
+        dj.ntime_min = ss.item.ntime_min;
+        dj.ntime_max = ss.item.ntime_max;
+        dj.extranonce2_size = ss.item.extranonce2_size;
+        dj.work_id = ss.item.work_id;
+        std::memcpy(dj.prevhash_le, ss.item.prevhash_le.data(), sizeof(dj.prevhash_le));
+        std::memcpy(dj.merkle_root_le, ss.item.merkle_root_le.data(), sizeof(dj.merkle_root_le));
+        std::memcpy(dj.share_target_le, ss.item.share_target_le.data(), sizeof(dj.share_target_le));
+        std::memcpy(dj.block_target_le, ss.item.block_target_le.data(), sizeof(dj.block_target_le));
+        std::memcpy(dj.midstate_le, ss.job_const.midstate_le.data(), sizeof(dj.midstate_le));
+        jobs.push_back(dj);
+      }
+      cuda_engine::uploadDeviceJobs(jobs.data(), static_cast<uint32_t>(jobs.size()));
       // Apply scheduler weighting
+      // Adjust penalties based on submit health (placeholder: penalize on rejects)
+      if (stratum_runner_ptr) {
+        // For demo, if rejects > accepts, reduce weight for source 0
+        if (stratum_runner_ptr->rejectedSubmits() > stratum_runner_ptr->acceptedSubmits()) {
+          scheduler.source_penalty[0] = 1;
+        } else {
+          scheduler.source_penalty[0] = 0;
+        }
+      }
       auto selected_ids = scheduler.select(active_ids, id_to_snap, 64);
-      cuda_engine::launchPushHitsToDeviceRing(selected_ids.data(), static_cast<uint32_t>(selected_ids.size()), nonce_base);
+      // Mining stub using uploaded jobs (same nonce across jobs)
+      cuda_engine::launchMineStub(static_cast<uint32_t>(jobs.size()), nonce_base);
       nonce_base += 1; // advance to keep testing new nonce across all jobs
       cuda_engine::HitRecord out[64]; uint32_t n = 0;
       if (submit_router && cuda_engine::drainDeviceHits(out, 64, &n) && n > 0) {
@@ -259,11 +292,22 @@ int main(int argc, char** argv) {
           if (it == id_to_snap.end()) continue;
           const auto& ss = it->second;
           uint8_t header[80] = {0};
-          // Fill BE nonce at the end for CPU check
-          header[76] = static_cast<uint8_t>((out[i].nonce >> 24) & 0xFF);
-          header[77] = static_cast<uint8_t>((out[i].nonce >> 16) & 0xFF);
-          header[78] = static_cast<uint8_t>((out[i].nonce >> 8) & 0xFF);
-          header[79] = static_cast<uint8_t>(out[i].nonce & 0xFF);
+          // Assemble 80-byte header in big-endian fields for local CPU verify
+          auto store_u32_be = [](uint8_t* p, uint32_t v){ p[0] = static_cast<uint8_t>((v >> 24) & 0xFF); p[1] = static_cast<uint8_t>((v >> 16) & 0xFF); p[2] = static_cast<uint8_t>((v >> 8) & 0xFF); p[3] = static_cast<uint8_t>(v & 0xFF); };
+          store_u32_be(&header[0],  ss.item.version);
+          {
+            uint8_t be_prev[32];
+            normalize::leU32WordsToBe32Bytes(ss.item.prevhash_le, be_prev);
+            std::memcpy(&header[4], be_prev, 32);
+          }
+          {
+            uint8_t be_mr[32];
+            normalize::leU32WordsToBe32Bytes(ss.item.merkle_root_le, be_mr);
+            std::memcpy(&header[36], be_mr, 32);
+          }
+          store_u32_be(&header[68], ss.item.ntime);
+          store_u32_be(&header[72], ss.item.nbits);
+          store_u32_be(&header[76], out[i].nonce);
           submit_router->verifyAndSubmit(header, ss.item.share_target_le, out[i].work_id, out[i].nonce);
         }
       }

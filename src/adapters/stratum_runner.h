@@ -33,6 +33,9 @@ class StratumRunner {
   int quickDisconnects() const { return consecutive_quick_disconnects_.load(); }
   void resetCounters() { consecutive_connect_failures_.store(0); consecutive_quick_disconnects_.store(0); }
 
+  int acceptedSubmits() const { return accepted_submits_.load(); }
+  int rejectedSubmits() const { return rejected_submits_.load(); }
+
  private:
   void runLoop();
 
@@ -54,6 +57,8 @@ class StratumRunner {
 
   std::atomic<int> consecutive_connect_failures_{0};
   std::atomic<int> consecutive_quick_disconnects_{0};
+  std::atomic<int> accepted_submits_{0};
+  std::atomic<int> rejected_submits_{0};
 };
 
 }  // namespace adapters

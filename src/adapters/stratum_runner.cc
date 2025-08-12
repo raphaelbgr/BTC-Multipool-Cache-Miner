@@ -119,6 +119,7 @@ void StratumRunner::runLoop() {
           if (j.contains("result")) {
             bool ok = j["result"].get<bool>();
             log.info("submit_result", {{"accepted", ok}});
+            if (ok) accepted_submits_.fetch_add(1); else rejected_submits_.fetch_add(1);
           } else if (j.contains("error") && !j["error"].is_null()) {
             // error format: [code, message, data]
             auto err = j["error"];
@@ -126,6 +127,7 @@ void StratumRunner::runLoop() {
             try { code = err[0].get<int>(); } catch (...) {}
             try { msg = err[1].get<std::string>(); } catch (...) {}
             log.warn("submit_error", {{"code", code}, {"message", msg}});
+            rejected_submits_.fetch_add(1);
           }
         } catch (...) {}
         continue;
