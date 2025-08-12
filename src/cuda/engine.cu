@@ -184,53 +184,101 @@ __global__ void kernel_mine_batch(unsigned int num_jobs, unsigned int nonce_base
   // Iterate micro-batch per thread
   for (unsigned int k = 0; k < nonces_per_thread; ++k) {
     unsigned int nonce = start_nonce + k;
-    if (threadIdx.x == 0 && blockIdx.x == 0) {
-      // Reuse single-thread path for header assembly and hashing
-      // Minimal duplication: call same body by inlining the key section
-      unsigned char header[80];
-      header[0] = (g_jobs[j].version >> 24) & 0xFF; header[1] = (g_jobs[j].version >> 16) & 0xFF;
-      header[2] = (g_jobs[j].version >> 8) & 0xFF;  header[3] = (g_jobs[j].version) & 0xFF;
+    // Assemble 80-byte header for this nonce
+    unsigned char header[80];
+    header[0] = (g_jobs[j].version >> 24) & 0xFF; header[1] = (g_jobs[j].version >> 16) & 0xFF;
+    header[2] = (g_jobs[j].version >> 8) & 0xFF;  header[3] = (g_jobs[j].version) & 0xFF;
+    #pragma unroll
+    for (int w = 0; w < 8; ++w) {
+      unsigned int v = g_jobs[j].prevhash_le[w];
+      header[4 + w*4 + 0] = (v >> 24) & 0xFF;
+      header[4 + w*4 + 1] = (v >> 16) & 0xFF;
+      header[4 + w*4 + 2] = (v >> 8) & 0xFF;
+      header[4 + w*4 + 3] = (v) & 0xFF;
+    }
+    #pragma unroll
+    for (int w = 0; w < 8; ++w) {
+      unsigned int v = g_jobs[j].merkle_root_le[w];
+      header[36 + w*4 + 0] = (v >> 24) & 0xFF;
+      header[36 + w*4 + 1] = (v >> 16) & 0xFF;
+      header[36 + w*4 + 2] = (v >> 8) & 0xFF;
+      header[36 + w*4 + 3] = (v) & 0xFF;
+    }
+    unsigned int ntime = g_jobs[j].ntime;
+    if (g_jobs[j].ntime_min && ntime < g_jobs[j].ntime_min) ntime = g_jobs[j].ntime_min;
+    if (g_jobs[j].ntime_max && ntime > g_jobs[j].ntime_max) ntime = g_jobs[j].ntime_max;
+    header[68] = (ntime >> 24) & 0xFF; header[69] = (ntime >> 16) & 0xFF;
+    header[70] = (ntime >> 8) & 0xFF;  header[71] = (ntime) & 0xFF;
+    unsigned int nbits = g_jobs[j].nbits;
+    header[72] = (nbits >> 24) & 0xFF; header[73] = (nbits >> 16) & 0xFF;
+    header[74] = (nbits >> 8) & 0xFF;  header[75] = (nbits) & 0xFF;
+    header[76] = (nonce >> 24) & 0xFF; header[77] = (nonce >> 16) & 0xFF;
+    header[78] = (nonce >> 8) & 0xFF;  header[79] = (nonce) & 0xFF;
+
+    // If midstate available, use optimized path; else full double sha
+    bool used_midstate = false;
+    #pragma unroll
+    for (int i=0;i<8;++i) { if (g_jobs[j].midstate_le[i] != 0u) { used_midstate = true; break; } }
+    unsigned char digest[32];
+    if (used_midstate) {
+      unsigned int st[8];
       #pragma unroll
-      for (int w = 0; w < 8; ++w) {
-        unsigned int v = g_jobs[j].prevhash_le[w];
-        header[4 + w*4 + 0] = (v >> 24) & 0xFF;
-        header[4 + w*4 + 1] = (v >> 16) & 0xFF;
-        header[4 + w*4 + 2] = (v >> 8) & 0xFF;
-        header[4 + w*4 + 3] = (v) & 0xFF;
-      }
+      for (int i=0;i<8;++i) st[i] = g_jobs[j].midstate_le[i];
+      unsigned int w0_15[16];
       #pragma unroll
-      for (int w = 0; w < 8; ++w) {
-        unsigned int v = g_jobs[j].merkle_root_le[w];
-        header[36 + w*4 + 0] = (v >> 24) & 0xFF;
-        header[36 + w*4 + 1] = (v >> 16) & 0xFF;
-        header[36 + w*4 + 2] = (v >> 8) & 0xFF;
-        header[36 + w*4 + 3] = (v) & 0xFF;
+      for (int i=0;i<4;++i) {
+        int o = 64 + i*4;
+        w0_15[i] = (unsigned int(header[o])<<24) | (unsigned int(header[o+1])<<16) |
+                   (unsigned int(header[o+2])<<8) | (unsigned int(header[o+3]));
       }
-      unsigned int ntime = g_jobs[j].ntime;
-      if (g_jobs[j].ntime_min && ntime < g_jobs[j].ntime_min) ntime = g_jobs[j].ntime_min;
-      if (g_jobs[j].ntime_max && ntime > g_jobs[j].ntime_max) ntime = g_jobs[j].ntime_max;
-      header[68] = (ntime >> 24) & 0xFF; header[69] = (ntime >> 16) & 0xFF;
-      header[70] = (ntime >> 8) & 0xFF;  header[71] = (ntime) & 0xFF;
-      unsigned int nbits = g_jobs[j].nbits;
-      header[72] = (nbits >> 24) & 0xFF; header[73] = (nbits >> 16) & 0xFF;
-      header[74] = (nbits >> 8) & 0xFF;  header[75] = (nbits) & 0xFF;
-      header[76] = (nonce >> 24) & 0xFF; header[77] = (nonce >> 16) & 0xFF;
-      header[78] = (nonce >> 8) & 0xFF;  header[79] = (nonce) & 0xFF;
-      unsigned char digest[32];
+      w0_15[4] = 0x80000000u;
+      #pragma unroll
+      for (int i=5;i<15;++i) w0_15[i] = 0u;
+      w0_15[15] = 640u;
+      cuda_sha256d::sha256_compress(st, w0_15);
+      unsigned char t1[32];
+      #pragma unroll
+      for (int i=0;i<8;++i) {
+        t1[i*4+0] = (unsigned char)((st[i] >> 24) & 0xFF);
+        t1[i*4+1] = (unsigned char)((st[i] >> 16) & 0xFF);
+        t1[i*4+2] = (unsigned char)((st[i] >> 8) & 0xFF);
+        t1[i*4+3] = (unsigned char)((st[i]) & 0xFF);
+      }
+      unsigned int st2[8];
+      #pragma unroll
+      for (int i=0;i<8;++i) st2[i] = cuda_sha256d::kSha256IV[i];
+      unsigned int w2[16];
+      #pragma unroll
+      for (int i=0;i<8;++i) {
+        int o = i*4;
+        w2[i] = (unsigned int(t1[o])<<24) | (unsigned int(t1[o+1])<<16) |
+                (unsigned int(t1[o+2])<<8) | (unsigned int(t1[o+3]));
+      }
+      w2[8] = 0x80000000u; for (int i=9;i<15;++i) w2[i]=0u; w2[15] = 256u;
+      cuda_sha256d::sha256_compress(st2, w2);
+      #pragma unroll
+      for (int i=0;i<8;++i) {
+        digest[i*4+0] = (unsigned char)((st2[i] >> 24) & 0xFF);
+        digest[i*4+1] = (unsigned char)((st2[i] >> 16) & 0xFF);
+        digest[i*4+2] = (unsigned char)((st2[i] >> 8) & 0xFF);
+        digest[i*4+3] = (unsigned char)((st2[i]) & 0xFF);
+      }
+    } else {
       cuda_sha256d::sha256d_80_be(header, digest);
-      bool leq = true;
-      #pragma unroll
-      for (int i=0;i<32;++i) {
-        unsigned char t = g_jobs[j].share_target_be[i];
-        if (digest[i] < t) { leq = true; break; }
-        if (digest[i] > t) { leq = false; break; }
-      }
-      if (leq) {
-        unsigned int idx = atomicInc(&g_hit_write_idx, 0xFFFFFFFFu);
-        unsigned int slot = (g_hit_cap == 0) ? 0u : (idx % g_hit_cap);
-        g_hit_buf[slot].work_id = g_jobs[j].work_id;
-        g_hit_buf[slot].nonce = nonce;
-      }
+    }
+
+    bool leq = true;
+    #pragma unroll
+    for (int i=0;i<32;++i) {
+      unsigned char t = g_jobs[j].share_target_be[i];
+      if (digest[i] < t) { leq = true; break; }
+      if (digest[i] > t) { leq = false; break; }
+    }
+    if (leq) {
+      unsigned int idx = atomicInc(&g_hit_write_idx, 0xFFFFFFFFu);
+      unsigned int slot = (g_hit_cap == 0) ? 0u : (idx % g_hit_cap);
+      g_hit_buf[slot].work_id = g_jobs[j].work_id;
+      g_hit_buf[slot].nonce = nonce;
     }
   }
 }
