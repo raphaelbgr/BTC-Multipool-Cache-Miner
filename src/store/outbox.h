@@ -79,6 +79,12 @@ class Outbox {
       }
       return true;
     }
+
+    bool clearFile(const std::string& filepath) {
+      std::lock_guard<std::mutex> lock(mu_);
+      std::ofstream ofs(filepath, std::ios::binary | std::ios::trunc);
+      return static_cast<bool>(ofs);
+    }
 };
 
 }  // namespace store

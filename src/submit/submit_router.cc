@@ -30,6 +30,18 @@ bool SubmitRouter::verifyAndSubmit(const uint8_t header80_be[80], const std::arr
   return true;
 }
 
+bool SubmitRouter::routeRaw(const HitRecord& rec) {
+  if (outbox_) {
+    store::PendingSubmit ps{};
+    ps.work_id = rec.work_id;
+    ps.nonce = rec.nonce;
+    std::memcpy(ps.header80, rec.header80, 80);
+    outbox_->enqueue(ps);
+  }
+  if (cb_) { cb_(rec); return true; }
+  return false;
+}
+
 }  // namespace submit
 
 

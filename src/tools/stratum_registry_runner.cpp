@@ -130,83 +130,120 @@ int main(int argc, char** argv) {
   }
 
   // Registry with multiple slots (supports multiple sources)
-  registry::WorkSourceRegistry reg(4);
-  adapters::StratumAdapter adapter("stratum");
-  adapters::StratumRunner* stratum_runner_ptr = nullptr;
-  std::unique_ptr<adapters::StratumRunner> stratum_runner;
+  auto cfg_all = config::loadFromJsonFile("config/pools.json");
+  const std::size_t num_slots = std::max<std::size_t>(1, cfg_all.pools.size());
+  registry::WorkSourceRegistry reg(num_slots);
+  // Multi-source structures
+  enum class SourceKind { Stratum, Gbt };
+  struct SourceInfo {
+    SourceKind kind{SourceKind::Stratum};
+    adapters::StratumAdapter* stratum_adapter{nullptr};
+    adapters::StratumRunner* stratum_runner{nullptr};
+    submit::StratumSubmitter* stratum_submitter{nullptr};
+    adapters::GbtAdapter* gbt_adapter{nullptr};
+  };
+  std::vector<SourceInfo> sources(num_slots);
+  std::vector<std::unique_ptr<adapters::StratumAdapter>> strat_adapters;
+  std::vector<std::unique_ptr<adapters::StratumRunner>> strat_runners;
+  std::vector<std::unique_ptr<submit::StratumSubmitter>> strat_submitters;
   std::unique_ptr<adapters::GbtAdapter> gbt_adapter;
   std::unique_ptr<adapters::GbtRunner> gbt_runner;
-  std::unique_ptr<submit::SubmitRouter> submit_router;
-  std::unique_ptr<submit::StratumSubmitter> stratum_submitter;
   std::unique_ptr<submit::GbtSubmitter> gbt_submitter;
+  std::unique_ptr<submit::SubmitRouter> submit_router;
+  // Map from work_id to source slot
+  std::unordered_map<uint64_t, uint32_t> workid_to_source;
   store::Outbox outbox;
   const std::string outbox_path = "logs/outbox.bin";
   outbox.loadFromFile(outbox_path);
+  // On startup, attempt to drain and resubmit old pending hits
+  auto replay_pending = [&](submit::SubmitRouter* router){
+    if (!router) return;
+    int replayed = 0;
+    while (true) {
+      auto s = outbox.tryDequeue();
+      if (!s.has_value()) break;
+      // Re-verify locally before resubmitting
+      // The target is unknown here, so we optimistically resubmit; pools enforce validity
+      submit::HitRecord rec{}; rec.work_id = s->work_id; rec.nonce = s->nonce; std::memcpy(rec.header80, s->header80, 80);
+      // Route through router; outbox enqueue is idempotent via dedupe
+      router->routeRaw(rec);
+      ++replayed;
+      if (replayed >= 128) break; // avoid long stalls on startup
+    }
+  };
 
   // If selected profile is GBT, start GBT runner; else Stratum
   bool use_gbt = false;
   if (!used_legacy) {
-    auto cfg = config::loadFromJsonFile("config/pools.json");
-    std::string choice; if (const char* env = std::getenv("BMAD_POOL")) choice = env;
-    const config::PoolEntry* sel = nullptr;
-    for (const auto& p : cfg.pools) { if (choice.empty() || p.name == choice) { sel = &p; if (!choice.empty()) break; } }
-    if (sel && sel->profile == "gbt") {
-      use_gbt = true;
-      gbt_adapter = std::make_unique<adapters::GbtAdapter>("gbt");
-      gbt_runner = std::make_unique<adapters::GbtRunner>(gbt_adapter.get(), *sel);
-      gbt_runner->start();
-      submit_router = std::make_unique<submit::SubmitRouter>([&](const submit::HitRecord& rec){
-        gbt_adapter->submitShare(rec.work_id, rec.nonce, rec.header80);
-        store::PendingSubmit ps{}; ps.work_id = rec.work_id; ps.nonce = rec.nonce; std::memcpy(ps.header80, rec.header80, 80);
-        outbox.appendToFile(outbox_path, ps);
-      });
-      submit_router->attachOutbox(&outbox);
-    }
-  }
-  if (!use_gbt) {
-    // Apply policy from selected pool if available
-    if (!used_legacy) {
-      auto cfg = config::loadFromJsonFile("config/pools.json");
-      std::string choice; if (const char* env = std::getenv("BMAD_POOL")) choice = env;
-      const config::PoolEntry* selp = nullptr;
-      for (const auto& p : cfg.pools) { if (choice.empty() || p.name == choice) { selp = &p; if (!choice.empty()) break; } }
-      if (selp) {
-        adapter.setCleanJobs(selp->policy.clean_jobs_default);
-        adapter.forceCleanJobs(selp->policy.force_clean_jobs);
-        if (selp->policy.version_mask.has_value()) adapter.setVersionMask(*selp->policy.version_mask);
-        if (selp->policy.ntime_min.has_value() || selp->policy.ntime_max.has_value()) {
-          uint32_t nmin = selp->policy.ntime_min.value_or(0);
-          uint32_t nmax = selp->policy.ntime_max.value_or(0);
-          adapter.setNtimeCaps(nmin, nmax);
+    // Initialize sources per pool
+    for (std::size_t idx = 0; idx < cfg_all.pools.size(); ++idx) {
+      const auto& p = cfg_all.pools[idx];
+      if (p.profile == "gbt") {
+        if (!gbt_adapter) {
+          use_gbt = true;
+          gbt_adapter = std::make_unique<adapters::GbtAdapter>("gbt");
+          gbt_runner = std::make_unique<adapters::GbtRunner>(gbt_adapter.get(), p);
+          gbt_runner->start();
+          // Initialize GBT submitter if RPC configured
+          if (p.rpc.has_value()) gbt_submitter = std::make_unique<submit::GbtSubmitter>(*p.rpc);
         }
-        if (selp->policy.share_nbits.has_value()) adapter.updateVarDiff(*selp->policy.share_nbits);
+        sources[idx].kind = SourceKind::Gbt;
+        sources[idx].gbt_adapter = gbt_adapter.get();
+      } else {
+        // Create stratum adapter and runner for this slot
+        auto sad = std::make_unique<adapters::StratumAdapter>("stratum");
+        auto& adp = *sad;
+        // Apply policy
+        adp.setCleanJobs(p.policy.clean_jobs_default);
+        adp.forceCleanJobs(p.policy.force_clean_jobs);
+        if (p.policy.version_mask.has_value()) adp.setVersionMask(*p.policy.version_mask);
+        if (p.policy.ntime_min.has_value() || p.policy.ntime_max.has_value()) {
+          adp.setNtimeCaps(p.policy.ntime_min.value_or(0), p.policy.ntime_max.value_or(0));
+        }
+        if (p.policy.share_nbits.has_value()) adp.updateVarDiff(*p.policy.share_nbits);
+        // Endpoint
+        if (p.endpoints.empty()) continue;
+        std::string h = p.endpoints[0].host; uint16_t prt = p.endpoints[0].port; bool tls = p.endpoints[0].use_tls;
+        // Credentials
+        adapters::PoolProfile prof = adapters::PoolProfile::kGeneric;
+        if (p.profile == "viabtc") prof = adapters::PoolProfile::kViaBTC; else if (p.profile == "f2pool") prof = adapters::PoolProfile::kF2Pool;
+        std::string walletOrAccount = (p.cred_mode == config::CredMode::WalletAsUser) ? p.wallet : p.account;
+        std::string workerName = p.worker;
+        std::string pwd = p.password.empty()? std::string("x") : p.password;
+        auto creds = adapters::formatStratumCredentials(prof, walletOrAccount, workerName, pwd);
+        auto srun = std::make_unique<adapters::StratumRunner>(&adp, h, prt, creds.first, creds.second, tls);
+        srun->start();
+        auto subm = std::make_unique<submit::StratumSubmitter>(srun.get(), creds.first);
+        sources[idx].kind = SourceKind::Stratum;
+        sources[idx].stratum_adapter = &adp;
+        sources[idx].stratum_runner = srun.get();
+        sources[idx].stratum_submitter = subm.get();
+        strat_submitters.push_back(std::move(subm));
+        strat_runners.push_back(std::move(srun));
+        strat_adapters.push_back(std::move(sad));
       }
     }
-    stratum_runner = std::make_unique<adapters::StratumRunner>(&adapter, host, port, user, pass, use_tls);
-    stratum_runner_ptr = stratum_runner.get();
-    stratum_runner->start();
-    stratum_submitter = std::make_unique<submit::StratumSubmitter>(stratum_runner_ptr, user);
+    // Submit router that routes shares to the originating stratum source
     submit_router = std::make_unique<submit::SubmitRouter>([&](const submit::HitRecord& rec){
-      // Build extranonce2 hex as zeros of configured size (placeholder)
-      uint8_t header[80]; std::memcpy(header, rec.header80, 80);
-      const uint8_t* h = header;
-      const uint8_t* ntime_be = &h[68]; (void)ntime_be;
-      const int en2_size = static_cast<int>(adapter.extranonce2Size());
-      std::string en2_hex; en2_hex.assign(static_cast<size_t>(en2_size) * 2, '0');
-      (void)stratum_submitter->submitFromHeader(header, en2_hex);
+      auto it = workid_to_source.find(rec.work_id);
+      if (it != workid_to_source.end()) {
+        uint32_t sid = it->second;
+        if (sid < sources.size() && sources[sid].kind == SourceKind::Stratum && sources[sid].stratum_submitter && sources[sid].stratum_adapter) {
+          // Build extranonce2 hex as zeros of configured size (placeholder)
+          int en2_size = static_cast<int>(sources[sid].stratum_adapter->extranonce2Size());
+          std::string en2_hex; en2_hex.assign(static_cast<size_t>(en2_size) * 2, '0');
+          (void)sources[sid].stratum_submitter->submitFromHeader(rec.header80, en2_hex);
+        }
+      }
       store::PendingSubmit ps{}; ps.work_id = rec.work_id; ps.nonce = rec.nonce; std::memcpy(ps.header80, rec.header80, 80);
       outbox.appendToFile(outbox_path, ps);
     });
     submit_router->attachOutbox(&outbox);
+    replay_pending(submit_router.get());
   }
+  // Dummy for legacy interactive submit path; will use first stratum if present
+  adapters::StratumRunner* stratum_runner_ptr = strat_runners.empty() ? nullptr : strat_runners.front().get();
   submit::StratumSubmitter submitter(stratum_runner_ptr, user);
-  // Initialize GBT submitter if config has RPC
-  if (!used_legacy) {
-    auto cfg = config::loadFromJsonFile("config/pools.json");
-    for (const auto& p : cfg.pools) {
-      if (p.profile == "gbt" && p.rpc.has_value()) { gbt_submitter = std::make_unique<submit::GbtSubmitter>(*p.rpc); break; }
-    }
-  }
 
   uint64_t last_gen = 0;
   std::string last_ntime_hex;
@@ -274,12 +311,29 @@ int main(int argc, char** argv) {
 
   while (!g_stop.load()) {
     // Drain full results and set registry
-    while (true) {
-      std::optional<normalize::NormalizerResult> full;
-      if (use_gbt) full = gbt_adapter->pollNormalizedFull();
-      else full = adapter.pollNormalizedFull();
-      if (!full.has_value()) break;
-      reg.set(0, full->item, full->job_const);
+    // Poll all stratum adapters and optional GBT into their slots
+    for (std::size_t sid = 0; sid < sources.size(); ++sid) {
+      bool progressed = false;
+      if (sources[sid].kind == SourceKind::Stratum && sources[sid].stratum_adapter) {
+        while (true) {
+          auto full = sources[sid].stratum_adapter->pollNormalizedFull();
+          if (!full.has_value()) break;
+          auto item = full->item; item.source_id = static_cast<uint32_t>(sid); item.active = true;
+          workid_to_source[item.work_id] = static_cast<uint32_t>(sid);
+          reg.set(sid, item, full->job_const);
+          progressed = true;
+        }
+      } else if (sources[sid].kind == SourceKind::Gbt && sources[sid].gbt_adapter) {
+        while (true) {
+          auto full = sources[sid].gbt_adapter->pollNormalizedFull();
+          if (!full.has_value()) break;
+          auto item = full->item; item.source_id = static_cast<uint32_t>(sid); item.active = true;
+          workid_to_source[item.work_id] = static_cast<uint32_t>(sid);
+          reg.set(sid, item, full->job_const);
+          progressed = true;
+        }
+      }
+      (void)progressed;
     }
 
     auto snap = reg.get(0);
@@ -347,23 +401,7 @@ int main(int argc, char** argv) {
         jobs.push_back(dj);
       }
       cuda_engine::uploadDeviceJobs(jobs.data(), static_cast<uint32_t>(jobs.size()));
-      // Apply scheduler weighting
-      // Adjust penalties based on submit health (placeholder: penalize on rejects)
-      if (stratum_runner_ptr) {
-        // For demo, if rejects > accepts, reduce weight for source 0
-        if (stratum_runner_ptr->rejectedSubmits() > stratum_runner_ptr->acceptedSubmits()) {
-          scheduler.source_penalty[0] = 1;
-        } else {
-          scheduler.source_penalty[0] = 0;
-        }
-        // Also penalize when avg submit latency is high
-        auto cfg = config::loadFromJsonFile("config/pools.json");
-        int penalty_ms = cfg.scheduler.latency_penalty_ms;
-        if (penalty_ms <= 0) penalty_ms = 1500;
-        if (stratum_runner_ptr->avgSubmitMs() > penalty_ms) {
-          scheduler.source_penalty[0] = 2;
-        }
-      }
+      // Apply scheduler weighting (basic: set weights from config; penalties TBD per-source)
       auto selected_ids = scheduler.select(active_ids, id_to_snap, 64);
       // Mining stub using uploaded jobs (same nonce across jobs) and measure kernel time
       auto t0 = std::chrono::steady_clock::now();

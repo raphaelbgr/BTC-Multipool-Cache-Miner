@@ -30,6 +30,9 @@ class SubmitRouter {
   bool verifyAndSubmit(const uint8_t header80_be[80], const std::array<uint32_t, 8>& target_le,
                        uint64_t work_id, uint32_t nonce);
 
+    // Route a pre-verified or previously persisted hit directly
+    bool routeRaw(const HitRecord& rec);
+
  private:
   SubmitCallback cb_;
   store::Outbox* outbox_{nullptr};
