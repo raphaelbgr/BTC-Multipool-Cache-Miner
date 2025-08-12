@@ -43,6 +43,16 @@ struct PoolEntry {
     std::string cb_tag;             // coinbase tag string, informational
   };
   std::optional<GbtConfig> gbt;
+
+    // Optional per-pool policy hints
+    struct PolicyCfg {
+      bool force_clean_jobs{false};
+      bool clean_jobs_default{true};
+      std::optional<uint32_t> version_mask;   // bitmask for version rolling
+      std::optional<uint32_t> ntime_min;
+      std::optional<uint32_t> ntime_max;
+      std::optional<uint32_t> share_nbits;    // initial varDiff share target (compact)
+    } policy;
 };
 
 struct AppConfig {

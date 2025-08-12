@@ -72,6 +72,15 @@ AppConfig loadFromJsonFile(const std::string& path) {
         if (g.contains("cb_tag")) gc.cb_tag = g["cb_tag"].get<std::string>();
         e.gbt = gc;
       }
+      if (p.contains("policy") && p["policy"].is_object()) {
+        const auto& po = p["policy"];
+        if (po.contains("force_clean_jobs")) e.policy.force_clean_jobs = po["force_clean_jobs"].get<bool>();
+        if (po.contains("clean_jobs_default")) e.policy.clean_jobs_default = po["clean_jobs_default"].get<bool>();
+        if (po.contains("version_mask")) { try { e.policy.version_mask = std::stoul(po["version_mask"].get<std::string>(), nullptr, 16); } catch(...){} }
+        if (po.contains("ntime_min")) { try { e.policy.ntime_min = std::stoul(po["ntime_min"].get<std::string>(), nullptr, 16); } catch(...){} }
+        if (po.contains("ntime_max")) { try { e.policy.ntime_max = std::stoul(po["ntime_max"].get<std::string>(), nullptr, 16); } catch(...){} }
+        if (po.contains("share_nbits")) { try { e.policy.share_nbits = std::stoul(po["share_nbits"].get<std::string>(), nullptr, 16); } catch(...){} }
+      }
       cfg.pools.push_back(std::move(e));
     }
   }

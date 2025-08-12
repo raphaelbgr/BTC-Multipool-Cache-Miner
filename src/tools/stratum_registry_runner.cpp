@@ -157,6 +157,24 @@ int main(int argc, char** argv) {
     }
   }
   if (!use_gbt) {
+    // Apply policy from selected pool if available
+    if (!used_legacy) {
+      auto cfg = config::loadFromJsonFile("config/pools.json");
+      std::string choice; if (const char* env = std::getenv("BMAD_POOL")) choice = env;
+      const config::PoolEntry* selp = nullptr;
+      for (const auto& p : cfg.pools) { if (choice.empty() || p.name == choice) { selp = &p; if (!choice.empty()) break; } }
+      if (selp) {
+        adapter.setCleanJobs(selp->policy.clean_jobs_default);
+        adapter.forceCleanJobs(selp->policy.force_clean_jobs);
+        if (selp->policy.version_mask.has_value()) adapter.setVersionMask(*selp->policy.version_mask);
+        if (selp->policy.ntime_min.has_value() || selp->policy.ntime_max.has_value()) {
+          uint32_t nmin = selp->policy.ntime_min.value_or(0);
+          uint32_t nmax = selp->policy.ntime_max.value_or(0);
+          adapter.setNtimeCaps(nmin, nmax);
+        }
+        if (selp->policy.share_nbits.has_value()) adapter.updateVarDiff(*selp->policy.share_nbits);
+      }
+    }
     stratum_runner = std::make_unique<adapters::StratumRunner>(&adapter, host, port, user, pass, use_tls);
     stratum_runner_ptr = stratum_runner.get();
     stratum_runner->start();
