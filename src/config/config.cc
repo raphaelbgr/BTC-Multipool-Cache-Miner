@@ -26,6 +26,9 @@ AppConfig loadFromJsonFile(const std::string& path) {
     if (m.contains("enable_file")) cfg.metrics.enable_file = m["enable_file"].get<bool>();
     if (m.contains("file_path")) cfg.metrics.file_path = m["file_path"].get<std::string>();
     if (m.contains("dump_interval_ms")) cfg.metrics.dump_interval_ms = m["dump_interval_ms"].get<int>();
+    if (m.contains("enable_http")) cfg.metrics.enable_http = m["enable_http"].get<bool>();
+    if (m.contains("http_host")) cfg.metrics.http_host = m["http_host"].get<std::string>();
+    if (m.contains("http_port")) cfg.metrics.http_port = static_cast<uint16_t>(m["http_port"].get<int>());
   }
   if (j.contains("cuda") && j["cuda"].is_object()) {
     const auto& c = j["cuda"];

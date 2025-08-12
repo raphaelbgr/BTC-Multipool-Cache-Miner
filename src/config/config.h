@@ -68,6 +68,9 @@ struct AppConfig {
     bool enable_file{false};
     std::string file_path{"logs/metrics.jsonl"};
     int dump_interval_ms{2000};
+    bool enable_http{false};
+    std::string http_host{"127.0.0.1"};
+    uint16_t http_port{8080};
   } metrics;
 
   // CUDA engine configuration

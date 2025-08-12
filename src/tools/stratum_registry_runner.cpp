@@ -255,6 +255,12 @@ int main(int argc, char** argv) {
   if (metrics_file) {
     metrics_ofs = std::make_unique<std::ofstream>(metrics_path, std::ios::out | std::ios::app);
   }
+  // Optional HTTP metrics server (placeholder, starts background thread)
+  std::unique_ptr<obs::MetricsHttpServer> metrics_http;
+  if (mcfg.metrics.enable_http) {
+    metrics_http = std::make_unique<obs::MetricsHttpServer>(&metrics, mcfg.metrics.http_host.c_str(), mcfg.metrics.http_port);
+    metrics_http->start();
+  }
 
   while (!g_stop.load()) {
     // Drain full results and set registry
