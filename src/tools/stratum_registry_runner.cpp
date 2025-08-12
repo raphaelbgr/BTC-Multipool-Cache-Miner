@@ -31,6 +31,7 @@
 #include "cuda/engine.h"
 #include "scheduler/scheduler.h"
 #include "normalize/endianness.h"
+#include "store/outbox.h"
 
 static std::atomic<bool> g_stop{false};
 
@@ -138,6 +139,9 @@ int main(int argc, char** argv) {
   std::unique_ptr<submit::SubmitRouter> submit_router;
   std::unique_ptr<submit::StratumSubmitter> stratum_submitter;
   std::unique_ptr<submit::GbtSubmitter> gbt_submitter;
+  store::Outbox outbox;
+  const std::string outbox_path = "logs/outbox.bin";
+  outbox.loadFromFile(outbox_path);
 
   // If selected profile is GBT, start GBT runner; else Stratum
   bool use_gbt = false;
@@ -153,7 +157,10 @@ int main(int argc, char** argv) {
       gbt_runner->start();
       submit_router = std::make_unique<submit::SubmitRouter>([&](const submit::HitRecord& rec){
         gbt_adapter->submitShare(rec.work_id, rec.nonce, rec.header80);
+        store::PendingSubmit ps{}; ps.work_id = rec.work_id; ps.nonce = rec.nonce; std::memcpy(ps.header80, rec.header80, 80);
+        outbox.appendToFile(outbox_path, ps);
       });
+      submit_router->attachOutbox(&outbox);
     }
   }
   if (!use_gbt) {
@@ -187,7 +194,10 @@ int main(int argc, char** argv) {
       const int en2_size = static_cast<int>(adapter.extranonce2Size());
       std::string en2_hex; en2_hex.assign(static_cast<size_t>(en2_size) * 2, '0');
       (void)stratum_submitter->submitFromHeader(header, en2_hex);
+      store::PendingSubmit ps{}; ps.work_id = rec.work_id; ps.nonce = rec.nonce; std::memcpy(ps.header80, rec.header80, 80);
+      outbox.appendToFile(outbox_path, ps);
     });
+    submit_router->attachOutbox(&outbox);
   }
   submit::StratumSubmitter submitter(stratum_runner_ptr, user);
   // Initialize GBT submitter if config has RPC

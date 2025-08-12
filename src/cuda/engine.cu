@@ -7,6 +7,13 @@
 
 namespace cuda_engine {
 
+__device__ inline unsigned int bswap32(unsigned int v) {
+  return ((v & 0x000000FFu) << 24) |
+         ((v & 0x0000FF00u) << 8)  |
+         ((v & 0x00FF0000u) >> 8)  |
+         ((v & 0xFF000000u) >> 24);
+}
+
 __global__ void kernel_noop() {
   cuda_sha256d::hash256_once_stub();
 }
@@ -225,12 +232,11 @@ __global__ void kernel_mine_batch(unsigned int num_jobs, unsigned int nonce_base
       #pragma unroll
       for (int i=0;i<8;++i) st[i] = g_jobs[j].midstate_le[i];
       unsigned int w0_15[16];
-      #pragma unroll
-      for (int i=0;i<4;++i) {
-        int o = 64 + i*4;
-        w0_15[i] = (unsigned int(header[o])<<24) | (unsigned int(header[o+1])<<16) |
-                   (unsigned int(header[o+2])<<8) | (unsigned int(header[o+3]));
-      }
+      // bytes 64..79: last 4 bytes of merkle_root (BE), ntime (BE), nbits (BE), nonce (BE)
+      w0_15[0] = bswap32(g_jobs[j].merkle_root_le[7]);
+      w0_15[1] = bswap32(ntime);
+      w0_15[2] = bswap32(nbits);
+      w0_15[3] = bswap32(nonce);
       w0_15[4] = 0x80000000u;
       #pragma unroll
       for (int i=5;i<15;++i) w0_15[i] = 0u;
