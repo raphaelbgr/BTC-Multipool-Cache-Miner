@@ -74,6 +74,7 @@ struct AppConfig {
   struct CudaCfg {
     int hit_ring_capacity{1024};
     int desired_threads_per_job{256};
+    int nonces_per_thread{1};
   } cuda;
 };
 

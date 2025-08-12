@@ -60,6 +60,13 @@ bool launchMineWithPlan(uint32_t num_jobs,
                         uint32_t threads_per_block,
                         uint32_t nonce_base);
 
+// Launch mining with plan and micro-batch of nonces per thread
+bool launchMineWithPlanBatch(uint32_t num_jobs,
+                             uint32_t blocks_per_job,
+                             uint32_t threads_per_block,
+                             uint32_t nonce_base,
+                             uint32_t nonces_per_thread);
+
 // Compute SHA-256d(header80) on device for a given uploaded job and nonce; writes 32-byte BE digest to out32_host
 bool computeDeviceHashForJob(uint32_t job_index, uint32_t nonce, unsigned char out32_host[32]);
 

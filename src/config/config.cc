@@ -31,6 +31,7 @@ AppConfig loadFromJsonFile(const std::string& path) {
     const auto& c = j["cuda"];
     if (c.contains("hit_ring_capacity")) cfg.cuda.hit_ring_capacity = c["hit_ring_capacity"].get<int>();
     if (c.contains("desired_threads_per_job")) cfg.cuda.desired_threads_per_job = c["desired_threads_per_job"].get<int>();
+    if (c.contains("nonces_per_thread")) cfg.cuda.nonces_per_thread = c["nonces_per_thread"].get<int>();
   }
   if (j.contains("pools") && j["pools"].is_array()) {
     for (const auto& p : j["pools"]) {

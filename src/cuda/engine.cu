@@ -175,6 +175,65 @@ __global__ void kernel_mine_stub(unsigned int num_jobs, unsigned int nonce_base)
     }
   }
 }
+
+__global__ void kernel_mine_batch(unsigned int num_jobs, unsigned int nonce_base, unsigned int nonces_per_thread) {
+  unsigned int j = blockIdx.y;
+  if (j >= num_jobs) return;
+  unsigned int lane = threadIdx.x + blockIdx.x * blockDim.x;
+  unsigned int start_nonce = nonce_base + j + lane * nonces_per_thread;
+  // Iterate micro-batch per thread
+  for (unsigned int k = 0; k < nonces_per_thread; ++k) {
+    unsigned int nonce = start_nonce + k;
+    if (threadIdx.x == 0 && blockIdx.x == 0) {
+      // Reuse single-thread path for header assembly and hashing
+      // Minimal duplication: call same body by inlining the key section
+      unsigned char header[80];
+      header[0] = (g_jobs[j].version >> 24) & 0xFF; header[1] = (g_jobs[j].version >> 16) & 0xFF;
+      header[2] = (g_jobs[j].version >> 8) & 0xFF;  header[3] = (g_jobs[j].version) & 0xFF;
+      #pragma unroll
+      for (int w = 0; w < 8; ++w) {
+        unsigned int v = g_jobs[j].prevhash_le[w];
+        header[4 + w*4 + 0] = (v >> 24) & 0xFF;
+        header[4 + w*4 + 1] = (v >> 16) & 0xFF;
+        header[4 + w*4 + 2] = (v >> 8) & 0xFF;
+        header[4 + w*4 + 3] = (v) & 0xFF;
+      }
+      #pragma unroll
+      for (int w = 0; w < 8; ++w) {
+        unsigned int v = g_jobs[j].merkle_root_le[w];
+        header[36 + w*4 + 0] = (v >> 24) & 0xFF;
+        header[36 + w*4 + 1] = (v >> 16) & 0xFF;
+        header[36 + w*4 + 2] = (v >> 8) & 0xFF;
+        header[36 + w*4 + 3] = (v) & 0xFF;
+      }
+      unsigned int ntime = g_jobs[j].ntime;
+      if (g_jobs[j].ntime_min && ntime < g_jobs[j].ntime_min) ntime = g_jobs[j].ntime_min;
+      if (g_jobs[j].ntime_max && ntime > g_jobs[j].ntime_max) ntime = g_jobs[j].ntime_max;
+      header[68] = (ntime >> 24) & 0xFF; header[69] = (ntime >> 16) & 0xFF;
+      header[70] = (ntime >> 8) & 0xFF;  header[71] = (ntime) & 0xFF;
+      unsigned int nbits = g_jobs[j].nbits;
+      header[72] = (nbits >> 24) & 0xFF; header[73] = (nbits >> 16) & 0xFF;
+      header[74] = (nbits >> 8) & 0xFF;  header[75] = (nbits) & 0xFF;
+      header[76] = (nonce >> 24) & 0xFF; header[77] = (nonce >> 16) & 0xFF;
+      header[78] = (nonce >> 8) & 0xFF;  header[79] = (nonce) & 0xFF;
+      unsigned char digest[32];
+      cuda_sha256d::sha256d_80_be(header, digest);
+      bool leq = true;
+      #pragma unroll
+      for (int i=0;i<32;++i) {
+        unsigned char t = g_jobs[j].share_target_be[i];
+        if (digest[i] < t) { leq = true; break; }
+        if (digest[i] > t) { leq = false; break; }
+      }
+      if (leq) {
+        unsigned int idx = atomicInc(&g_hit_write_idx, 0xFFFFFFFFu);
+        unsigned int slot = (g_hit_cap == 0) ? 0u : (idx % g_hit_cap);
+        g_hit_buf[slot].work_id = g_jobs[j].work_id;
+        g_hit_buf[slot].nonce = nonce;
+      }
+    }
+  }
+}
 __global__ void kernel_hash_one(uint32_t job_index, uint32_t nonce, unsigned char* out32) {
   if (!g_jobs) return;
   unsigned int j = job_index;
@@ -280,6 +339,25 @@ bool cuda_engine::launchMineWithPlan(uint32_t num_jobs,
   dim3 grid(blocks_per_job, num_jobs, 1);
   dim3 block(threads_per_block, 1, 1);
   kernel_mine_stub<<<grid, block>>>(num_jobs, nonce_base);
+  cudaDeviceSynchronize();
+  return true;
+#endif
+}
+
+bool cuda_engine::launchMineWithPlanBatch(uint32_t num_jobs,
+                                          uint32_t blocks_per_job,
+                                          uint32_t threads_per_block,
+                                          uint32_t nonce_base,
+                                          uint32_t nonces_per_thread) {
+#ifndef __CUDACC__
+  (void)num_jobs; (void)blocks_per_job; (void)threads_per_block; (void)nonce_base; (void)nonces_per_thread; return true;
+#else
+  if (g_num_jobs == 0 || num_jobs == 0) return false;
+  if (blocks_per_job == 0 || threads_per_block == 0) return false;
+  if (nonces_per_thread == 0) nonces_per_thread = 1;
+  dim3 grid(blocks_per_job, num_jobs, 1);
+  dim3 block(threads_per_block, 1, 1);
+  kernel_mine_batch<<<grid, block>>>(num_jobs, nonce_base, nonces_per_thread);
   cudaDeviceSynchronize();
   return true;
 #endif

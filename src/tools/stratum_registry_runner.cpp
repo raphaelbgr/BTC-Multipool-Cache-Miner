@@ -356,7 +356,12 @@ int main(int argc, char** argv) {
       auto plan = cuda_engine::computeLaunchPlan(static_cast<uint32_t>(jobs.size()),
                                                  static_cast<uint64_t>(std::max(1, app_cfg.cuda.desired_threads_per_job)));
       if (plan.num_jobs > 0 && plan.blocks_per_job > 0 && plan.threads_per_block > 0) {
-        cuda_engine::launchMineWithPlan(plan.num_jobs, plan.blocks_per_job, plan.threads_per_block, nonce_base);
+        int npt = std::max(1, app_cfg.cuda.nonces_per_thread);
+        if (npt > 1) {
+          cuda_engine::launchMineWithPlanBatch(plan.num_jobs, plan.blocks_per_job, plan.threads_per_block, nonce_base, static_cast<uint32_t>(npt));
+        } else {
+          cuda_engine::launchMineWithPlan(plan.num_jobs, plan.blocks_per_job, plan.threads_per_block, nonce_base);
+        }
       } else {
         cuda_engine::launchMineStub(static_cast<uint32_t>(jobs.size()), nonce_base);
       }
