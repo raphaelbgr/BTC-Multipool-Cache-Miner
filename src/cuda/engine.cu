@@ -554,6 +554,18 @@ bool cuda_engine::drainDeviceHits(HitRecord* out_hits_host,
 #endif
 }
 
+bool cuda_engine::getDeviceMemoryInfo(uint64_t* out_free_bytes, uint64_t* out_total_bytes) {
+#ifndef __CUDACC__
+  if (out_free_bytes) *out_free_bytes = 0; if (out_total_bytes) *out_total_bytes = 0; return false;
+#else
+  size_t free_b = 0, total_b = 0;
+  cudaMemGetInfo(&free_b, &total_b);
+  if (out_free_bytes) *out_free_bytes = static_cast<uint64_t>(free_b);
+  if (out_total_bytes) *out_total_bytes = static_cast<uint64_t>(total_b);
+  return true;
+#endif
+}
+
 }  // namespace cuda_engine
 
 

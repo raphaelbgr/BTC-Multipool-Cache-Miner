@@ -92,4 +92,7 @@ bool drainDeviceHits(struct HitRecord* out_hits_host,
                      uint32_t max_out,
                      uint32_t* out_count);
 
+// Query device memory info (bytes). Returns false if CUDA not available
+bool getDeviceMemoryInfo(uint64_t* out_free_bytes, uint64_t* out_total_bytes);
+
 }

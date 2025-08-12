@@ -317,6 +317,13 @@ int main(int argc, char** argv) {
   int desired_threads_per_job = std::max(1, cfg_all.cuda.desired_threads_per_job);
   int nonces_per_thread = std::max(1, cfg_all.cuda.nonces_per_thread);
   const int budget_ms = 16; // aim for ~16ms batches by default
+  // Report basic CUDA memory info
+  {
+    uint64_t free_b=0,total_b=0; if (cuda_engine::getDeviceMemoryInfo(&free_b,&total_b)) {
+      metrics.setGauge("cuda.mem_free_mb", static_cast<int64_t>(free_b/1024/1024));
+      metrics.setGauge("cuda.mem_total_mb", static_cast<int64_t>(total_b/1024/1024));
+    }
+  }
 
   while (!g_stop.load()) {
     // Drain full results and set registry
