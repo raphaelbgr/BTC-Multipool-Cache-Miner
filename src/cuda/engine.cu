@@ -276,6 +276,23 @@ bool cuda_engine::launchMineStub(uint32_t num_jobs, uint32_t nonce_base) {
 #endif
 }
 
+bool cuda_engine::launchMineWithPlan(uint32_t num_jobs,
+                                     uint32_t blocks_per_job,
+                                     uint32_t threads_per_block,
+                                     uint32_t nonce_base) {
+#ifndef __CUDACC__
+  (void)num_jobs; (void)blocks_per_job; (void)threads_per_block; (void)nonce_base; return true;
+#else
+  if (g_num_jobs == 0 || num_jobs == 0) return false;
+  if (blocks_per_job == 0 || threads_per_block == 0) return false;
+  dim3 grid(blocks_per_job, num_jobs, 1);
+  dim3 block(threads_per_block, 1, 1);
+  kernel_mine_stub<<<grid, block>>>(num_jobs, nonce_base);
+  cudaDeviceSynchronize();
+  return true;
+#endif
+}
+
 bool cuda_engine::uploadDeviceJobs(const DeviceJob* jobs_host, uint32_t num_jobs) {
 #ifndef __CUDACC__
   (void)jobs_host; (void)num_jobs; return true;

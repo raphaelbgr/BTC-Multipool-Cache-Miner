@@ -53,6 +53,12 @@ bool uploadDeviceJobs(const DeviceJob* jobs_host, uint32_t num_jobs);
 // Launch mining stub over uploaded jobs: one candidate per job with given nonce base
 bool launchMineStub(uint32_t num_jobs, uint32_t nonce_base);
 
+// Launch mining stub with an explicit plan (blocks_per_job x threads_per_block), grid.y = num_jobs
+bool launchMineWithPlan(uint32_t num_jobs,
+                        uint32_t blocks_per_job,
+                        uint32_t threads_per_block,
+                        uint32_t nonce_base);
+
 // Compute SHA-256d(header80) on device for a given uploaded job and nonce; writes 32-byte BE digest to out32_host
 bool computeDeviceHashForJob(uint32_t job_index, uint32_t nonce, unsigned char out32_host[32]);
 

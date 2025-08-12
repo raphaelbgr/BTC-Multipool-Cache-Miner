@@ -325,7 +325,15 @@ int main(int argc, char** argv) {
       auto selected_ids = scheduler.select(active_ids, id_to_snap, 64);
       // Mining stub using uploaded jobs (same nonce across jobs) and measure kernel time
       auto t0 = std::chrono::steady_clock::now();
-      cuda_engine::launchMineStub(static_cast<uint32_t>(jobs.size()), nonce_base);
+      // Use configured desired_threads_per_job to compute a plan
+      auto app_cfg = config::loadFromJsonFile("config/pools.json");
+      auto plan = cuda_engine::computeLaunchPlan(static_cast<uint32_t>(jobs.size()),
+                                                 static_cast<uint64_t>(std::max(1, app_cfg.cuda.desired_threads_per_job)));
+      if (plan.num_jobs > 0 && plan.blocks_per_job > 0 && plan.threads_per_block > 0) {
+        cuda_engine::launchMineWithPlan(plan.num_jobs, plan.blocks_per_job, plan.threads_per_block, nonce_base);
+      } else {
+        cuda_engine::launchMineStub(static_cast<uint32_t>(jobs.size()), nonce_base);
+      }
       auto t1 = std::chrono::steady_clock::now();
       int kernel_ms = static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count());
       metrics.setGauge("cuda.kernel_ms", kernel_ms);
