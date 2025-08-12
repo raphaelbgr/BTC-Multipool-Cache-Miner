@@ -84,4 +84,34 @@ Aligned constants and precomputed midstates required for kernel header assembly.
 ### Milestones & Ownership
 - Mirrors PRD milestones (M1–M6). Each milestone includes code, tests, and doc updates.
 
+### Implemented So Far (Current Status)
+- Config-driven multi-pool source loader (`config/pools.json`) with per-pool profiles (ViaBTC, F2Pool, CKPool, NiceHash) and a local-node GBT entry (cookie auth).
+- Endpoint rotation: advances to next endpoint after repeated connect failures or quick disconnects; per-connection backoff with structured logs.
+- Stratum V1 runner: connect → subscribe → authorize → notify handling; submit_result logging for mining.submit responses.
+- TLS support via OpenSSL backend; plaintext sockets on Windows and POSIX. Auto-enable TLS on ports like 443/3334 when configured.
+- Structured JSON logging with optional file sink (`BMAD_LOG_FILE`).
+- Normalizer path and registry integration are in place; CUDA engine stubs compiled.
+- GBT: node connectivity validated (cookie auth + getblocktemplate) and config schema defined. Full GBT job ingestion/submit wiring pending next.
+
+### Config & Run
+- File: `config/pools.json`
+  - Each pool entry defines:
+    - `profile`: viabtc | f2pool | ckpool | nicehash | gbt
+    - `cred_mode`: `wallet_as_user` (wallet.worker) or `account_worker` (account.worker)
+    - `endpoints`: `[ { host, port, use_tls } ]` (rotation order)
+    - For GBT: `rpc` (url, use_tls, auth=cookie) and `gbt` (poll_ms, rules)
+- Environment (optional):
+  - `BMAD_POOL`: select pool by name; default is first in config
+  - `BMAD_LOG_FILE`: write JSONL logs to file
+  - `BMAD_AUTO_SUBMIT`: `en2:ntime:nonce` (hex) test submit after first job
+- Run (no CLI args required):
+  - `build\\src\\stratum_registry_runner.exe`
+  - Example pool-specific (optional): `set BMAD_POOL=viabtc`
+
+### Next Up
+- Implement `GbtRunner`: poll `getblocktemplate` (cookie), assemble coinbase to configured wallet, compute witness commitment and Merkle, feed jobs to registry, and submit solutions via `submitblock`.
+- Linux validation for OpenSSL backend and config-driven runner.
+- Stratum V2 adapter (Braiins) or V2→V1 proxy integration.
+- Submit pipeline persistence (Ledger/Outbox replay) and CUDA engine auto-submit hook.
+
 
