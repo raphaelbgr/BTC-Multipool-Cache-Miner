@@ -44,7 +44,9 @@ void StratumAdapter::ingestJobWithPolicy(normalize::RawJobInputs inputs) {
   if (policy_vmask_) inputs.vmask = policy_vmask_;
   if (policy_ntime_min_) inputs.ntime_min = policy_ntime_min_;
   if (policy_ntime_max_) inputs.ntime_max = policy_ntime_max_;
-  inputs.clean_jobs = policy_clean_jobs_;
+  if (force_clean_jobs_) {
+    inputs.clean_jobs = policy_clean_jobs_;
+  }
   auto out = normalize::normalizeJob(inputs);
   if (!out.has_value()) return;
   q_.push(*out);

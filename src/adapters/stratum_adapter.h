@@ -57,7 +57,8 @@ class StratumAdapter : public AdapterBase {
   uint32_t policy_vmask_{0};
   uint32_t policy_ntime_min_{0};
   uint32_t policy_ntime_max_{0};
-  bool policy_clean_jobs_{true};
+  bool policy_clean_jobs_{true};         // default only; not forced unless force_clean_jobs_ is true
+  bool force_clean_jobs_{false};
 
  public:
   // Policy setters
@@ -65,6 +66,7 @@ class StratumAdapter : public AdapterBase {
   void setVersionMask(uint32_t vmask) { std::lock_guard<std::mutex> l(mu_); policy_vmask_ = vmask; }
   void setNtimeCaps(uint32_t nmin, uint32_t nmax) { std::lock_guard<std::mutex> l(mu_); policy_ntime_min_ = nmin; policy_ntime_max_ = nmax; }
   void setCleanJobs(bool flag) { std::lock_guard<std::mutex> l(mu_); policy_clean_jobs_ = flag; }
+  void forceCleanJobs(bool force) { std::lock_guard<std::mutex> l(mu_); force_clean_jobs_ = force; }
 };
 
 }  // namespace adapters

@@ -59,6 +59,16 @@ void StratumRunner::runLoop() {
     log.info("connected", {{"host", host_}, {"port", port_}});
     client_->sendSubscribe();
     client_->sendAuthorize();
+    // Negotiate version rolling if supported
+    try {
+      nlohmann::json cfg;
+      cfg["id"] = 100;
+      cfg["method"] = "mining.configure";
+      cfg["params"] = nlohmann::json::array();
+      cfg["params"].push_back(nlohmann::json::array({"version-rolling"}));
+      cfg["params"].push_back(nlohmann::json{{"version-rolling.mask", "ffffffff"}});
+      client_->sendJson(cfg);
+    } catch (...) {}
     adapter_->connect();
 
     // If a server drops immediately after TCP connect (e.g., proxy), loop will reconnect.
@@ -86,6 +96,20 @@ void StratumRunner::runLoop() {
         try {
           bool ok = j["result"].get<bool>();
           log.info("authorize", {{"ok", ok}});
+        } catch (...) {}
+        continue;
+      }
+      if (j.contains("result") && j["id"] == 100) {
+        // mining.configure response
+        try {
+          auto res = j["result"];
+          if (res.contains("version-rolling") && res["version-rolling"].get<bool>()) {
+            std::string mask_hex = res.value<std::string>("version-rolling.mask", "00000000");
+            uint32_t mask = 0;
+            try { mask = std::stoul(mask_hex, nullptr, 16); } catch (...) { mask = 0; }
+            adapter_->setVersionMask(mask);
+            log.info("version_rolling", {{"mask", mask_hex}});
+          }
         } catch (...) {}
         continue;
       }
@@ -139,6 +163,17 @@ void StratumRunner::runLoop() {
               for (size_t i=0;i<n;i++){ unsigned int v; sscanf(hex.c_str()+2*i, "%02x", &v); out[i]=static_cast<uint8_t>(v);} };
             hexToBytes(prevhash_hex, in.prevhash_be, 32);
             hexToBytes(mr_hex, in.merkle_root_be, 32);
+            // clean_jobs flag (param index 7 per Stratum V1)
+            bool clean = false;
+            try { clean = params[7].get<bool>(); } catch (...) { clean = false; }
+            in.clean_jobs = clean;
+            // Update adapter policy clean_jobs default to reflect server intent without forcing it
+            adapter_->setCleanJobs(clean);
+            // Apply basic ntime caps around provided ntime to allow minimal rolling
+            in.ntime_min = in.job.ntime;
+            in.ntime_max = in.job.ntime + 2;
+            // Ensure share target is set from current varDiff policy if present
+            // (Stratum set_difficulty event updates adapter policy already)
             // header_first64 for midstate: version..merkle_root (64 bytes)
             // Here we leave zeros as placeholder; midstate still computed over zeros.
             adapter_->ingestJobWithPolicy(in);
