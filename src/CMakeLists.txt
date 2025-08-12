@@ -19,6 +19,7 @@ add_library(miner_core
   adapters/gbt_adapter.cc
   adapters/gbt_runner.cc
   adapters/pool_router.cc
+  scheduler/scheduler.cc
   adapters/pool_profiles.cc
   adapters/stratum_runner.cc
   cache/vram_pages.cc

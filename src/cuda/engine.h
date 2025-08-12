@@ -36,4 +36,16 @@ bool launchWriteHitsDemo(const uint64_t* work_ids_host,
                          uint32_t nonce_base,
                          struct HitRecord* out_hits_host);
 
+// Device hit ring lifecycle and push API (simple global buffer per device)
+bool initDeviceHitBuffer(uint32_t capacity);
+void freeDeviceHitBuffer();
+// Launch a tiny kernel that pushes one hit per job into the device ring
+bool launchPushHitsToDeviceRing(const uint64_t* work_ids_host,
+                                uint32_t num_jobs,
+                                uint32_t nonce_base);
+// Drain up to max_out hits into host buffer; returns number drained via out_count
+bool drainDeviceHits(struct HitRecord* out_hits_host,
+                     uint32_t max_out,
+                     uint32_t* out_count);
+
 }

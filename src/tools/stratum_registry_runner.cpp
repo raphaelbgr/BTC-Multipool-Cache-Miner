@@ -7,6 +7,8 @@
 #include <nlohmann/json.hpp>
 #include <queue>
 #include <mutex>
+#include <unordered_map>
+#include <algorithm>
 #include <cstdlib>
 #include <sstream>
 
@@ -22,12 +24,18 @@
 #include "submit/stratum_submitter.h"
 #include "submit/submit_router.h"
 #include "config/config.h"
+#include "cuda/hit_ring.h"
+#include "cuda/engine.h"
+#include "scheduler/scheduler.h"
 
 static std::atomic<bool> g_stop{false};
 
 static void on_sigint(int) { g_stop.store(true); }
 
 int main(int argc, char** argv) {
+  // Simple scheduler state: per-source weights and a tick for fair selection
+  scheduler::SchedulerState scheduler;
+
   std::signal(SIGINT, on_sigint);
   std::string host;
   uint16_t port = 0;
@@ -108,14 +116,15 @@ int main(int argc, char** argv) {
     std::cout << j.dump() << std::endl;
   }
 
-  // Registry with one slot
-  registry::WorkSourceRegistry reg(1);
+  // Registry with multiple slots (supports multiple sources)
+  registry::WorkSourceRegistry reg(4);
   adapters::StratumAdapter adapter("stratum");
   adapters::StratumRunner* stratum_runner_ptr = nullptr;
   std::unique_ptr<adapters::StratumRunner> stratum_runner;
   std::unique_ptr<adapters::GbtAdapter> gbt_adapter;
   std::unique_ptr<adapters::GbtRunner> gbt_runner;
   std::unique_ptr<submit::SubmitRouter> submit_router;
+  std::unique_ptr<submit::StratumSubmitter> stratum_submitter;
 
   // If selected profile is GBT, start GBT runner; else Stratum
   bool use_gbt = false;
@@ -138,6 +147,16 @@ int main(int argc, char** argv) {
     stratum_runner = std::make_unique<adapters::StratumRunner>(&adapter, host, port, user, pass, use_tls);
     stratum_runner_ptr = stratum_runner.get();
     stratum_runner->start();
+    stratum_submitter = std::make_unique<submit::StratumSubmitter>(stratum_runner_ptr, user);
+    submit_router = std::make_unique<submit::SubmitRouter>([&](const submit::HitRecord& rec){
+      // Build extranonce2 hex as zeros of configured size (placeholder)
+      uint8_t header[80]; std::memcpy(header, rec.header80, 80);
+      const uint8_t* h = header;
+      const uint8_t* ntime_be = &h[68]; (void)ntime_be;
+      const int en2_size = static_cast<int>(adapter.extranonce2Size());
+      std::string en2_hex; en2_hex.assign(static_cast<size_t>(en2_size) * 2, '0');
+      (void)stratum_submitter->submitFromHeader(header, en2_hex);
+    });
   }
   submit::StratumSubmitter submitter(stratum_runner_ptr, user);
 
@@ -180,6 +199,10 @@ int main(int argc, char** argv) {
     }
   });
   input_thread.detach();
+  // Initialize device hit buffer (scaffold)
+  cuda_engine::initDeviceHitBuffer(1024);
+  uint32_t nonce_base = 0; // same nonce across jobs per iteration
+
   while (!g_stop.load()) {
     // Drain full results and set registry
     while (true) {
@@ -214,9 +237,36 @@ int main(int argc, char** argv) {
       }
     }
 
-    // Demo: launch a tiny multi-job stub when we have an active job, to exercise CUDA path
-    if (snap.has_value()) {
-      cuda_engine::launchMultiJobStub(1, 256);
+    // Build active job list across all slots for fair iteration
+    std::vector<uint64_t> active_ids;
+    std::unordered_map<uint64_t, registry::WorkSlotSnapshot> id_to_snap;
+    for (std::size_t i = 0; i < reg.size(); ++i) {
+      auto s = reg.get(i);
+      if (!s.has_value()) continue;
+      if (!s->item.active) continue;
+      active_ids.push_back(s->item.work_id);
+      id_to_snap.emplace(s->item.work_id, *s);
+    }
+    if (!active_ids.empty()) {
+      // Apply scheduler weighting
+      auto selected_ids = scheduler.select(active_ids, id_to_snap, 64);
+      cuda_engine::launchPushHitsToDeviceRing(selected_ids.data(), static_cast<uint32_t>(selected_ids.size()), nonce_base);
+      nonce_base += 1; // advance to keep testing new nonce across all jobs
+      cuda_engine::HitRecord out[64]; uint32_t n = 0;
+      if (submit_router && cuda_engine::drainDeviceHits(out, 64, &n) && n > 0) {
+        for (uint32_t i = 0; i < n; ++i) {
+          auto it = id_to_snap.find(out[i].work_id);
+          if (it == id_to_snap.end()) continue;
+          const auto& ss = it->second;
+          uint8_t header[80] = {0};
+          // Fill BE nonce at the end for CPU check
+          header[76] = static_cast<uint8_t>((out[i].nonce >> 24) & 0xFF);
+          header[77] = static_cast<uint8_t>((out[i].nonce >> 16) & 0xFF);
+          header[78] = static_cast<uint8_t>((out[i].nonce >> 8) & 0xFF);
+          header[79] = static_cast<uint8_t>(out[i].nonce & 0xFF);
+          submit_router->verifyAndSubmit(header, ss.item.share_target_le, out[i].work_id, out[i].nonce);
+        }
+      }
     }
     // Process any queued stdin lines without blocking
     {
