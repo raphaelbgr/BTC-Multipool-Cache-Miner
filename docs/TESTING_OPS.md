@@ -1,3 +1,38 @@
+## Testing and Ops Notes
+
+### Current State
+- Config-driven multi-pool runner operational (no CLI args required) with endpoint rotation and TLS.
+- GBT path implemented:
+  - Polls `getblocktemplate` with `rules=["segwit"]` (cookie auth by default).
+  - Normalizes to `WorkItem` and feeds registry.
+  - `GbtSubmitter` caches template txs and submits via `submitblock`.
+- All unit tests currently green: 42/42.
+
+### How to Run (Windows)
+- Use VS 2022 Developer Command Prompt.
+- Build: `cmd /c build_ninja_vs2022.bat`
+- Run runner: `build\src\stratum_registry_runner.exe`
+  - Optional: `set BMAD_POOL=viabtc|f2pool|ckpool-solo|nicehash|mynode-gbt`
+  - Optional: `set BMAD_LOG_FILE=runner.jsonl`
+
+### Local Node RPC (PowerShell)
+- Named params, cookie auth auto:
+  - `bitcoin-cli --% -named getblocktemplate template_request="{\"rules\":[\"segwit\"]}"`
+
+### Manual GBT Submit (for debugging)
+- In runner console when `BMAD_POOL=mynode-gbt`:
+  - `submit_header <header80_hex>`
+  - Header is 80 bytes, hex-encoded. The runner verifies on CPU and routes to `submitblock` if valid.
+
+### CI Notes
+- `BUILD_TOOLS` is OFF by default to avoid building the `stratum_probe` diagnostic tool during tests.
+- POSIX plain socket backend added for Linux builds; TLS via OpenSSL when available.
+
+### Next Tests to Add
+- Coinbase assembly + witness commitment vector tests.
+- Block-hex construction (varint and ordering) unit tests.
+- Regtest E2E: `getblocktemplate` → easy header → `submitblock` accept path.
+
 ## Testing & Operations Guide
 
 ### Environments

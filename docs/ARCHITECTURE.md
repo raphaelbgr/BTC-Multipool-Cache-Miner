@@ -8,7 +8,7 @@
 ### Component Overview
 - CacheManager (VRAM): dynamic per‑GPU cache targeting ~85% VRAM; maintains midstates, normalized templates/variants, per‑job dedup filters, and header‑variant staging. Watermarks and `min_free_mib` guard rails.
 - PredictabilityWorker (CUDA): low‑priority stream precomputing/warming cache pages with double‑buffer shadow pages and epoch swap on stable `gen`. Adaptive throttling based on VRAM and GPU util.
-- Adapters: `AdapterBase`, `StratumAdapter`, concrete `PoolAdapters/*`, and `GbtAdapter` + `GbtRunner`. Convert external schemas to `RawJob` with policy metadata (rolling caps, extranonce constraints, submit schema). GBT path polls `getblocktemplate` via JSON‑RPC (Bitcoin Core), using cookie auth by default.
+- Adapters: `AdapterBase`, `StratumAdapter`, concrete `PoolAdapters/*`, and `GbtAdapter` + `GbtRunner`. Convert external schemas to `RawJob` with policy metadata (rolling caps, extranonce constraints, submit schema). GBT path polls `getblocktemplate` via JSON‑RPC (Bitcoin Core), using cookie auth by default. `GbtSubmitter` assembles block hex (header + varint(tx_count) + txs) and calls `submitblock`.
 - Normalizer: converts `RawJob` → `WorkItem` + `GpuJobConst`; computes share and block targets; endian normalization; coinbase assembly with witness commitment; midstate precompute; Merkle root.
 - WorkSourceRegistry: fixed‑size arrays for N sources tracking `WorkItem` and `GpuJobConst`. In‑place writes; `gen` bump last; `active` flags; `found_submitted` sticky until superseded.
 - CudaEngine: per‑nonce, cross‑job kernel. Grid y‑dim = job index; x‑dim = nonce offsets. Short micro‑batches (~0.5–3 ms). Emits hits into a lock‑free ring buffer per device.

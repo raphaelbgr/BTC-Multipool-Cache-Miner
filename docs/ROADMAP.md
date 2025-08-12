@@ -7,7 +7,7 @@
 
 ### M2 — Adapters
 - `AdapterBase`, `StratumAdapter`, initial pool profiles
-- `GbtAdapter` with BIP22/23 and segwit rules
+- `GbtAdapter` with BIP22/23 and segwit rules; `GbtRunner` polling via JSON-RPC; `GbtSubmitter` calling `submitblock`
 - Robust reconnect, clean_jobs handling
 
 ### M3 — Normalizer & Registry
@@ -18,7 +18,7 @@
 ### M4 — CUDA Engine & Submit
 - Cross‑job per‑nonce kernel; ring buffer for hits
 - CPU verification; `SubmitRouter` to adapters
-- Regtest end‑to‑end share submission
+- Regtest end‑to‑end share submission (GBT path first)
 
 ### M5 — Cache & PredictabilityWorker
 - VRAM CacheManager with watermarks and safety margin

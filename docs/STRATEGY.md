@@ -29,6 +29,11 @@ Maximize coverage and responsiveness for a true solo block find while maintainin
 - Respect pool policies: version/ntime rolling masks, `clean_jobs` invalidation.
 - Map Stratum notify → `RawJob` → `normalize::RawJobInputs` → `WorkItem`/`GpuJobConst`.
 
+### Adapter Semantics (GBT now active)
+- Poll `getblocktemplate` with `rules=["segwit"]` (cookie auth by default) and normalize into `WorkItem`.
+- On submission, build full block hex as `header` + varint(`tx_count`) + `coinbase` + transactions, and POST via `submitblock`.
+- Prefer solo routing for block hits per policy; CPU‑verify headers before submit.
+
 ### Safety & Observability
 - Strict CPU verification before submit; no blind routing.
 - `Ledger` and `Outbox` provide crash‑safe dedupe and replay upon restart.
