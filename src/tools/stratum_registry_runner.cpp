@@ -18,6 +18,7 @@
 #include "net/stratum_client.h"
 #include "registry/work_source_registry.h"
 #include "submit/stratum_submitter.h"
+#include "submit/submit_router.h"
 #include "config/config.h"
 
 static std::atomic<bool> g_stop{false};
@@ -112,6 +113,7 @@ int main(int argc, char** argv) {
   std::unique_ptr<adapters::StratumRunner> stratum_runner;
   std::unique_ptr<adapters::GbtAdapter> gbt_adapter;
   std::unique_ptr<adapters::GbtRunner> gbt_runner;
+  std::unique_ptr<submit::SubmitRouter> submit_router;
 
   // If selected profile is GBT, start GBT runner; else Stratum
   bool use_gbt = false;
@@ -125,6 +127,9 @@ int main(int argc, char** argv) {
       gbt_adapter = std::make_unique<adapters::GbtAdapter>("gbt");
       gbt_runner = std::make_unique<adapters::GbtRunner>(gbt_adapter.get(), *sel);
       gbt_runner->start();
+      submit_router = std::make_unique<submit::SubmitRouter>([&](const submit::HitRecord& rec){
+        gbt_adapter->submitShare(rec.work_id, rec.nonce, rec.header80);
+      });
     }
   }
   if (!use_gbt) {
@@ -152,6 +157,9 @@ int main(int argc, char** argv) {
   }
   bool auto_submitted = false;
   std::cout << "Type: s [<en2_hex> <ntime_hex> <nonce_hex>] or submit <en2_hex> <ntime_hex> <nonce_hex>" << std::endl;
+  if (use_gbt) {
+    std::cout << "Type: submit_header <header80_hex> (GBT)" << std::endl;
+  }
 
   // Non-blocking stdin reader thread feeding a queue
   std::queue<std::string> input_queue;
@@ -228,6 +236,25 @@ int main(int argc, char** argv) {
             j["en2"] = en2; j["ntime"] = ntime_hex; j["nonce"] = nonce_hex;
             if (!haveArgs && last_ntime_hex.empty()) j["note"] = "no job yet; submit likely fails until first notify";
             std::cout << j.dump() << std::endl;
+          } else if (use_gbt && cmd == "submit_header") {
+            std::string hhex;
+            if (!(iss >> hhex) || hhex.size() != 160) {
+              std::cout << "{\"error\":\"need 80-byte header hex\"}" << std::endl;
+            } else {
+              uint8_t header[80];
+              for (int i = 0; i < 80; ++i) {
+                unsigned int v; sscanf(hhex.c_str() + 2*i, "%02x", &v); header[i] = static_cast<uint8_t>(v);
+              }
+              auto snap = reg.get(0);
+              if (snap.has_value()) {
+                // Extract nonce from last 4 bytes (BE)
+                uint32_t nonce = (header[76] << 24) | (header[77] << 16) | (header[78] << 8) | header[79];
+                bool ok = submit_router && submit_router->verifyAndSubmit(header, snap->item.share_target_le, snap->item.work_id, nonce);
+                nlohmann::json js; js["submit_header"] = ok ? "accepted_local" : "rejected_local"; std::cout << js.dump() << std::endl;
+              } else {
+                std::cout << "{\"error\":\"no job yet\"}" << std::endl;
+              }
+            }
           } else {
             std::cout << "{\"error\":\"unknown command\"}" << std::endl;
           }

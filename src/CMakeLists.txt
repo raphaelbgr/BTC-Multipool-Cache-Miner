@@ -13,6 +13,7 @@ add_library(miner_core
   config/config.cc
   submit/cpu_verify.cc
   submit/submit_router.cc
+  submit/gbt_submitter.cc
   submit/stratum_submitter.h
   adapters/stratum_adapter.cc
   adapters/gbt_adapter.cc

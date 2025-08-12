@@ -10,7 +10,12 @@
 namespace adapters {
 
 GbtRunner::GbtRunner(GbtAdapter* adapter, const config::PoolEntry& pool_cfg)
-    : adapter_(adapter), pool_(pool_cfg) {}
+    : adapter_(adapter), pool_(pool_cfg) {
+  if (pool_.rpc.has_value()) {
+    submitter_ = std::make_shared<submit::GbtSubmitter>(*pool_.rpc);
+    adapter_->setSubmitter(submitter_);
+  }
+}
 
 GbtRunner::~GbtRunner() { stop(); }
 
@@ -76,18 +81,27 @@ void GbtRunner::runLoop() {
         in.source_id = 0;
         in.job.source_name = "gbt";
         in.job.work_id = static_cast<uint64_t>(std::hash<std::string>{}(prevhash));
-        in.job.version = std::stoul(gbt["version"].dump()); // may be int
+        // version in GBT can be int; get<int>(), then cast
+        in.job.version = static_cast<uint32_t>(gbt["version"].get<int>());
         in.job.nbits = std::stoul(gbt["bits"].get<std::string>(), nullptr, 16);
         in.job.ntime = static_cast<uint32_t>(gbt["curtime"].get<int64_t>());
         // prevhash BE
         hexToBytes(prevhash, in.prevhash_be, 32);
-        // Build merkle root from coinbase commit placeholder: use target merkle from gbt for now
-        auto mr = gbt["default_witness_commitment"].is_string() ? gbt["default_witness_commitment"].get<std::string>() : std::string(64, '0');
+        // For now, use GBT's provided merkle root if available; placeholder otherwise
+        std::string mr;
+        if (gbt.contains("default_witness_commitment") && gbt["default_witness_commitment"].is_string()) {
+          mr = gbt["default_witness_commitment"].get<std::string>();
+        } else if (gbt.contains("merkleroot") && gbt["merkleroot"].is_string()) {
+          mr = gbt["merkleroot"].get<std::string>();
+        } else {
+          mr = std::string(64, '0');
+        }
         hexToBytes(mr, in.merkle_root_be, 32);
         // share target: easy default
         in.share_nbits = in.job.nbits;
         in.clean_jobs = true;
         adapter_->ingestTemplate(in);
+        if (submitter_) submitter_->updateTemplate(gbt);
       }
     } catch (...) {
       // ignore malformatted

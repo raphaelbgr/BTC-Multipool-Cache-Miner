@@ -10,8 +10,15 @@ std::optional<registry::WorkItem> GbtAdapter::pollNormalized() {
   return it.item;
 }
 
-void GbtAdapter::submitShare(uint64_t, uint32_t, const uint8_t[80]) {
-  // Placeholder: would submit via RPC in a real implementation.
+void GbtAdapter::submitShare(uint64_t, uint32_t, const uint8_t header80_be[80]) {
+  std::shared_ptr<submit::GbtSubmitter> sub;
+  {
+    std::lock_guard<std::mutex> lock(mu_);
+    sub = submitter_;
+  }
+  if (sub) {
+    sub->submitHeader(header80_be);
+  }
 }
 
 void GbtAdapter::ingestTemplate(const normalize::RawJobInputs& inputs) {

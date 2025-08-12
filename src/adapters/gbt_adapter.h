@@ -8,6 +8,7 @@
 #include "adapters/adapter_base.h"
 #include "normalize/normalizer.h"
 #include "normalize/targets.h"
+#include "submit/gbt_submitter.h"
 
 namespace adapters {
 
@@ -25,10 +26,14 @@ class GbtAdapter : public AdapterBase {
   // Returns both WorkItem and GpuJobConst when available
   std::optional<normalize::NormalizerResult> pollNormalizedFull();
 
+  // Wire a submitter (optional). If present, submitShare will call submitblock.
+  void setSubmitter(std::shared_ptr<submit::GbtSubmitter> submitter) { submitter_ = std::move(submitter); }
+
  private:
   std::string name_;
   std::mutex mu_;
   std::queue<normalize::NormalizerResult> q_;
+  std::shared_ptr<submit::GbtSubmitter> submitter_;
 };
 
 }  // namespace adapters

@@ -11,6 +11,7 @@
 
 #include "adapters/gbt_adapter.h"
 #include "config/config.h"
+#include "submit/gbt_submitter.h"
 
 namespace adapters {
 
@@ -29,6 +30,7 @@ class GbtRunner {
 
   GbtAdapter* adapter_;
   config::PoolEntry pool_;
+  std::shared_ptr<submit::GbtSubmitter> submitter_;
   std::atomic<bool> stop_flag_{false};
   std::thread th_;
 };
