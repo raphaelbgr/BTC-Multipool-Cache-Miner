@@ -300,6 +300,14 @@ int main(int argc, char** argv) {
         std::memcpy(dj.prevhash_le, ss.item.prevhash_le.data(), sizeof(dj.prevhash_le));
         std::memcpy(dj.merkle_root_le, ss.item.merkle_root_le.data(), sizeof(dj.merkle_root_le));
         std::memcpy(dj.share_target_le, ss.item.share_target_le.data(), sizeof(dj.share_target_le));
+        // Precompute big-endian share target for device compare
+        for (int w = 0; w < 8; ++w) {
+          uint32_t t = ss.item.share_target_le[7 - w];
+          dj.share_target_be[w*4+0] = static_cast<uint8_t>((t >> 24) & 0xFF);
+          dj.share_target_be[w*4+1] = static_cast<uint8_t>((t >> 16) & 0xFF);
+          dj.share_target_be[w*4+2] = static_cast<uint8_t>((t >> 8) & 0xFF);
+          dj.share_target_be[w*4+3] = static_cast<uint8_t>((t) & 0xFF);
+        }
         std::memcpy(dj.block_target_le, ss.item.block_target_le.data(), sizeof(dj.block_target_le));
         std::memcpy(dj.midstate_le, ss.job_const.midstate_le.data(), sizeof(dj.midstate_le));
         jobs.push_back(dj);

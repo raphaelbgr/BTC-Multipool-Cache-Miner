@@ -25,6 +25,7 @@ struct alignas(64) DeviceJob {
   uint32_t share_target_le[8]{};
   uint32_t block_target_le[8]{};
   uint32_t midstate_le[8]{}; // precomputed SHA-256 state after first 64 bytes
+  uint8_t  share_target_be[32]{}; // precomputed BE target for device compare
 };
 
 // Forward-declare launch plan utilities

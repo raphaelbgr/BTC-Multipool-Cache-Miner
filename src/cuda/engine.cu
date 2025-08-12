@@ -159,21 +159,13 @@ __global__ void kernel_mine_stub(unsigned int num_jobs, unsigned int nonce_base)
     } else {
       cuda_sha256d::sha256d_80_be(header, digest);
     }
-    // Compare big-endian digest to little-endian target: convert target to big for compare
-    unsigned char target_be[32];
-    #pragma unroll
-    for (int w=0; w<8; ++w) {
-      unsigned int t = g_jobs[j].share_target_le[7 - w];
-      target_be[w*4+0] = (unsigned char)((t >> 24) & 0xFF);
-      target_be[w*4+1] = (unsigned char)((t >> 16) & 0xFF);
-      target_be[w*4+2] = (unsigned char)((t >> 8) & 0xFF);
-      target_be[w*4+3] = (unsigned char)((t) & 0xFF);
-    }
+    // Compare big-endian digest to precomputed big-endian share target
     bool leq = true;
     #pragma unroll
     for (int i=0;i<32;++i) {
-      if (digest[i] < target_be[i]) { leq = true; break; }
-      if (digest[i] > target_be[i]) { leq = false; break; }
+      unsigned char t = g_jobs[j].share_target_be[i];
+      if (digest[i] < t) { leq = true; break; }
+      if (digest[i] > t) { leq = false; break; }
     }
     if (leq) {
       unsigned int idx = atomicInc(&g_hit_write_idx, 0xFFFFFFFFu);
