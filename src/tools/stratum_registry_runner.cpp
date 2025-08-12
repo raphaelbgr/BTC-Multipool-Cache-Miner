@@ -313,6 +313,10 @@ int main(int argc, char** argv) {
   std::unordered_map<uint32_t, int> src_penalty;
   const int latency_penalty_ms = std::max(0, cfg_all.scheduler.latency_penalty_ms);
   uint64_t last_backpressure_ms = 0;
+  // Auto-tuning knobs
+  int desired_threads_per_job = std::max(1, cfg_all.cuda.desired_threads_per_job);
+  int nonces_per_thread = std::max(1, cfg_all.cuda.nonces_per_thread);
+  const int budget_ms = 16; // aim for ~16ms batches by default
 
   while (!g_stop.load()) {
     // Drain full results and set registry
@@ -433,14 +437,12 @@ int main(int argc, char** argv) {
       auto selected_ids = scheduler.select(active_ids, id_to_snap, 64);
       // Mining stub using uploaded jobs (same nonce across jobs) and measure kernel time
       auto t0 = std::chrono::steady_clock::now();
-      // Use configured desired_threads_per_job to compute a plan
-      auto app_cfg = config::loadFromJsonFile("config/pools.json");
+      // Use configured desired_threads_per_job to compute a plan (auto-tuned)
       auto plan = cuda_engine::computeLaunchPlan(static_cast<uint32_t>(jobs.size()),
-                                                 static_cast<uint64_t>(std::max(1, app_cfg.cuda.desired_threads_per_job)));
+                                                 static_cast<uint64_t>(desired_threads_per_job));
       if (plan.num_jobs > 0 && plan.blocks_per_job > 0 && plan.threads_per_block > 0) {
-        int npt = std::max(1, app_cfg.cuda.nonces_per_thread);
-        if (npt > 1) {
-          cuda_engine::launchMineWithPlanBatch(plan.num_jobs, plan.blocks_per_job, plan.threads_per_block, nonce_base, static_cast<uint32_t>(npt));
+        if (nonces_per_thread > 1) {
+          cuda_engine::launchMineWithPlanBatch(plan.num_jobs, plan.blocks_per_job, plan.threads_per_block, nonce_base, static_cast<uint32_t>(nonces_per_thread));
         } else {
           cuda_engine::launchMineWithPlan(plan.num_jobs, plan.blocks_per_job, plan.threads_per_block, nonce_base);
         }
@@ -451,6 +453,14 @@ int main(int argc, char** argv) {
       int kernel_ms = static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count());
       metrics.setGauge("cuda.kernel_ms", kernel_ms);
       metrics.setGauge("cuda.jobs", static_cast<int64_t>(jobs.size()));
+      // Auto-tune nonces_per_thread if far from budget
+      {
+        cuda_engine::AutoTuneInputs ai; ai.observedMsPerBatch = static_cast<uint32_t>(kernel_ms);
+        ai.maxMsPerBatch = static_cast<uint32_t>(budget_ms);
+        ai.currentMicroBatch = static_cast<uint32_t>(nonces_per_thread);
+        auto dec = cuda_engine::autoTuneMicroBatch(ai);
+        nonces_per_thread = static_cast<int>(dec.nextMicroBatch);
+      }
       nonce_base += 1; // advance to keep testing new nonce across all jobs
       cuda_engine::HitRecord out[64]; uint32_t n = 0;
       if (submit_router && cuda_engine::drainDeviceHits(out, 64, &n) && n > 0) {
