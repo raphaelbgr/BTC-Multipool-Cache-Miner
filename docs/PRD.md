@@ -51,7 +51,7 @@ Research/education‑grade Bitcoin SHA‑256d GPU miner that maximizes effective
 4) CUDA Engine (same nonce across all jobs)
    - Grid mapping: y‑dimension = job index; x‑dimension = nonce offsets; micro‑batches (~0.5–3 ms).
    - Per thread: assemble header (job constants + nonce) → double SHA‑256 → compare to share and block targets; record hits in a ring buffer.
-   - Current status: multi‑job launch stub using `grid.y = jobs`, demo device write‑hits path and host ring buffer; full kernel header assembly pending.
+   - Current status: multi‑job launch stub using `grid.y = jobs`; device‑side hit ring scaffold with host drain helpers (`initDeviceHitBuffer`, `launchPushHitsToDeviceRing`, `drainDeviceHits`); demo write‑hits path; full kernel header assembly pending.
    - Constants in __constant__/read‑only memory; minimize branching; round unrolling.
 
 5) Scheduler
