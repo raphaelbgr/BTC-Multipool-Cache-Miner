@@ -53,6 +53,18 @@ struct AppConfig {
     int latency_penalty_ms{1500}; // apply penalty if avg submit latency exceeds this
     int max_weight{4};            // cap per-source weight replication
   } scheduler;
+  // Metrics sink configuration
+  struct MetricsCfg {
+    bool enable_file{false};
+    std::string file_path{"logs/metrics.jsonl"};
+    int dump_interval_ms{2000};
+  } metrics;
+
+  // CUDA engine configuration
+  struct CudaCfg {
+    int hit_ring_capacity{1024};
+    int desired_threads_per_job{256};
+  } cuda;
 };
 
 // Load from JSON file (e.g., config/pools.json). Returns empty config if file missing/invalid.

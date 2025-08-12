@@ -2,6 +2,7 @@
 #include <chrono>
 #include <csignal>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <thread>
 #include <nlohmann/json.hpp>
@@ -11,6 +12,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <sstream>
+#include <memory>
 
 #include "adapters/pool_profiles.h"
 #include "adapters/stratum_adapter.h"
@@ -39,6 +41,7 @@ int main(int argc, char** argv) {
   scheduler::SchedulerState scheduler;
   // Load scheduler source weights from config (by pool index mapping to source_id)
   auto cfg_weights = config::loadFromJsonFile("config/pools.json");
+  scheduler.max_weight_cap = static_cast<uint32_t>(std::max(1, cfg_weights.scheduler.max_weight));
   for (size_t sid = 0; sid < cfg_weights.pools.size(); ++sid) {
     int w = cfg_weights.pools[sid].weight;
     if (w <= 0) w = 1;
@@ -216,11 +219,24 @@ int main(int argc, char** argv) {
     }
   });
   input_thread.detach();
-  // Initialize device hit buffer (scaffold)
-  cuda_engine::initDeviceHitBuffer(1024);
+  // Initialize device hit buffer from config
+  {
+    auto cfg = config::loadFromJsonFile("config/pools.json");
+    int cap = std::max(1, cfg.cuda.hit_ring_capacity);
+    cuda_engine::initDeviceHitBuffer(static_cast<uint32_t>(cap));
+  }
   uint32_t nonce_base = 0; // same nonce across jobs per iteration
   // Metrics
   obs::MetricsRegistry metrics;
+  // Metrics sink config (load once)
+  auto mcfg = config::loadFromJsonFile("config/pools.json");
+  const int metrics_interval_ms = std::max(100, mcfg.metrics.dump_interval_ms);
+  const bool metrics_file = mcfg.metrics.enable_file;
+  const std::string metrics_path = mcfg.metrics.file_path;
+  std::unique_ptr<std::ofstream> metrics_ofs;
+  if (metrics_file) {
+    metrics_ofs = std::make_unique<std::ofstream>(metrics_path, std::ios::out | std::ios::app);
+  }
 
   while (!g_stop.load()) {
     // Drain full results and set registry
@@ -307,8 +323,13 @@ int main(int argc, char** argv) {
         }
       }
       auto selected_ids = scheduler.select(active_ids, id_to_snap, 64);
-      // Mining stub using uploaded jobs (same nonce across jobs)
+      // Mining stub using uploaded jobs (same nonce across jobs) and measure kernel time
+      auto t0 = std::chrono::steady_clock::now();
       cuda_engine::launchMineStub(static_cast<uint32_t>(jobs.size()), nonce_base);
+      auto t1 = std::chrono::steady_clock::now();
+      int kernel_ms = static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count());
+      metrics.setGauge("cuda.kernel_ms", kernel_ms);
+      metrics.setGauge("cuda.jobs", static_cast<int64_t>(jobs.size()));
       nonce_base += 1; // advance to keep testing new nonce across all jobs
       cuda_engine::HitRecord out[64]; uint32_t n = 0;
       if (submit_router && cuda_engine::drainDeviceHits(out, 64, &n) && n > 0) {
@@ -422,11 +443,22 @@ int main(int argc, char** argv) {
       }
     }
 
-    // Periodically dump metrics snapshot
+    // Periodically set stratum metrics and dump metrics snapshot
     static uint64_t last_metrics_ms = 0;
     auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
-    if (now_ms - last_metrics_ms > 2000) {
-      std::cout << metrics.snapshot().dump() << std::endl;
+    if (now_ms - last_metrics_ms > metrics_interval_ms) {
+      if (stratum_runner_ptr) {
+        metrics.setGauge("stratum.avg_submit_ms", stratum_runner_ptr->avgSubmitMs());
+        metrics.setGauge("stratum.accepted", stratum_runner_ptr->acceptedSubmits());
+        metrics.setGauge("stratum.rejected", stratum_runner_ptr->rejectedSubmits());
+      }
+      const auto mjson = metrics.snapshot();
+      if (metrics_ofs && metrics_ofs->good()) {
+        (*metrics_ofs) << mjson.dump() << "\n";
+        metrics_ofs->flush();
+      } else {
+        std::cout << mjson.dump() << std::endl;
+      }
       last_metrics_ms = now_ms;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(200));

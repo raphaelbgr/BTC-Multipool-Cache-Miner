@@ -21,6 +21,17 @@ AppConfig loadFromJsonFile(const std::string& path) {
     if (s.contains("latency_penalty_ms")) cfg.scheduler.latency_penalty_ms = s["latency_penalty_ms"].get<int>();
     if (s.contains("max_weight")) cfg.scheduler.max_weight = s["max_weight"].get<int>();
   }
+  if (j.contains("metrics") && j["metrics"].is_object()) {
+    const auto& m = j["metrics"];
+    if (m.contains("enable_file")) cfg.metrics.enable_file = m["enable_file"].get<bool>();
+    if (m.contains("file_path")) cfg.metrics.file_path = m["file_path"].get<std::string>();
+    if (m.contains("dump_interval_ms")) cfg.metrics.dump_interval_ms = m["dump_interval_ms"].get<int>();
+  }
+  if (j.contains("cuda") && j["cuda"].is_object()) {
+    const auto& c = j["cuda"];
+    if (c.contains("hit_ring_capacity")) cfg.cuda.hit_ring_capacity = c["hit_ring_capacity"].get<int>();
+    if (c.contains("desired_threads_per_job")) cfg.cuda.desired_threads_per_job = c["desired_threads_per_job"].get<int>();
+  }
   if (j.contains("pools") && j["pools"].is_array()) {
     for (const auto& p : j["pools"]) {
       PoolEntry e;

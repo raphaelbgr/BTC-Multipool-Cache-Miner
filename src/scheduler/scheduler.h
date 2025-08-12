@@ -13,6 +13,8 @@ struct SchedulerState {
   uint64_t tick{0};
   // Optional backpressure: per-source penalty (0..N) reduces effective weight
   std::unordered_map<uint32_t, uint32_t> source_penalty;
+  // Configurable maximum weight replication
+  uint32_t max_weight_cap{4};
 
   std::vector<uint64_t> select(const std::vector<uint64_t>& work_ids,
                                const std::unordered_map<uint64_t, registry::WorkSlotSnapshot>& snaps,
@@ -25,7 +27,10 @@ struct SchedulerState {
       uint32_t sid = it->second.item.source_id;
       uint32_t w = 1u;
       auto wit = source_weight.find(sid);
-      if (wit != source_weight.end() && wit->second > 0) w = (wit->second > 4u ? 4u : wit->second);
+      if (wit != source_weight.end() && wit->second > 0) {
+        uint32_t cap = (max_weight_cap == 0 ? 1u : max_weight_cap);
+        w = (wit->second > cap ? cap : wit->second);
+      }
       auto pit = source_penalty.find(sid);
       if (pit != source_penalty.end() && pit->second > 0) {
         if (pit->second >= w) w = 1u; else w = w - pit->second;

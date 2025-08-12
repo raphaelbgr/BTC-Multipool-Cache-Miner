@@ -103,10 +103,10 @@ __global__ void kernel_mine_stub(unsigned int num_jobs, unsigned int nonce_base)
 
     // Compute SHA256d and compare against share_target (LE u32[8])
     unsigned char digest[32];
-    bool used_midstate = true;
-    // If midstate is zeroed, fall back to full 80-byte hash path
+    bool used_midstate = false;
+    // If any word of midstate is non-zero, assume a valid midstate was provided
     #pragma unroll
-    for (int i=0;i<8;++i) { if (g_jobs[j].midstate_le[i] != 0u) { used_midstate = true; break; } used_midstate = false; }
+    for (int i=0;i<8;++i) { if (g_jobs[j].midstate_le[i] != 0u) { used_midstate = true; break; } }
     if (used_midstate) {
       // Compute SHA256(header) using provided midstate for first 64 bytes
       unsigned int st[8];
