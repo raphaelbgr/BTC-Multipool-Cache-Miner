@@ -30,7 +30,11 @@ Research/education‑grade Bitcoin SHA‑256d GPU miner that maximizes effective
 1) Multi‑source work ingestion
    - N Stratum pools (varDiff; extranonce1/2; version/ntime caps; submit schema differences) and one local node (GBT).
    - Adapters: `AdapterBase → StratumAdapter (generic) → PoolAdapters/*` and `GbtAdapter`.
-   - Automatic recovery on disconnects; respects pool clean_jobs; honors rolling/version/ntime caps.
+   - Stratum specifics implemented:
+     - varDiff updates applied via `mining.set_difficulty` → `share_target` distinct from `block_target`.
+     - `mining.configure` negotiation for `version-rolling.mask`; mask propagated to normalization (`vmask`).
+     - `mining.notify` parsing honors `clean_jobs`, extranonce sizes, and sets minimal `ntime` rolling caps.
+   - Automatic recovery on disconnects; respects pool `clean_jobs`; honors rolling/version/ntime caps.
 
 2) Normalization (mandatory before GPU)
    - Convert RawJob to uniform `WorkItem` and `GpuJobConst`.
@@ -47,6 +51,7 @@ Research/education‑grade Bitcoin SHA‑256d GPU miner that maximizes effective
 4) CUDA Engine (same nonce across all jobs)
    - Grid mapping: y‑dimension = job index; x‑dimension = nonce offsets; micro‑batches (~0.5–3 ms).
    - Per thread: assemble header (job constants + nonce) → double SHA‑256 → compare to share and block targets; record hits in a ring buffer.
+   - Current status: multi‑job launch stub using `grid.y = jobs`, demo device write‑hits path and host ring buffer; full kernel header assembly pending.
    - Constants in __constant__/read‑only memory; minimize branching; round unrolling.
 
 5) Scheduler
@@ -86,7 +91,7 @@ Research/education‑grade Bitcoin SHA‑256d GPU miner that maximizes effective
 - Job hot‑swap: in‑place updates; `gen` bump; kernel absorbs within ≤1 batch.
 - VRAM cache: ~85% utilization per GPU without breaching `min_free_mib`; watermarks respected.
 - PredictabilityWorker: safe double‑buffer; throttles appropriately; no interference with main kernels.
-- Kernel: dual‑compare per job; correct routing and CPU verification before submit.
+- Kernel: dual‑compare per job; correct routing and CPU verification before submit. Device hit ring feeds `SubmitRouter`.
 - Ledger/Outbox: duplicates dropped; pending hits replay after restart.
 - Stability: no crashes on disconnects; automatic recovery; no multi‑submit.
 

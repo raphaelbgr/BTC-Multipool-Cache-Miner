@@ -11,7 +11,7 @@
 - Adapters: `AdapterBase`, `StratumAdapter`, concrete `PoolAdapters/*`, and `GbtAdapter` + `GbtRunner`. Convert external schemas to `RawJob` with policy metadata (rolling caps, extranonce constraints, submit schema). GBT path polls `getblocktemplate` via JSON‑RPC (Bitcoin Core), using cookie auth by default. `GbtSubmitter` assembles block hex (header + varint(tx_count) + txs) and calls `submitblock`.
 - Normalizer: converts `RawJob` → `WorkItem` + `GpuJobConst`; computes share and block targets; endian normalization; coinbase assembly with witness commitment; midstate precompute; Merkle root.
 - WorkSourceRegistry: fixed‑size arrays for N sources tracking `WorkItem` and `GpuJobConst`. In‑place writes; `gen` bump last; `active` flags; `found_submitted` sticky until superseded.
-- CudaEngine: per‑nonce, cross‑job kernel. Grid y‑dim = job index; x‑dim = nonce offsets. Short micro‑batches (~0.5–3 ms). Emits hits into a lock‑free ring buffer per device.
+- CudaEngine: per‑nonce, cross‑job kernel. Grid y‑dim = job index; x‑dim = nonce offsets. Short micro‑batches (~0.5–3 ms). Emits hits into a device‑side ring buffer per device, drained by host into a lock‑protected host ring.
 - Scheduler: fair, weighted policy. Backpressure against sources with rejects/latency. Tunes micro‑batch duration for responsiveness to hot‑swaps.
 - SubmitRouter: CPU verifies double SHA‑256 on headers before routing shares/blocks to their originating adapter. Idempotent per job.
 - Ledger & Outbox: O(1) in‑RAM job map with mmap snapshotting; crash‑safe append‑only outbox that replays pending hits on startup; dedup via ledger.
@@ -37,14 +37,14 @@ Aligned constants and precomputed midstates required for kernel header assembly.
 4) Targets: compute `share_target` (varDiff) and `block_target` (from `nbits`) as LE `u32[8]`.
 5) Precompute midstates; produce compact `GpuJobConst`.
 6) Write into `WorkSourceRegistry` slot; bump `gen` last; mark `active=1`.
-7) Enqueue async copy of the updated slot to device.
+7) Enqueue async copy of the updated slot to device; update device job table for the kernel.
 
 ### CUDA Execution Model
 - Threads compute `nonce = base + offset` and loop over job indices (y‑dim). For each indexed job j:
   - Assemble 80‑byte header (constants + nonce)
   - Compute SHA‑256d
   - Compare `h` with `share_target[j]` and `block_target[j]`
-  - On match, record hit `{job_index, nonce, type}`
+- On match, record hit `{job_index, nonce, type}` into a device ring with atomic write index; host drains between launches.
 - Job constants reside in `__constant__` or read‑only memory; job loop strives to minimize branch divergence; SHA rounds unrolled for throughput.
 
 ### VRAM Cache Strategy
@@ -87,10 +87,10 @@ Aligned constants and precomputed midstates required for kernel header assembly.
 ### Implemented So Far (Current Status)
 - Config-driven multi-pool source loader (`config/pools.json`) with per-pool profiles (ViaBTC, F2Pool, CKPool, NiceHash) and a local-node GBT entry (cookie auth).
 - Endpoint rotation: advances to next endpoint after repeated connect failures or quick disconnects; per-connection backoff with structured logs.
-- Stratum V1 runner: connect → subscribe → authorize → notify handling; submit_result logging for mining.submit responses.
+- Stratum V1 runner: connect → subscribe → authorize → notify handling; varDiff via `mining.set_difficulty`, `mining.configure` version‑rolling mask negotiation; `clean_jobs` honored; submit_result logging.
 - TLS support via OpenSSL backend; plaintext sockets on Windows and POSIX. Auto-enable TLS on ports like 443/3334 when configured.
 - Structured JSON logging with optional file sink (`BMAD_LOG_FILE`).
-- Normalizer path and registry integration are in place; CUDA engine stubs compiled.
+- Normalizer path and registry integration are in place; CUDA engine has multi‑job launch stub and a demo device path that writes one hit per job for host drain tests.
 - GBT: node connectivity validated (cookie auth + getblocktemplate) and config schema defined. Full GBT job ingestion/submit wiring pending next.
 
 ### Config & Run

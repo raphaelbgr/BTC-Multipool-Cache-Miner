@@ -17,6 +17,8 @@
 #include "adapters/gbt_runner.h"
 #include "net/stratum_client.h"
 #include "registry/work_source_registry.h"
+#include "cuda/engine.h"
+#include "cuda/launch_plan.h"
 #include "submit/stratum_submitter.h"
 #include "submit/submit_router.h"
 #include "config/config.h"
@@ -210,6 +212,11 @@ int main(int argc, char** argv) {
         std::cout << js.dump() << std::endl;
         auto_submitted = true;
       }
+    }
+
+    // Demo: launch a tiny multi-job stub when we have an active job, to exercise CUDA path
+    if (snap.has_value()) {
+      cuda_engine::launchMultiJobStub(1, 256);
     }
     // Process any queued stdin lines without blocking
     {

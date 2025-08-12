@@ -167,6 +167,11 @@ void StratumRunner::runLoop() {
             bool clean = false;
             try { clean = params[7].get<bool>(); } catch (...) { clean = false; }
             in.clean_jobs = clean;
+            // propagate known extranonce2 size from subscription
+            {
+              std::lock_guard<std::mutex> lk(mu_);
+              in.extranonce2_size = extranonce2_size_;
+            }
             // Update adapter policy clean_jobs default to reflect server intent without forcing it
             adapter_->setCleanJobs(clean);
             // Apply basic ntime caps around provided ntime to allow minimal rolling

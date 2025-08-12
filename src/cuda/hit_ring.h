@@ -13,6 +13,15 @@ struct HitRecord {
   uint32_t nonce{0};
 };
 
+// Simple device-visible ring buffer header for hits.
+// For now, we allocate this in unified memory or copy from device to host explicitly.
+struct DeviceHitRing {
+  // Written by device: incremented atomically on push; host drains by reading up to write_index.
+  unsigned int write_index{0};
+  unsigned int capacity{0};
+  // Followed by capacity elements of HitRecord in device memory.
+};
+
 class HitRingBuffer {
  public:
   explicit HitRingBuffer(std::size_t capacity)
