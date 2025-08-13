@@ -46,6 +46,10 @@ static DeviceJob* g_jobs = nullptr;
 static __device__ __constant__ DeviceJob g_jobs_const[64];
 static __device__ unsigned int g_jobs_const_size = 0;
 static unsigned int g_num_jobs = 0;
+// Optional: per-block flush counter for diagnostics
+static __device__ unsigned int g_block_flush_count = 0;
+// Per-SM flush counters (size set at runtime to #SMs). For simplicity use a fixed upper bound.
+static __device__ unsigned int g_sm_flush_counts[128];
 
 __global__ void kernel_init_hit_buf(HitRecordDevice* buf, unsigned int cap) {
   g_hit_buf = buf;
@@ -200,6 +204,8 @@ __global__ void kernel_mine_batch(unsigned int num_jobs, unsigned int nonce_base
   if (threadIdx.x == 0) s_count = 0;
   __syncthreads();
   // Iterate micro-batch per thread
+  // Unroll small micro-batches for better ILP
+  #pragma unroll 4
   for (unsigned int k = 0; k < nonces_per_thread; ++k) {
     unsigned int nonce = start_nonce + k;
     // Assemble 80-byte header for this nonce
@@ -307,6 +313,14 @@ __global__ void kernel_mine_batch(unsigned int num_jobs, unsigned int nonce_base
   }
   __syncthreads();
   if (threadIdx.x == 0 && s_count > 0 && g_hit_buf && g_hit_cap) {
+    // Count one flush per block when we have local hits
+    atomicInc(&g_block_flush_count, 0xFFFFFFFFu);
+    // Per-SM counter (requires SM ID). Use cooperative groups intrinsic if available; else fallback to blockIdx.x%1.
+#if (__CUDACC_VER_MAJOR__ >= 9)
+    unsigned int smid;
+    asm volatile ("mov.u32 %0, %smid;" : "=r"(smid));
+    atomicInc(&g_sm_flush_counts[smid % 128], 0xFFFFFFFFu);
+#endif
     unsigned int start = atomicAdd(&g_hit_write_idx, s_count);
     for (unsigned int i = 0; i < s_count; ++i) {
       unsigned int slot = (g_hit_cap == 0) ? 0u : ((start + i) % g_hit_cap);
@@ -315,6 +329,195 @@ __global__ void kernel_mine_batch(unsigned int num_jobs, unsigned int nonce_base
     }
   }
 }
+
+#ifdef __CUDACC__
+template<int UNROLL>
+__global__ void kernel_mine_batch_unroll(unsigned int num_jobs, unsigned int nonce_base, unsigned int nonces_per_thread) {
+  unsigned int j = blockIdx.y;
+  if (j >= num_jobs) return;
+  unsigned int lane = threadIdx.x + blockIdx.x * blockDim.x;
+  unsigned int start_nonce = nonce_base + j + lane * nonces_per_thread;
+  const DeviceJob* J = (j < g_jobs_const_size) ? &g_jobs_const[j] : &g_jobs[j];
+  struct LocalHit { unsigned long long work_id; unsigned int nonce; };
+  __shared__ LocalHit s_hits[64];
+  __shared__ unsigned int s_count;
+  if (threadIdx.x == 0) s_count = 0;
+  __syncthreads();
+  unsigned int k = 0;
+  for (; k + UNROLL <= nonces_per_thread; k += UNROLL) {
+    #pragma unroll
+    for (int u = 0; u < UNROLL; ++u) {
+      unsigned int nonce = start_nonce + k + static_cast<unsigned int>(u);
+      unsigned char header[80];
+      header[0] = (J->version >> 24) & 0xFF; header[1] = (J->version >> 16) & 0xFF;
+      header[2] = (J->version >> 8) & 0xFF;  header[3] = (J->version) & 0xFF;
+      #pragma unroll
+      for (int w = 0; w < 8; ++w) {
+        unsigned int v = J->prevhash_le[w];
+        header[4 + w*4 + 0] = (v >> 24) & 0xFF;
+        header[4 + w*4 + 1] = (v >> 16) & 0xFF;
+        header[4 + w*4 + 2] = (v >> 8) & 0xFF;
+        header[4 + w*4 + 3] = (v) & 0xFF;
+      }
+      #pragma unroll
+      for (int w = 0; w < 8; ++w) {
+        unsigned int v = J->merkle_root_le[w];
+        header[36 + w*4 + 0] = (v >> 24) & 0xFF;
+        header[36 + w*4 + 1] = (v >> 16) & 0xFF;
+        header[36 + w*4 + 2] = (v >> 8) & 0xFF;
+        header[36 + w*4 + 3] = (v) & 0xFF;
+      }
+      unsigned int ntime = J->ntime;
+      if (J->ntime_min && ntime < J->ntime_min) ntime = J->ntime_min;
+      if (J->ntime_max && ntime > J->ntime_max) ntime = J->ntime_max;
+      header[68] = (ntime >> 24) & 0xFF; header[69] = (ntime >> 16) & 0xFF;
+      header[70] = (ntime >> 8) & 0xFF;  header[71] = (ntime) & 0xFF;
+      unsigned int nbits = J->nbits;
+      header[72] = (nbits >> 24) & 0xFF; header[73] = (nbits >> 16) & 0xFF;
+      header[74] = (nbits >> 8) & 0xFF;  header[75] = (nbits) & 0xFF;
+      header[76] = (nonce >> 24) & 0xFF; header[77] = (nonce >> 16) & 0xFF;
+      header[78] = (nonce >> 8) & 0xFF;  header[79] = (nonce) & 0xFF;
+      bool used_midstate = false;
+      #pragma unroll
+      for (int i=0;i<8;++i) { if (J->midstate_le[i] != 0u) { used_midstate = true; break; } }
+      unsigned char digest[32];
+      if (used_midstate) {
+        unsigned int st[8];
+        #pragma unroll
+        for (int i=0;i<8;++i) st[i] = J->midstate_le[i];
+        unsigned int w0_15[16];
+        w0_15[0] = bswap32(J->merkle_root_le[7]);
+        w0_15[1] = bswap32(ntime);
+        w0_15[2] = bswap32(nbits);
+        w0_15[3] = bswap32(nonce);
+        w0_15[4] = 0x80000000u;
+        #pragma unroll
+        for (int i=5;i<15;++i) w0_15[i] = 0u;
+        w0_15[15] = 640u;
+        cuda_sha256d::sha256_compress(st, w0_15);
+        unsigned char t1[32];
+        #pragma unroll
+        for (int i=0;i<8;++i) {
+          t1[i*4+0] = (unsigned char)((st[i] >> 24) & 0xFF);
+          t1[i*4+1] = (unsigned char)((st[i] >> 16) & 0xFF);
+          t1[i*4+2] = (unsigned char)((st[i] >> 8) & 0xFF);
+          t1[i*4+3] = (unsigned char)((st[i]) & 0xFF);
+        }
+        unsigned int st2[8];
+        #pragma unroll
+        for (int i=0;i<8;++i) st2[i] = cuda_sha256d::kSha256IV[i];
+        unsigned int w2[16];
+        #pragma unroll
+        for (int i=0;i<8;++i) {
+          int o = i*4;
+          w2[i] = (unsigned int(t1[o])<<24) | (unsigned int(t1[o+1])<<16) |
+                  (unsigned int(t1[o+2])<<8) | (unsigned int(t1[o+3]));
+        }
+        w2[8] = 0x80000000u; for (int i=9;i<15;++i) w2[i]=0u; w2[15] = 256u;
+        cuda_sha256d::sha256_compress(st2, w2);
+        #pragma unroll
+        for (int i=0;i<8;++i) {
+          digest[i*4+0] = (unsigned char)((st2[i] >> 24) & 0xFF);
+          digest[i*4+1] = (unsigned char)((st2[i] >> 16) & 0xFF);
+          digest[i*4+2] = (unsigned char)((st2[i] >> 8) & 0xFF);
+          digest[i*4+3] = (unsigned char)((st2[i]) & 0xFF);
+        }
+      } else {
+        cuda_sha256d::sha256d_80_be(header, digest);
+      }
+      bool leq = true;
+      #pragma unroll
+      for (int i=0;i<32;++i) {
+        unsigned char t = J->share_target_be[i];
+        if (digest[i] < t) { leq = true; break; }
+        if (digest[i] > t) { leq = false; break; }
+      }
+      if (leq) {
+        unsigned int li = atomicAdd(&s_count, 1u);
+        if (li < 64u) {
+          s_hits[li].work_id = J->work_id;
+          s_hits[li].nonce = nonce;
+        } else {
+          unsigned int idx = atomicInc(&g_hit_write_idx, 0xFFFFFFFFu);
+          unsigned int slot = (g_hit_cap == 0) ? 0u : (idx % g_hit_cap);
+          g_hit_buf[slot].work_id = J->work_id;
+          g_hit_buf[slot].nonce = nonce;
+        }
+      }
+    }
+  }
+  // tail
+  for (; k < nonces_per_thread; ++k) {
+    // reuse generic for tail
+    unsigned int nonce = start_nonce + k;
+    unsigned char header[80];
+    header[0] = (J->version >> 24) & 0xFF; header[1] = (J->version >> 16) & 0xFF;
+    header[2] = (J->version >> 8) & 0xFF;  header[3] = (J->version) & 0xFF;
+    #pragma unroll
+    for (int w = 0; w < 8; ++w) {
+      unsigned int v = J->prevhash_le[w];
+      header[4 + w*4 + 0] = (v >> 24) & 0xFF;
+      header[4 + w*4 + 1] = (v >> 16) & 0xFF;
+      header[4 + w*4 + 2] = (v >> 8) & 0xFF;
+      header[4 + w*4 + 3] = (v) & 0xFF;
+    }
+    #pragma unroll
+    for (int w = 0; w < 8; ++w) {
+      unsigned int v = J->merkle_root_le[w];
+      header[36 + w*4 + 0] = (v >> 24) & 0xFF;
+      header[36 + w*4 + 1] = (v >> 16) & 0xFF;
+      header[36 + w*4 + 2] = (v >> 8) & 0xFF;
+      header[36 + w*4 + 3] = (v) & 0xFF;
+    }
+    unsigned int ntime = J->ntime;
+    if (J->ntime_min && ntime < J->ntime_min) ntime = J->ntime_min;
+    if (J->ntime_max && ntime > J->ntime_max) ntime = J->ntime_max;
+    header[68] = (ntime >> 24) & 0xFF; header[69] = (ntime >> 16) & 0xFF;
+    header[70] = (ntime >> 8) & 0xFF;  header[71] = (ntime) & 0xFF;
+    unsigned int nbits = J->nbits;
+    header[72] = (nbits >> 24) & 0xFF; header[73] = (nbits >> 16) & 0xFF;
+    header[74] = (nbits >> 8) & 0xFF;  header[75] = (nbits) & 0xFF;
+    header[76] = (nonce >> 24) & 0xFF; header[77] = (nonce >> 16) & 0xFF;
+    header[78] = (nonce >> 8) & 0xFF;  header[79] = (nonce) & 0xFF;
+    unsigned char digest[32];
+    cuda_sha256d::sha256d_80_be(header, digest);
+    bool leq = true;
+    #pragma unroll
+    for (int i=0;i<32;++i) {
+      unsigned char t = J->share_target_be[i];
+      if (digest[i] < t) { leq = true; break; }
+      if (digest[i] > t) { leq = false; break; }
+    }
+    if (leq) {
+      unsigned int li = atomicAdd(&s_count, 1u);
+      if (li < 64u) {
+        s_hits[li].work_id = J->work_id;
+        s_hits[li].nonce = nonce;
+      } else {
+        unsigned int idx = atomicInc(&g_hit_write_idx, 0xFFFFFFFFu);
+        unsigned int slot = (g_hit_cap == 0) ? 0u : (idx % g_hit_cap);
+        g_hit_buf[slot].work_id = J->work_id;
+        g_hit_buf[slot].nonce = nonce;
+      }
+    }
+  }
+  __syncthreads();
+  if (threadIdx.x == 0 && s_count > 0 && g_hit_buf && g_hit_cap) {
+    atomicInc(&g_block_flush_count, 0xFFFFFFFFu);
+#if (__CUDACC_VER_MAJOR__ >= 9)
+    unsigned int smid;
+    asm volatile ("mov.u32 %0, %smid;" : "=r"(smid));
+    atomicInc(&g_sm_flush_counts[smid % 128], 0xFFFFFFFFu);
+#endif
+    unsigned int start = atomicAdd(&g_hit_write_idx, s_count);
+    for (unsigned int i = 0; i < s_count; ++i) {
+      unsigned int slot = (g_hit_cap == 0) ? 0u : ((start + i) % g_hit_cap);
+      g_hit_buf[slot].work_id = s_hits[i].work_id;
+      g_hit_buf[slot].nonce = s_hits[i].nonce;
+    }
+  }
+}
+#endif
 __global__ void kernel_hash_one(uint32_t job_index, uint32_t nonce, unsigned char* out32) {
   if (!g_jobs) return;
   unsigned int j = job_index;
@@ -438,7 +641,16 @@ bool cuda_engine::launchMineWithPlanBatch(uint32_t num_jobs,
   if (nonces_per_thread == 0) nonces_per_thread = 1;
   dim3 grid(blocks_per_job, num_jobs, 1);
   dim3 block(threads_per_block, 1, 1);
-  kernel_mine_batch<<<grid, block>>>(num_jobs, nonce_base, nonces_per_thread);
+  // Choose specialized unroll kernel when beneficial
+  if (nonces_per_thread >= 8) {
+    kernel_mine_batch_unroll<8><<<grid, block>>>(num_jobs, nonce_base, nonces_per_thread);
+  } else if (nonces_per_thread >= 4) {
+    kernel_mine_batch_unroll<4><<<grid, block>>>(num_jobs, nonce_base, nonces_per_thread);
+  } else if (nonces_per_thread >= 2) {
+    kernel_mine_batch_unroll<2><<<grid, block>>>(num_jobs, nonce_base, nonces_per_thread);
+  } else {
+    kernel_mine_batch<<<grid, block>>>(num_jobs, nonce_base, nonces_per_thread);
+  }
   cudaDeviceSynchronize();
   return true;
 #endif
@@ -620,6 +832,47 @@ bool cuda_engine::getMineBatchOccupancy(uint32_t threads_per_block,
     }
     *out_occupancy_0_1 = occ;
   }
+  return true;
+#endif
+}
+
+bool cuda_engine::readAndResetBlockFlushCount(uint32_t* out_count) {
+#ifndef __CUDACC__
+  if (out_count) *out_count = 0; return false;
+#else
+  unsigned int val = 0;
+  cudaMemcpyFromSymbol(&val, g_block_flush_count, sizeof(unsigned int));
+  unsigned int zero = 0;
+  cudaMemcpyToSymbol(g_block_flush_count, &zero, sizeof(unsigned int));
+  if (out_count) *out_count = val;
+  return true;
+#endif
+}
+
+bool cuda_engine::getMineBatchKernelAttrs(int* out_num_regs, size_t* out_shared_bytes, int* out_max_threads_per_block) {
+#ifndef __CUDACC__
+  if (out_num_regs) *out_num_regs = 0; if (out_shared_bytes) *out_shared_bytes = 0; if (out_max_threads_per_block) *out_max_threads_per_block = 0; return false;
+#else
+  cudaFuncAttributes attr{};
+  cudaFuncGetAttributes(&attr, (const void*)kernel_mine_batch);
+  if (out_num_regs) *out_num_regs = attr.numRegs;
+  if (out_shared_bytes) *out_shared_bytes = static_cast<size_t>(attr.sharedSizeBytes);
+  if (out_max_threads_per_block) *out_max_threads_per_block = attr.maxThreadsPerBlock;
+  return true;
+#endif
+}
+
+bool cuda_engine::readAndResetSmFlushCounts(uint32_t sm_count, uint32_t* out_counts) {
+#ifndef __CUDACC__
+  (void)sm_count; (void)out_counts; return false;
+#else
+  if (!out_counts) return false;
+  uint32_t tmp[128];
+  cudaMemcpyFromSymbol(tmp, g_sm_flush_counts, sizeof(uint32_t) * 128);
+  for (uint32_t i = 0; i < sm_count && i < 128u; ++i) out_counts[i] = tmp[i];
+  // zero them
+  uint32_t zeros[128] = {0};
+  cudaMemcpyToSymbol(g_sm_flush_counts, zeros, sizeof(uint32_t) * 128);
   return true;
 #endif
 }

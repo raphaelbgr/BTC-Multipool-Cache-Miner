@@ -8,6 +8,7 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <filesystem>
 
 namespace store {
 
@@ -118,6 +119,19 @@ class Outbox {
 
     bool clearFile(const std::string& filepath) {
       std::lock_guard<std::mutex> lock(mu_);
+      std::ofstream ofs(filepath, std::ios::binary | std::ios::trunc);
+      return static_cast<bool>(ofs);
+    }
+
+    // Rotate file to a new path (rename). Returns true on success; if rename fails, falls back to copy+truncate.
+    bool rotateFile(const std::string& filepath, const std::string& newpath) {
+      std::lock_guard<std::mutex> lock(mu_);
+      std::error_code ec;
+      std::filesystem::create_directories(std::filesystem::path(newpath).parent_path(), ec);
+      std::filesystem::rename(filepath, newpath, ec);
+      if (!ec) return true;
+      // Fallback: copy and truncate
+      std::filesystem::copy_file(filepath, newpath, std::filesystem::copy_options::overwrite_existing, ec);
       std::ofstream ofs(filepath, std::ios::binary | std::ios::trunc);
       return static_cast<bool>(ofs);
     }

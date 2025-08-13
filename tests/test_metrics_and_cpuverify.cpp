@@ -2,6 +2,7 @@
 #include "obs/metrics.h"
 #include "submit/cpu_verify.h"
 #include "normalize/targets.h"
+#include "config/config.h"
 
 TEST(Metrics, Snapshot) {
   obs::MetricsRegistry m;
@@ -13,6 +14,15 @@ TEST(Metrics, Snapshot) {
   ASSERT_TRUE(j.contains("gauges"));
   EXPECT_EQ(j["counters"]["a"], 3);
   EXPECT_EQ(j["gauges"]["g"], -5);
+}
+
+TEST(Config, LoadsDefaultsAndParsesNewSections) {
+  auto cfg = config::loadDefault();
+  EXPECT_GE(cfg.pools.size(), 1u);
+  EXPECT_FALSE(cfg.outbox.path.empty());
+  EXPECT_EQ(cfg.outbox.rotate_interval_sec, 0ull);
+  EXPECT_FALSE(cfg.ledger.path.empty());
+  EXPECT_GT(cfg.ledger.max_bytes, 0ull);
 }
 
 TEST(CPUVerify, Sha256d_KnownVector) {

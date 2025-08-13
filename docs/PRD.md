@@ -51,7 +51,7 @@ Research/education‑grade Bitcoin SHA‑256d GPU miner that maximizes effective
 4) CUDA Engine (same nonce across all jobs)
    - Grid mapping: y‑dimension = job index; x‑dimension = nonce offsets; micro‑batches (~0.5–3 ms).
    - Per thread: assemble header (job constants + nonce) → double SHA‑256 → compare to share and block targets; record hits in a ring buffer.
-   - Current status: device SHA‑256d implemented (including midstate tail path); `DeviceJob` uploaded per job; constant‑memory fast path for up to 64 jobs; device hit ring with host drain; host reconstructs header to CPU‑verify before submit. Simple auto‑tune adjusts `nonces_per_thread` and desired threads/job; further occupancy and unrolling optimization TBD.
+    - Current status: device SHA‑256d implemented (including midstate tail path); `DeviceJob` uploaded per job; constant‑memory fast path for up to 64 jobs; device hit ring with host drain; per‑block shared‑memory hit buffers reduce global atomic contention; host reconstructs header to CPU‑verify before submit. Auto‑tune adjusts `nonces_per_thread` and desired threads/job and is now occupancy‑aware via a kernel occupancy query; further unrolling optimization TBD.
    - Constants in __constant__/read‑only memory; minimize branching; round unrolling.
 
 5) Scheduler
@@ -70,7 +70,7 @@ Research/education‑grade Bitcoin SHA‑256d GPU miner that maximizes effective
 
 8) SubmitRouter, Ledger & Outbox
    - CPU rebuild and verify header pre‑submit; idempotent routing to the originating adapter.
-   - Persistent O(1) job map (ledger) with mmap snapshot; dedupe jobs; crash‑safe outbox with replay; rotation by size and optional rotate‑on‑start; acceptance‑based pruning wired via runner callbacks.
+- Persistent O(1) job map (ledger) with periodic JSONL snapshots and rotation policy (size and/or time‑based); dedupe jobs; crash‑safe outbox with replay; rotation by size, optional time‑based interval, and optional rotate‑on‑start; acceptance‑based pruning wired via runner callbacks.
 
 9) Observability
 - Metrics: per‑source hashrate (EWMA), share accept/reject/stale, kernel time, desired threads and nonces per thread, CUDA mem free/total, PCIe/VRAM usage.
@@ -111,12 +111,25 @@ Research/education‑grade Bitcoin SHA‑256d GPU miner that maximizes effective
 - Concurrency bugs → In‑place updates with `gen` last; minimal pointer churn; ring buffers; robust unit/integration tests.
 
 ### Metrics (north‑star & health)
-- Hashrate per source; share acceptance/reject/stale; kernel time/occupancy; VRAM residency/util; PCIe bandwidth; predict worker duty cycle; recovery MTTR.
+- Hashrate per source; share acceptance/reject/stale; kernel time; kernel occupancy and active blocks/SM; per‑SM flush counters (summaries); kernel attributes (regs/shared/TPB); VRAM residency/util; PCIe bandwidth; predict worker duty cycle; recovery MTTR.
 
 ### Open Questions
 - Minimum GPU VRAM to officially support? (e.g., 6 GiB+)
 - Default scheduler weights and solo bias—conservative or configurable presets?
 - Which bloom/cuckoo default parameters for dedup FPR and memory footprint?
+
+### Configuration Overview
+- File: `config/pools.json`
+  - Each pool entry defines:
+    - `profile`: viabtc | f2pool | ckpool | nicehash | gbt
+    - `cred_mode`: `wallet_as_user` or `account_worker`
+    - `endpoints`: `[ { host, port, use_tls } ]`
+    - For GBT: `rpc` (url, use_tls, auth=cookie|userpass, username, password, cookie_path) and `gbt` (poll_ms, rules)
+  - Global sections:
+    - `cuda`: `hit_ring_capacity`, `desired_threads_per_job`, `nonces_per_thread`
+    - `metrics`: `enable_file`, `file_path`, `dump_interval_ms`, `enable_http`, `http_host`, `http_port`
+    - `outbox`: `path`, `max_bytes`, `rotate_on_start`, `rotate_interval_sec`
+    - `ledger`: `path`, `max_bytes`, `rotate_interval_sec`
 
 ### Example Configuration
 See `docs/config-example.ini` for a complete example.

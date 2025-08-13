@@ -9,12 +9,12 @@
 - CacheManager (VRAM): dynamic per‑GPU cache targeting ~85% VRAM; maintains midstates, normalized templates/variants, per‑job dedup filters, and header‑variant staging. Watermarks and `min_free_mib` guard rails.
 - PredictabilityWorker (CUDA): low‑priority stream precomputing/warming cache pages with double‑buffer shadow pages and epoch swap on stable `gen`. Adaptive throttling based on VRAM and GPU util.
 - Adapters: `AdapterBase`, `StratumAdapter`, concrete `PoolAdapters/*`, and `GbtAdapter` + `GbtRunner`. Convert external schemas to `RawJob` with policy metadata (rolling caps, extranonce constraints, submit schema). GBT path polls `getblocktemplate` via JSON‑RPC (Bitcoin Core), using cookie auth by default. `GbtSubmitter` assembles block hex (header + varint(tx_count) + txs) and calls `submitblock`.
-- Normalizer: converts `RawJob` → `WorkItem` + `GpuJobConst`; computes share and block targets; endian normalization; coinbase assembly with extranonces; midstate precompute; Merkle root.
+- Normalizer: converts `RawJob` → `WorkItem` + `GpuJobConst`; computes share and block targets; endian normalization; coinbase assembly with extranonces; midstate precompute; Merkle root. For GBT, miner uses `merkleroot` for header while witness commitment is handled inside coinbase.
 - WorkSourceRegistry: fixed‑size arrays for N sources tracking `WorkItem` and `GpuJobConst`. In‑place writes; `gen` bump last; `active` flags; `found_submitted` sticky until superseded.
-- CudaEngine: per‑nonce, cross‑job kernel. Grid y‑dim = job index; x‑dim = nonce offsets. Short micro‑batches (~0.5–3 ms). Emits hits into a device‑side ring buffer per device, drained by host into a lock‑protected host ring. Device SHA‑256d implemented (midstate path), with `DeviceJob` table uploaded each hot‑swap; constant‑memory fast path for small job sets.
-- Scheduler: fair, weighted policy. Backpressure against sources with rejects/latency (decaying penalty). Tunes micro‑batch duration for responsiveness to hot‑swaps (simple auto‑tune).
+- CudaEngine: per‑nonce, cross‑job kernel. Grid y‑dim = job index; x‑dim = nonce offsets. Short micro‑batches (~0.5–3 ms). Emits hits into a device‑side ring buffer per device, drained by host into a lock‑protected host ring. Per‑block shared‑memory hit buffers coalesce writes to reduce global atomic contention. Device SHA‑256d implemented (midstate path), with `DeviceJob` table uploaded each hot‑swap; constant‑memory fast path for small job sets; specialized unrolled kernels for micro‑batches (2/4/8).
+- Scheduler: fair, weighted policy. Backpressure against sources with rejects/latency (decaying penalty). Tunes micro‑batch duration for responsiveness to hot‑swaps (simple auto‑tune). Occupancy‑aware tuning adjusts threads per job.
 - SubmitRouter: CPU verifies double SHA‑256 on headers before routing shares/blocks to their originating adapter. Idempotent per job.
-- Ledger & Outbox: O(1) in‑RAM job map with mmap snapshotting; crash‑safe append‑only outbox that replays pending hits on startup; size‑based rotation and optional rotate‑on‑start; acceptance cleanup wired from runner to prune persisted entries.
+- Ledger & Outbox: O(1) in‑RAM job map with periodic JSONL snapshots and rotation policy (size/time); crash‑safe append‑only outbox that replays pending hits on startup; size‑based rotation, optional time‑based rotation, and optional rotate‑on‑start; acceptance cleanup wired from runner to prune persisted entries.
 
 ### Data Models (Kernel‑ready)
 
@@ -68,7 +68,7 @@ Aligned constants and precomputed midstates required for kernel header assembly.
 - Ledger stores job key and timestamps; outbox replays pending hits post‑restart; dedup guarantees idempotency.
 
 ### Observability
-- Metrics: hashrate per source, accept/reject/stale, kernel timing, occupancy, PCIe BW, VRAM usage, predict worker duty cycle.
+- Metrics: hashrate per source, accept/reject/stale, kernel timing, occupancy (active blocks/SM, %), per‑SM flush summaries, kernel attributes (regs/shared/TPB), PCIe BW, VRAM usage, predict worker duty cycle.
 - Logs: structured JSON; per‑hit traces; connection state; retry/backoff reasons.
 
 ### Testing Strategy
@@ -92,7 +92,7 @@ Aligned constants and precomputed midstates required for kernel header assembly.
 - TLS support via OpenSSL backend; plaintext sockets on Windows and POSIX. Auto-enable TLS on ports like 443/3334 when configured.
 - Structured JSON logging with optional file sink (`BMAD_LOG_FILE`).
 - Normalizer path and registry integration are in place; CUDA engine has multi‑job launch stub and a demo device path that writes one hit per job for host drain tests.
-- GBT: node connectivity validated (cookie auth + getblocktemplate) and config schema defined. Full GBT job ingestion/submit wiring pending next.
+- GBT: node connectivity validated (cookie auth + getblocktemplate) and config schema defined (supports `cookie_path` override). Template transactions cached and block submission via `submitblock` implemented. A helper builds full block hex (header + varint(tx_count) + coinbase + txs) pre-submit for diagnostics. If only `default_witness_commitment` is present, a minimal coinbase carrying an OP_RETURN witness commitment is synthesized for diagnostics.
 
 ### Config & Run
 - File: `config/pools.json`
@@ -100,7 +100,7 @@ Aligned constants and precomputed midstates required for kernel header assembly.
     - `profile`: viabtc | f2pool | ckpool | nicehash | gbt
     - `cred_mode`: `wallet_as_user` (wallet.worker) or `account_worker` (account.worker)
     - `endpoints`: `[ { host, port, use_tls } ]` (rotation order)
-    - For GBT: `rpc` (url, use_tls, auth=cookie) and `gbt` (poll_ms, rules)
+    - For GBT: `rpc` (url, use_tls, auth=cookie|userpass, username, password, cookie_path) and `gbt` (poll_ms, rules)
 - Environment (optional):
   - `BMAD_POOL`: select pool by name; default is first in config
   - `BMAD_LOG_FILE`: write JSONL logs to file

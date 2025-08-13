@@ -155,8 +155,25 @@ int main(int argc, char** argv) {
   store::Outbox outbox;
   const auto outbox_cfg = cfg_all.outbox;
   const std::string outbox_path = outbox_cfg.path;
+  uint64_t last_outbox_rotate_ms = 0;
+  auto rotate_outbox_if_needed = [&](bool force){
+    auto file_exceeds_limit = [&](){
+      std::ifstream ifs(outbox_path, std::ios::binary | std::ios::ate);
+      if (!ifs) return false; std::streamsize sz = ifs.tellg();
+      return sz >= static_cast<std::streamsize>(outbox_cfg.max_bytes);
+    };
+    auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    bool time_exceeded = (outbox_cfg.rotate_interval_sec > 0) && (now_ms - last_outbox_rotate_ms > outbox_cfg.rotate_interval_sec * 1000ull);
+    if (force || file_exceeds_limit() || time_exceeded) {
+      // Rotate to path.<epoch>.bak
+      auto epoch = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+      std::ostringstream oss; oss << outbox_path << "." << epoch << ".bak";
+      outbox.rotateFile(outbox_path, oss.str());
+      last_outbox_rotate_ms = now_ms;
+    }
+  };
   if (outbox_cfg.rotate_on_start) {
-    outbox.clearFile(outbox_path);
+    rotate_outbox_if_needed(true);
   } else {
     outbox.loadFromFile(outbox_path);
   }
@@ -245,18 +262,9 @@ int main(int argc, char** argv) {
           if (sources[sid].stratum_runner) sources[sid].stratum_runner->setPendingSubmit(rec.work_id, rec.nonce);
         }
       }
-      // Append to outbox only if under size limit
+      // Append to outbox and rotate if needed
       store::PendingSubmit ps{}; ps.work_id = rec.work_id; ps.nonce = rec.nonce; std::memcpy(ps.header80, rec.header80, 80);
-      // Note: os file size check omitted for brevity; append directly
-      // Enforce outbox size limit with truncate rotation
-      auto file_exceeds_limit = [&](){
-        std::ifstream ifs(outbox_path, std::ios::binary | std::ios::ate);
-        if (!ifs) return false; std::streamsize sz = ifs.tellg();
-        return sz >= static_cast<std::streamsize>(outbox_cfg.max_bytes);
-      };
-      if (file_exceeds_limit()) {
-        outbox.clearFile(outbox_path);
-      }
+      rotate_outbox_if_needed(false);
       outbox.appendToFile(outbox_path, ps);
     });
     submit_router->attachOutbox(&outbox);
@@ -348,6 +356,12 @@ int main(int argc, char** argv) {
   // Hashrate tracking (EWMA)
   double hashrate_khs_ewma = 0.0;
   auto ewma = [](double prev, double cur){ return prev == 0.0 ? cur : (prev * 0.8 + cur * 0.2); };
+  // Periodic ledger snapshot to file
+  store::Ledger ledger;
+  const std::string ledger_path = cfg_all.ledger.path.empty()? std::string("runner.jsonl") : cfg_all.ledger.path;
+  uint64_t last_ledger_snapshot_ms = 0;
+  const uint64_t ledger_period_ms = 5000;
+  uint64_t last_ledger_rotate_ms = 0;
 
   while (!g_stop.load()) {
     // Drain full results and set registry
@@ -494,8 +508,17 @@ int main(int argc, char** argv) {
           metrics.setGauge("cuda.sms", sms);
           metrics.setGauge("cuda.active_blocks_per_sm", ab);
           metrics.setGauge("cuda.max_threads_per_sm", maxthr);
+          int num_regs = 0; size_t sh_bytes = 0; int max_tpb = 0;
+          if (cuda_engine::getMineBatchKernelAttrs(&num_regs, &sh_bytes, &max_tpb)) {
+            metrics.setGauge("cuda.kernel_regs", num_regs);
+            metrics.setGauge("cuda.kernel_shared_bytes", static_cast<int64_t>(sh_bytes));
+            metrics.setGauge("cuda.kernel_max_tpb", max_tpb);
+          }
         }
       }
+      // Occupancy-aware auto-tune: prefer increasing threads_per_block if occupancy low
+      float occ = 0.0f; int sms = 0; int ab = 0; int maxthr = 0;
+      bool have_occ = cuda_engine::getMineBatchOccupancy(static_cast<uint32_t>(plan.threads_per_block), &occ, &sms, &ab, &maxthr);
       // Auto-tune nonces_per_thread if far from budget
       {
         cuda_engine::AutoTuneInputs ai; ai.observedMsPerBatch = static_cast<uint32_t>(kernel_ms);
@@ -505,7 +528,9 @@ int main(int argc, char** argv) {
         nonces_per_thread = static_cast<int>(dec.nextMicroBatch);
       }
       // Simple auto-tune for desired_threads_per_job
-      if (kernel_ms * 5 < budget_ms * 4) {
+      if (have_occ && occ < 0.5f && desired_threads_per_job < 1024) {
+        desired_threads_per_job = std::min(1024, desired_threads_per_job * 2);
+      } else if (kernel_ms * 5 < budget_ms * 4) {
         desired_threads_per_job = std::min(1024, desired_threads_per_job * 2);
       } else if (kernel_ms > budget_ms && desired_threads_per_job > 64) {
         desired_threads_per_job = std::max(64, desired_threads_per_job / 2);
@@ -522,6 +547,24 @@ int main(int argc, char** argv) {
         double khs = (nonces_tested / secs) / 1000.0;
         hashrate_khs_ewma = ewma(hashrate_khs_ewma, khs);
         metrics.setGauge("cuda.hashrate_khs", static_cast<int64_t>(hashrate_khs_ewma));
+      }
+      // Block flush diagnostics
+      {
+        uint32_t flushes = 0;
+        if (cuda_engine::readAndResetBlockFlushCount(&flushes)) {
+          metrics.setGauge("cuda.block_flushes", static_cast<int64_t>(flushes));
+          int sms = 0; float occ_dummy = 0.0f; int ab_dummy=0; int maxthr_dummy=0;
+          if (cuda_engine::getMineBatchOccupancy(static_cast<uint32_t>(plan.threads_per_block), &occ_dummy, &sms, &ab_dummy, &maxthr_dummy) && sms > 0) {
+            std::vector<uint32_t> smc(static_cast<size_t>(sms));
+            if (cuda_engine::readAndResetSmFlushCounts(static_cast<uint32_t>(sms), smc.data())) {
+              // Emit sum and max to keep cardinality low
+              uint64_t sum = 0; uint32_t mx = 0;
+              for (uint32_t v : smc) { sum += v; if (v > mx) mx = v; }
+              metrics.setGauge("cuda.block_flushes_sum", static_cast<int64_t>(sum));
+              metrics.setGauge("cuda.block_flushes_max_sm", static_cast<int64_t>(mx));
+            }
+          }
+        }
       }
       nonce_base += 1; // advance to keep testing new nonce across all jobs
       cuda_engine::HitRecord out[64]; uint32_t n = 0;
@@ -561,6 +604,37 @@ int main(int argc, char** argv) {
             metrics.increment("submit.shares", 1);
           }
         }
+      }
+      // Periodic ledger snapshot
+      auto now_ms2 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+      if (now_ms2 - last_ledger_snapshot_ms > ledger_period_ms) {
+        // Populate ledger with current active items
+        for (const auto& kv : id_to_snap) {
+          ledger.put(kv.second.item);
+        }
+        // Rotate ledger file if large or based on interval
+        auto rotate_ledger_if_needed = [&](){
+          bool do_rotate = false;
+          // size
+          std::ifstream ifs(ledger_path, std::ios::binary | std::ios::ate);
+          if (ifs) {
+            std::streamsize sz = ifs.tellg();
+            if (sz >= static_cast<std::streamsize>(cfg_all.ledger.max_bytes)) do_rotate = true;
+          }
+          auto nowms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+          if (cfg_all.ledger.rotate_interval_sec > 0 && (nowms - last_ledger_rotate_ms > cfg_all.ledger.rotate_interval_sec * 1000ull)) do_rotate = true;
+          if (do_rotate) {
+            auto epoch = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+            std::ostringstream oss; oss << ledger_path << "." << epoch << ".bak";
+            // naive rotate via rename or copy+truncate
+            std::error_code ec; std::filesystem::rename(ledger_path, oss.str(), ec);
+            if (ec) { std::filesystem::copy_file(ledger_path, oss.str(), std::filesystem::copy_options::overwrite_existing, ec); std::ofstream ofs(ledger_path, std::ios::binary | std::ios::trunc); }
+            last_ledger_rotate_ms = nowms;
+          }
+        };
+        rotate_ledger_if_needed();
+        ledger.saveToFile(ledger_path);
+        last_ledger_snapshot_ms = now_ms2;
       }
     }
     // Process any queued stdin lines without blocking

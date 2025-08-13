@@ -53,4 +53,26 @@ TEST(Store, OutboxAppendAndLoad) {
   EXPECT_EQ(d->header80[79], 79);
 }
 
+TEST(Store, OutboxRotateFile) {
+  store::Outbox ob;
+  const char* src = "outbox_rotate_src.bin";
+  const char* dst = "outbox_rotate_dst.bin";
+  // Write one record
+  store::PendingSubmit s{}; s.work_id = 1; s.nonce = 2; for (int i=0;i<80;++i) s.header80[i]=0xAA;
+  ASSERT_TRUE(ob.appendToFile(src, s));
+  // Rotate
+  ASSERT_TRUE(ob.rotateFile(src, dst));
+  // Destination must exist and be at least one record in size
+  std::error_code ec;
+  auto sz_dst = std::filesystem::file_size(dst, ec);
+  ASSERT_FALSE(ec);
+  EXPECT_GE(static_cast<long long>(sz_dst), 92);
+  // Source may be missing (rename) or truncated (copy+truncate). Accept either.
+  if (std::filesystem::exists(src)) {
+    auto sz_src = std::filesystem::file_size(src, ec);
+    ASSERT_FALSE(ec);
+    EXPECT_EQ(static_cast<long long>(sz_src), 0);
+  }
+}
+
 

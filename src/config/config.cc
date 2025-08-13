@@ -41,6 +41,13 @@ AppConfig loadFromJsonFile(const std::string& path) {
     if (o.contains("path")) cfg.outbox.path = o["path"].get<std::string>();
     if (o.contains("max_bytes")) cfg.outbox.max_bytes = o["max_bytes"].get<uint64_t>();
     if (o.contains("rotate_on_start")) cfg.outbox.rotate_on_start = o["rotate_on_start"].get<bool>();
+    if (o.contains("rotate_interval_sec")) cfg.outbox.rotate_interval_sec = o["rotate_interval_sec"].get<uint64_t>();
+  }
+  if (j.contains("ledger") && j["ledger"].is_object()) {
+    const auto& l = j["ledger"];
+    if (l.contains("path")) cfg.ledger.path = l["path"].get<std::string>();
+    if (l.contains("max_bytes")) cfg.ledger.max_bytes = l["max_bytes"].get<uint64_t>();
+    if (l.contains("rotate_interval_sec")) cfg.ledger.rotate_interval_sec = l["rotate_interval_sec"].get<uint64_t>();
   }
   if (j.contains("pools") && j["pools"].is_array()) {
     for (const auto& p : j["pools"]) {
@@ -70,6 +77,7 @@ AppConfig loadFromJsonFile(const std::string& path) {
         if (r.contains("auth")) rc.auth = r["auth"].get<std::string>();
         if (r.contains("username")) rc.username = r["username"].get<std::string>();
         if (r.contains("password")) rc.password = r["password"].get<std::string>();
+        if (r.contains("cookie_path")) rc.cookie_path = r["cookie_path"].get<std::string>();
         e.rpc = rc;
       }
       if (p.contains("gbt") && p["gbt"].is_object()) {

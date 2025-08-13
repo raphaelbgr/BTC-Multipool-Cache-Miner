@@ -87,15 +87,11 @@ void GbtRunner::runLoop() {
         in.job.ntime = static_cast<uint32_t>(gbt["curtime"].get<int64_t>());
         // prevhash BE
         hexToBytes(prevhash, in.prevhash_be, 32);
-        // For now, use GBT's provided merkle root if available; placeholder otherwise
-        std::string mr;
-        if (gbt.contains("default_witness_commitment") && gbt["default_witness_commitment"].is_string()) {
-          mr = gbt["default_witness_commitment"].get<std::string>();
-        } else if (gbt.contains("merkleroot") && gbt["merkleroot"].is_string()) {
-          mr = gbt["merkleroot"].get<std::string>();
-        } else {
-          mr = std::string(64, '0');
-        }
+        // Header merkle root must be the merkle of txids, not the witness commitment.
+        // Use GBT's provided merkleroot for header.
+        std::string mr = gbt.contains("merkleroot") && gbt["merkleroot"].is_string()
+                           ? gbt["merkleroot"].get<std::string>()
+                           : std::string(64, '0');
         hexToBytes(mr, in.merkle_root_be, 32);
         // share target: easy default
         in.share_nbits = in.job.nbits;

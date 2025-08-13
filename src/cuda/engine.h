@@ -107,4 +107,13 @@ bool getDeviceMemoryInfo(uint64_t* out_free_bytes, uint64_t* out_total_bytes);
                              int* out_active_blocks_per_sm,
                              int* out_max_threads_per_sm);
 
+  // Read and reset the device-side per-block flush counter (diagnostics). Returns false if CUDA not available.
+  bool readAndResetBlockFlushCount(uint32_t* out_count);
+
+  // Read kernel attributes for mining batch kernel. Returns false if CUDA not available.
+  bool getMineBatchKernelAttrs(int* out_num_regs, size_t* out_shared_bytes, int* out_max_threads_per_block);
+
+  // Read and reset per-SM flush counts into out_counts[sm_count]. Returns false if CUDA not available.
+  bool readAndResetSmFlushCounts(uint32_t sm_count, uint32_t* out_counts);
+
 }

@@ -60,7 +60,7 @@
 - [x] Milestone 5: Config skeleton and defaults
 - [x] Normalizer pieces: midstate utilities and Merkle root computation
 - [x] Submit path: CPU SHA‑256/sha256d utilities and `SubmitRouter` that CPU‑verifies before routing
-- [x] Persistence scaffolding: in‑memory Ledger + Outbox; SubmitRouter hooks
+- [x] Persistence scaffolding: in‑memory Ledger + Outbox; SubmitRouter hooks; outbox size‑based rotation; periodic ledger snapshots
 - [x] Tests green: endianness, targets, registry, logging, metrics, CPU verify, midstate, merkle, submit router
 - [x] Adapters skeleton: `AdapterBase`, `StratumAdapter` façade with basic state machine and ingest/poll
 - [x] GBT path: `GbtAdapter` ingest/poll queue and `GbtRunner` that polls `getblocktemplate` with `rules=["segwit"]` using cookie auth by default; `GbtSubmitter` assembles and calls `submitblock`.
@@ -75,8 +75,8 @@
 
 ### Next Up
 - Multi-source concurrency is implemented (one runner per pool + optional GBT). Continue refining scheduler backpressure and ensure no starvation.
- - Submit pipeline: acceptance correlation wired (runner → router prune). Next: finalize Ledger snapshot format and rolling rotation policy.
-- CUDA engine: occupancy tuning, per-SM local hit buffers to reduce global atomic contention; extend constant-memory usage; auto-tune `threads_per_block` and `nonces_per_thread`.
+ - Submit pipeline: acceptance correlation wired (runner → router prune). Size‑based outbox rotation in place; ledger snapshots periodic JSONL.
+- CUDA engine: per‑block shared hit buffers in place; occupancy metrics and occupancy‑aware tuning in place; extend constant‑memory usage; next: unrolling and register pressure tuning, block‑flush counters.
 - GBT: complete witness commitment path and full block assembly for `submitblock` on hits.
 
 

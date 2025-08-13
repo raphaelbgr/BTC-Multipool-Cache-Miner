@@ -33,6 +33,7 @@ struct PoolEntry {
     std::string auth;    // "cookie" or "userpass"
     std::string username;
     std::string password;
+      std::string cookie_path; // optional override
   };
   std::optional<RpcConfig> rpc;
 
@@ -85,7 +86,15 @@ struct AppConfig {
     std::string path{"logs/outbox.bin"};
     uint64_t max_bytes{10ull * 1024ull * 1024ull}; // 10MB default
     bool rotate_on_start{false};
+    uint64_t rotate_interval_sec{0}; // optional time-based rotation, 0=disabled
   } outbox;
+
+  // Ledger persistence configuration
+  struct LedgerCfg {
+    std::string path{"runner.jsonl"};
+    uint64_t max_bytes{10ull * 1024ull * 1024ull};
+    uint64_t rotate_interval_sec{0};
+  } ledger;
 };
 
 // Load from JSON file (e.g., config/pools.json). Returns empty config if file missing/invalid.
