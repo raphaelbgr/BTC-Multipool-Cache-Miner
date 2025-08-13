@@ -33,6 +33,9 @@ class SubmitRouter {
     // Route a pre-verified or previously persisted hit directly
     bool routeRaw(const HitRecord& rec);
 
+  // Inform router a submission has been accepted; allows persistence cleanup
+  void onAccepted(uint64_t work_id, uint32_t nonce);
+
  private:
   SubmitCallback cb_;
   store::Outbox* outbox_{nullptr};

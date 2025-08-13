@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <cuda_runtime.h>
+#include <cuda.h>
 
 namespace cuda_engine {
 
@@ -191,16 +192,23 @@ __global__ void kernel_mine_batch(unsigned int num_jobs, unsigned int nonce_base
   if (j >= num_jobs) return;
   unsigned int lane = threadIdx.x + blockIdx.x * blockDim.x;
   unsigned int start_nonce = nonce_base + j + lane * nonces_per_thread;
+  const DeviceJob* J = (j < g_jobs_const_size) ? &g_jobs_const[j] : &g_jobs[j];
+  // Per-block local hit buffer to reduce global atomic contention
+  struct LocalHit { unsigned long long work_id; unsigned int nonce; };
+  __shared__ LocalHit s_hits[64];
+  __shared__ unsigned int s_count;
+  if (threadIdx.x == 0) s_count = 0;
+  __syncthreads();
   // Iterate micro-batch per thread
   for (unsigned int k = 0; k < nonces_per_thread; ++k) {
     unsigned int nonce = start_nonce + k;
     // Assemble 80-byte header for this nonce
     unsigned char header[80];
-    header[0] = (g_jobs[j].version >> 24) & 0xFF; header[1] = (g_jobs[j].version >> 16) & 0xFF;
-    header[2] = (g_jobs[j].version >> 8) & 0xFF;  header[3] = (g_jobs[j].version) & 0xFF;
+    header[0] = (J->version >> 24) & 0xFF; header[1] = (J->version >> 16) & 0xFF;
+    header[2] = (J->version >> 8) & 0xFF;  header[3] = (J->version) & 0xFF;
     #pragma unroll
     for (int w = 0; w < 8; ++w) {
-      unsigned int v = g_jobs[j].prevhash_le[w];
+      unsigned int v = J->prevhash_le[w];
       header[4 + w*4 + 0] = (v >> 24) & 0xFF;
       header[4 + w*4 + 1] = (v >> 16) & 0xFF;
       header[4 + w*4 + 2] = (v >> 8) & 0xFF;
@@ -208,18 +216,18 @@ __global__ void kernel_mine_batch(unsigned int num_jobs, unsigned int nonce_base
     }
     #pragma unroll
     for (int w = 0; w < 8; ++w) {
-      unsigned int v = g_jobs[j].merkle_root_le[w];
+      unsigned int v = J->merkle_root_le[w];
       header[36 + w*4 + 0] = (v >> 24) & 0xFF;
       header[36 + w*4 + 1] = (v >> 16) & 0xFF;
       header[36 + w*4 + 2] = (v >> 8) & 0xFF;
       header[36 + w*4 + 3] = (v) & 0xFF;
     }
-    unsigned int ntime = g_jobs[j].ntime;
-    if (g_jobs[j].ntime_min && ntime < g_jobs[j].ntime_min) ntime = g_jobs[j].ntime_min;
-    if (g_jobs[j].ntime_max && ntime > g_jobs[j].ntime_max) ntime = g_jobs[j].ntime_max;
+    unsigned int ntime = J->ntime;
+    if (J->ntime_min && ntime < J->ntime_min) ntime = J->ntime_min;
+    if (J->ntime_max && ntime > J->ntime_max) ntime = J->ntime_max;
     header[68] = (ntime >> 24) & 0xFF; header[69] = (ntime >> 16) & 0xFF;
     header[70] = (ntime >> 8) & 0xFF;  header[71] = (ntime) & 0xFF;
-    unsigned int nbits = g_jobs[j].nbits;
+    unsigned int nbits = J->nbits;
     header[72] = (nbits >> 24) & 0xFF; header[73] = (nbits >> 16) & 0xFF;
     header[74] = (nbits >> 8) & 0xFF;  header[75] = (nbits) & 0xFF;
     header[76] = (nonce >> 24) & 0xFF; header[77] = (nonce >> 16) & 0xFF;
@@ -228,15 +236,15 @@ __global__ void kernel_mine_batch(unsigned int num_jobs, unsigned int nonce_base
     // If midstate available, use optimized path; else full double sha
     bool used_midstate = false;
     #pragma unroll
-    for (int i=0;i<8;++i) { if (g_jobs[j].midstate_le[i] != 0u) { used_midstate = true; break; } }
+    for (int i=0;i<8;++i) { if (J->midstate_le[i] != 0u) { used_midstate = true; break; } }
     unsigned char digest[32];
     if (used_midstate) {
       unsigned int st[8];
       #pragma unroll
-      for (int i=0;i<8;++i) st[i] = g_jobs[j].midstate_le[i];
+      for (int i=0;i<8;++i) st[i] = J->midstate_le[i];
       unsigned int w0_15[16];
       // bytes 64..79: last 4 bytes of merkle_root (BE), ntime (BE), nbits (BE), nonce (BE)
-      w0_15[0] = bswap32(g_jobs[j].merkle_root_le[7]);
+      w0_15[0] = bswap32(J->merkle_root_le[7]);
       w0_15[1] = bswap32(ntime);
       w0_15[2] = bswap32(nbits);
       w0_15[3] = bswap32(nonce);
@@ -279,15 +287,31 @@ __global__ void kernel_mine_batch(unsigned int num_jobs, unsigned int nonce_base
     bool leq = true;
     #pragma unroll
     for (int i=0;i<32;++i) {
-      unsigned char t = g_jobs[j].share_target_be[i];
+      unsigned char t = J->share_target_be[i];
       if (digest[i] < t) { leq = true; break; }
       if (digest[i] > t) { leq = false; break; }
     }
     if (leq) {
-      unsigned int idx = atomicInc(&g_hit_write_idx, 0xFFFFFFFFu);
-      unsigned int slot = (g_hit_cap == 0) ? 0u : (idx % g_hit_cap);
-      g_hit_buf[slot].work_id = g_jobs[j].work_id;
-      g_hit_buf[slot].nonce = nonce;
+      unsigned int li = atomicAdd(&s_count, 1u);
+      if (li < 64u) {
+        s_hits[li].work_id = J->work_id;
+        s_hits[li].nonce = nonce;
+      } else {
+        // Fallback: direct global write if local buffer overflows
+        unsigned int idx = atomicInc(&g_hit_write_idx, 0xFFFFFFFFu);
+        unsigned int slot = (g_hit_cap == 0) ? 0u : (idx % g_hit_cap);
+        g_hit_buf[slot].work_id = J->work_id;
+        g_hit_buf[slot].nonce = nonce;
+      }
+    }
+  }
+  __syncthreads();
+  if (threadIdx.x == 0 && s_count > 0 && g_hit_buf && g_hit_cap) {
+    unsigned int start = atomicAdd(&g_hit_write_idx, s_count);
+    for (unsigned int i = 0; i < s_count; ++i) {
+      unsigned int slot = (g_hit_cap == 0) ? 0u : ((start + i) % g_hit_cap);
+      g_hit_buf[slot].work_id = s_hits[i].work_id;
+      g_hit_buf[slot].nonce = s_hits[i].nonce;
     }
   }
 }
@@ -562,6 +586,40 @@ bool cuda_engine::getDeviceMemoryInfo(uint64_t* out_free_bytes, uint64_t* out_to
   cudaMemGetInfo(&free_b, &total_b);
   if (out_free_bytes) *out_free_bytes = static_cast<uint64_t>(free_b);
   if (out_total_bytes) *out_total_bytes = static_cast<uint64_t>(total_b);
+  return true;
+#endif
+}
+
+bool cuda_engine::getMineBatchOccupancy(uint32_t threads_per_block,
+                                        float* out_occupancy_0_1,
+                                        int* out_sms,
+                                        int* out_active_blocks_per_sm,
+                                        int* out_max_threads_per_sm) {
+#ifndef __CUDACC__
+  (void)threads_per_block; (void)out_occupancy_0_1; (void)out_sms; (void)out_active_blocks_per_sm; (void)out_max_threads_per_sm; return false;
+#else
+  cudaDeviceProp prop{};
+  int dev = 0;
+  cudaGetDevice(&dev);
+  cudaGetDeviceProperties(&prop, dev);
+  int activeBlocks = 0;
+  cudaOccupancyMaxActiveBlocksPerMultiprocessor(&activeBlocks,
+                                                kernel_mine_batch,
+                                                static_cast<int>(threads_per_block),
+                                                0);
+  if (out_active_blocks_per_sm) *out_active_blocks_per_sm = activeBlocks;
+  if (out_sms) *out_sms = prop.multiProcessorCount;
+  if (out_max_threads_per_sm) *out_max_threads_per_sm = prop.maxThreadsPerMultiProcessor;
+  if (out_occupancy_0_1) {
+    // Approximate: activeBlocks * threads_per_block compared to max threads per SM
+    int activeThreads = activeBlocks * static_cast<int>(threads_per_block);
+    float occ = 0.0f;
+    if (prop.maxThreadsPerMultiProcessor > 0) {
+      occ = static_cast<float>(activeThreads) / static_cast<float>(prop.maxThreadsPerMultiProcessor);
+      if (occ < 0.0f) occ = 0.0f; if (occ > 1.0f) occ = 1.0f;
+    }
+    *out_occupancy_0_1 = occ;
+  }
   return true;
 #endif
 }

@@ -80,6 +80,42 @@ class Outbox {
       return true;
     }
 
+    // Remove a specific (work_id, nonce) from the queue and seen set
+    bool drop(uint64_t work_id, uint32_t nonce) {
+      std::lock_guard<std::mutex> lock(mu_);
+      if (q_.empty()) return false;
+      bool removed = false;
+      std::queue<PendingSubmit> tmp;
+      while (!q_.empty()) {
+        auto s = q_.front(); q_.pop();
+        if (!removed && s.work_id == work_id && s.nonce == nonce) {
+          removed = true;
+          const uint64_t key = (s.work_id << 32) ^ s.nonce;
+          seen_.erase(key);
+          continue;
+        }
+        tmp.push(s);
+      }
+      q_.swap(tmp);
+      return removed;
+    }
+
+    // Rewrite file from current queue contents (truncate + append all)
+    bool rewriteFile(const std::string& filepath) {
+      std::lock_guard<std::mutex> lock(mu_);
+      std::ofstream ofs(filepath, std::ios::binary | std::ios::trunc);
+      if (!ofs) return false;
+      std::queue<PendingSubmit> tmp = q_;
+      while (!tmp.empty()) {
+        const auto& s = tmp.front();
+        ofs.write(reinterpret_cast<const char*>(&s.work_id), sizeof(s.work_id));
+        ofs.write(reinterpret_cast<const char*>(&s.nonce), sizeof(s.nonce));
+        ofs.write(reinterpret_cast<const char*>(s.header80), sizeof(s.header80));
+        tmp.pop();
+      }
+      return true;
+    }
+
     bool clearFile(const std::string& filepath) {
       std::lock_guard<std::mutex> lock(mu_);
       std::ofstream ofs(filepath, std::ios::binary | std::ios::trunc);

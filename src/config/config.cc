@@ -36,6 +36,12 @@ AppConfig loadFromJsonFile(const std::string& path) {
     if (c.contains("desired_threads_per_job")) cfg.cuda.desired_threads_per_job = c["desired_threads_per_job"].get<int>();
     if (c.contains("nonces_per_thread")) cfg.cuda.nonces_per_thread = c["nonces_per_thread"].get<int>();
   }
+  if (j.contains("outbox") && j["outbox"].is_object()) {
+    const auto& o = j["outbox"];
+    if (o.contains("path")) cfg.outbox.path = o["path"].get<std::string>();
+    if (o.contains("max_bytes")) cfg.outbox.max_bytes = o["max_bytes"].get<uint64_t>();
+    if (o.contains("rotate_on_start")) cfg.outbox.rotate_on_start = o["rotate_on_start"].get<bool>();
+  }
   if (j.contains("pools") && j["pools"].is_array()) {
     for (const auto& p : j["pools"]) {
       PoolEntry e;

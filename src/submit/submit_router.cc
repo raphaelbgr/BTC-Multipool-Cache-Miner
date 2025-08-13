@@ -42,6 +42,15 @@ bool SubmitRouter::routeRaw(const HitRecord& rec) {
   return false;
 }
 
+void SubmitRouter::onAccepted(uint64_t work_id, uint32_t nonce) {
+  if (outbox_) {
+    // Best-effort drop and rewrite persistence
+    if (outbox_->drop(work_id, nonce)) {
+      (void)0; // no-op
+    }
+  }
+}
+
 }  // namespace submit
 
 

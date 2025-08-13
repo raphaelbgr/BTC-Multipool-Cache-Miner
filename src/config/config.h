@@ -79,6 +79,13 @@ struct AppConfig {
     int desired_threads_per_job{256};
     int nonces_per_thread{1};
   } cuda;
+
+  // Outbox persistence configuration
+  struct OutboxCfg {
+    std::string path{"logs/outbox.bin"};
+    uint64_t max_bytes{10ull * 1024ull * 1024ull}; // 10MB default
+    bool rotate_on_start{false};
+  } outbox;
 };
 
 // Load from JSON file (e.g., config/pools.json). Returns empty config if file missing/invalid.

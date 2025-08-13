@@ -95,4 +95,16 @@ bool drainDeviceHits(struct HitRecord* out_hits_host,
 // Query device memory info (bytes). Returns false if CUDA not available
 bool getDeviceMemoryInfo(uint64_t* out_free_bytes, uint64_t* out_total_bytes);
 
+  // Query kernel occupancy for the mining batch kernel at a given threads_per_block.
+  // Returns false if CUDA not available. Outputs:
+  //  - out_occupancy_0_1: active_threads_per_sm / max_threads_per_sm, clamped to [0,1]
+  //  - out_sms: number of SMs on the device
+  //  - out_active_blocks_per_sm: active blocks per SM for the kernel
+  //  - out_max_threads_per_sm: hardware limit of threads per SM
+  bool getMineBatchOccupancy(uint32_t threads_per_block,
+                             float* out_occupancy_0_1,
+                             int* out_sms,
+                             int* out_active_blocks_per_sm,
+                             int* out_max_threads_per_sm);
+
 }

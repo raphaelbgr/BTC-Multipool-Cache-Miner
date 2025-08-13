@@ -128,6 +128,7 @@ void StratumRunner::runLoop() {
               int ewma = (prev == 0) ? ms : (prev * 7 + ms) / 8;
               avg_submit_ms_.store(ewma);
               last_submit_sent_ = {};
+              if (ok && on_accepted_) { on_accepted_(pending_work_id_, pending_nonce_); }
             }
           } else if (j.contains("error") && !j["error"].is_null()) {
             // error format: [code, message, data]

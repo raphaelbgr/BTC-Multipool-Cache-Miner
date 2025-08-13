@@ -153,8 +153,13 @@ int main(int argc, char** argv) {
   // Map from work_id to source slot
   std::unordered_map<uint64_t, uint32_t> workid_to_source;
   store::Outbox outbox;
-  const std::string outbox_path = "logs/outbox.bin";
-  outbox.loadFromFile(outbox_path);
+  const auto outbox_cfg = cfg_all.outbox;
+  const std::string outbox_path = outbox_cfg.path;
+  if (outbox_cfg.rotate_on_start) {
+    outbox.clearFile(outbox_path);
+  } else {
+    outbox.loadFromFile(outbox_path);
+  }
   // On startup, attempt to drain and resubmit old pending hits
   auto replay_pending = [&](submit::SubmitRouter* router){
     if (!router) return;
@@ -212,6 +217,10 @@ int main(int argc, char** argv) {
         std::string pwd = p.password.empty()? std::string("x") : p.password;
         auto creds = adapters::formatStratumCredentials(prof, walletOrAccount, workerName, pwd);
         auto srun = std::make_unique<adapters::StratumRunner>(&adp, h, prt, creds.first, creds.second, tls);
+        // Wire acceptance callback to prune outbox via SubmitRouter (attached later)
+        srun->setAcceptedCallback([&](uint64_t wid, uint32_t nonce){
+          if (submit_router) submit_router->onAccepted(wid, nonce);
+        });
         srun->start();
         auto subm = std::make_unique<submit::StratumSubmitter>(srun.get(), creds.first);
         sources[idx].kind = SourceKind::Stratum;
@@ -233,9 +242,21 @@ int main(int argc, char** argv) {
           int en2_size = static_cast<int>(sources[sid].stratum_adapter->extranonce2Size());
           std::string en2_hex; en2_hex.assign(static_cast<size_t>(en2_size) * 2, '0');
           (void)sources[sid].stratum_submitter->submitFromHeader(rec.header80, en2_hex);
+          if (sources[sid].stratum_runner) sources[sid].stratum_runner->setPendingSubmit(rec.work_id, rec.nonce);
         }
       }
+      // Append to outbox only if under size limit
       store::PendingSubmit ps{}; ps.work_id = rec.work_id; ps.nonce = rec.nonce; std::memcpy(ps.header80, rec.header80, 80);
+      // Note: os file size check omitted for brevity; append directly
+      // Enforce outbox size limit with truncate rotation
+      auto file_exceeds_limit = [&](){
+        std::ifstream ifs(outbox_path, std::ios::binary | std::ios::ate);
+        if (!ifs) return false; std::streamsize sz = ifs.tellg();
+        return sz >= static_cast<std::streamsize>(outbox_cfg.max_bytes);
+      };
+      if (file_exceeds_limit()) {
+        outbox.clearFile(outbox_path);
+      }
       outbox.appendToFile(outbox_path, ps);
     });
     submit_router->attachOutbox(&outbox);
@@ -324,6 +345,9 @@ int main(int argc, char** argv) {
       metrics.setGauge("cuda.mem_total_mb", static_cast<int64_t>(total_b/1024/1024));
     }
   }
+  // Hashrate tracking (EWMA)
+  double hashrate_khs_ewma = 0.0;
+  auto ewma = [](double prev, double cur){ return prev == 0.0 ? cur : (prev * 0.8 + cur * 0.2); };
 
   while (!g_stop.load()) {
     // Drain full results and set registry
@@ -447,9 +471,11 @@ int main(int argc, char** argv) {
       // Use configured desired_threads_per_job to compute a plan (auto-tuned)
       auto plan = cuda_engine::computeLaunchPlan(static_cast<uint32_t>(jobs.size()),
                                                  static_cast<uint64_t>(desired_threads_per_job));
+      bool used_batch = false;
       if (plan.num_jobs > 0 && plan.blocks_per_job > 0 && plan.threads_per_block > 0) {
         if (nonces_per_thread > 1) {
           cuda_engine::launchMineWithPlanBatch(plan.num_jobs, plan.blocks_per_job, plan.threads_per_block, nonce_base, static_cast<uint32_t>(nonces_per_thread));
+          used_batch = true;
         } else {
           cuda_engine::launchMineWithPlan(plan.num_jobs, plan.blocks_per_job, plan.threads_per_block, nonce_base);
         }
@@ -460,6 +486,16 @@ int main(int argc, char** argv) {
       int kernel_ms = static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count());
       metrics.setGauge("cuda.kernel_ms", kernel_ms);
       metrics.setGauge("cuda.jobs", static_cast<int64_t>(jobs.size()));
+      // Occupancy metric for visibility
+      {
+        float occ = 0.0f; int sms = 0; int ab = 0; int maxthr = 0;
+        if (cuda_engine::getMineBatchOccupancy(static_cast<uint32_t>(plan.threads_per_block), &occ, &sms, &ab, &maxthr)) {
+          metrics.setGauge("cuda.occupancy_pct", static_cast<int64_t>(occ * 100.0f));
+          metrics.setGauge("cuda.sms", sms);
+          metrics.setGauge("cuda.active_blocks_per_sm", ab);
+          metrics.setGauge("cuda.max_threads_per_sm", maxthr);
+        }
+      }
       // Auto-tune nonces_per_thread if far from budget
       {
         cuda_engine::AutoTuneInputs ai; ai.observedMsPerBatch = static_cast<uint32_t>(kernel_ms);
@@ -467,6 +503,25 @@ int main(int argc, char** argv) {
         ai.currentMicroBatch = static_cast<uint32_t>(nonces_per_thread);
         auto dec = cuda_engine::autoTuneMicroBatch(ai);
         nonces_per_thread = static_cast<int>(dec.nextMicroBatch);
+      }
+      // Simple auto-tune for desired_threads_per_job
+      if (kernel_ms * 5 < budget_ms * 4) {
+        desired_threads_per_job = std::min(1024, desired_threads_per_job * 2);
+      } else if (kernel_ms > budget_ms && desired_threads_per_job > 64) {
+        desired_threads_per_job = std::max(64, desired_threads_per_job / 2);
+      }
+      // Estimate hashrate
+      {
+        double nonces_tested = 0.0;
+        if (used_batch) {
+          nonces_tested = static_cast<double>(plan.blocks_per_job) * static_cast<double>(plan.threads_per_block) * static_cast<double>(nonces_per_thread) * static_cast<double>(jobs.size());
+        } else {
+          nonces_tested = static_cast<double>(jobs.size());
+        }
+        double secs = std::max(0.001, static_cast<double>(kernel_ms) / 1000.0);
+        double khs = (nonces_tested / secs) / 1000.0;
+        hashrate_khs_ewma = ewma(hashrate_khs_ewma, khs);
+        metrics.setGauge("cuda.hashrate_khs", static_cast<int64_t>(hashrate_khs_ewma));
       }
       nonce_base += 1; // advance to keep testing new nonce across all jobs
       cuda_engine::HitRecord out[64]; uint32_t n = 0;
