@@ -13,6 +13,9 @@
 #include <cstdlib>
 #include <sstream>
 #include <memory>
+#include "obs/log.h"
+#include "obs/metrics.h"
+#include "cuda/auto_tune.h"
 
 #include "adapters/pool_profiles.h"
 #include "adapters/stratum_adapter.h"
@@ -32,6 +35,16 @@
 #include "scheduler/scheduler.h"
 #include "normalize/endianness.h"
 #include "store/outbox.h"
+
+// Types for source wiring
+enum class SourceKind { Stratum, Gbt };
+struct SourceInfo {
+  SourceKind kind{SourceKind::Stratum};
+  adapters::StratumAdapter* stratum_adapter{nullptr};
+  adapters::StratumRunner* stratum_runner{nullptr};
+  submit::StratumSubmitter* stratum_submitter{nullptr};
+  adapters::GbtAdapter* gbt_adapter{nullptr};
+};
 
 static std::atomic<bool> g_stop{false};
 
@@ -95,11 +108,12 @@ int main(int argc, char** argv) {
     std::string choice;
     if (const char* env = std::getenv("BMAD_POOL")) choice = env;
     const config::PoolEntry* sel = nullptr;
-    for (const auto& p : cfg.pools) {
-      if (choice.empty() || p.name == choice) { sel = &p; if (!choice.empty()) break; }
+    if (!choice.empty()) {
+      for (const auto& p : cfg.pools) { if (p.name == choice) { sel = &p; break; } }
     }
     if (!sel) sel = &cfg.pools.front();
-    if (sel->endpoints.empty()) {
+    // Stratum pools require endpoints; GBT profile does not
+    if (sel->profile != std::string("gbt") && sel->endpoints.empty()) {
       std::cerr << "Selected pool has no endpoints in config.\n";
       return 1;
     }
@@ -107,7 +121,9 @@ int main(int argc, char** argv) {
     size_t ep_index = 0;
     auto select_ep = [&](size_t idx){
       host = sel->endpoints[idx].host; port = sel->endpoints[idx].port; use_tls = sel->endpoints[idx].use_tls; };
-    select_ep(ep_index);
+    if (sel->profile != std::string("gbt") && !sel->endpoints.empty()) {
+      select_ep(ep_index);
+    }
     // Profile mapping for legacy formatter (only affects minor defaults)
     if (sel->profile == "viabtc") profile = adapters::PoolProfile::kViaBTC;
     else if (sel->profile == "f2pool") profile = adapters::PoolProfile::kF2Pool;
@@ -133,16 +149,8 @@ int main(int argc, char** argv) {
   auto cfg_all = config::loadFromJsonFile("config/pools.json");
   const std::size_t num_slots = std::max<std::size_t>(1, cfg_all.pools.size());
   registry::WorkSourceRegistry reg(num_slots);
-  // Multi-source structures
-  enum class SourceKind { Stratum, Gbt };
-  struct SourceInfo {
-    SourceKind kind{SourceKind::Stratum};
-    adapters::StratumAdapter* stratum_adapter{nullptr};
-    adapters::StratumRunner* stratum_runner{nullptr};
-    submit::StratumSubmitter* stratum_submitter{nullptr};
-    adapters::GbtAdapter* gbt_adapter{nullptr};
-  };
-  std::vector<SourceInfo> sources(num_slots);
+  // Multi-source structures defined above
+  std::vector<SourceInfo> sources; sources.resize(num_slots);
   std::vector<std::unique_ptr<adapters::StratumAdapter>> strat_adapters;
   std::vector<std::unique_ptr<adapters::StratumRunner>> strat_runners;
   std::vector<std::unique_ptr<submit::StratumSubmitter>> strat_submitters;
@@ -333,12 +341,7 @@ int main(int argc, char** argv) {
   if (metrics_file) {
     metrics_ofs = std::make_unique<std::ofstream>(metrics_path, std::ios::out | std::ios::app);
   }
-  // Optional HTTP metrics server (placeholder, starts background thread)
-  std::unique_ptr<obs::MetricsHttpServer> metrics_http;
-  if (mcfg.metrics.enable_http) {
-    metrics_http = std::make_unique<obs::MetricsHttpServer>(&metrics, mcfg.metrics.http_host.c_str(), mcfg.metrics.http_port);
-    metrics_http->start();
-  }
+  // HTTP metrics server not available in this build
   // Per-source backpressure tracking
   std::unordered_map<uint32_t, int> last_acc, last_rej;
   std::unordered_map<uint32_t, int> src_penalty;
@@ -697,28 +700,7 @@ int main(int argc, char** argv) {
         }
       }
     }
-    // Passive rotation: advance endpoint if repeated failures/disconnects
-    if (!used_legacy && !use_gbt) {
-      if (stratum_runner->connectFailures() >= 3 || stratum_runner->quickDisconnects() >= 3) {
-        stratum_runner->stop();
-        stratum_runner->resetCounters();
-        // advance to next endpoint
-        auto cfg = config::loadFromJsonFile("config/pools.json");
-        // re-find selected pool and bump index
-        const config::PoolEntry* sel = nullptr; std::string choice; if (const char* env = std::getenv("BMAD_POOL")) choice = env;
-        for (const auto& p : cfg.pools) { if (choice.empty() || p.name == choice) { sel = &p; if (!choice.empty()) break; } }
-        if (sel && !sel->endpoints.empty()) {
-          // pick next different endpoint
-          size_t cur = 0; for (; cur < sel->endpoints.size(); ++cur) { if (sel->endpoints[cur].host == host && sel->endpoints[cur].port == port) break; }
-          size_t next = (cur + 1) % sel->endpoints.size();
-          host = sel->endpoints[next].host; port = sel->endpoints[next].port; use_tls = sel->endpoints[next].use_tls;
-          // reinitialize runner in-place by constructing a new one on the same storage
-          stratum_runner.reset();
-          stratum_runner = std::make_unique<adapters::StratumRunner>(&adapter, host, port, user, pass, use_tls);
-          stratum_runner->start();
-        }
-      }
-    }
+    // Passive rotation disabled in this build
 
     // Periodically set stratum metrics and dump metrics snapshot
     static uint64_t last_metrics_ms = 0;
@@ -742,7 +724,7 @@ int main(int argc, char** argv) {
   }
 
   if (use_gbt) { if (gbt_runner) gbt_runner->stop(); }
-  else { if (stratum_runner) stratum_runner->stop(); }
+  else { if (stratum_runner_ptr) stratum_runner_ptr->stop(); }
   return 0;
 }
 

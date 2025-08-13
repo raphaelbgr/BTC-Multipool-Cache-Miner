@@ -4,6 +4,11 @@
 
 namespace cuda_engine {
 
+struct HitRecord {
+  uint64_t work_id;
+  uint32_t nonce;
+};
+
 struct LaunchParams {
   uint32_t blocks{0};
   uint32_t threads_per_block{0};
@@ -72,6 +77,9 @@ bool usingConstJobs();
 
 // Compute SHA-256d(header80) on device for a given uploaded job and nonce; writes 32-byte BE digest to out32_host
 bool computeDeviceHashForJob(uint32_t job_index, uint32_t nonce, unsigned char out32_host[32]);
+
+  // Compute SHA-256d for a raw 80-byte big-endian header on device; writes 32-byte BE digest to out32_host
+  bool computeDeviceHashForHeader80(const unsigned char header80_be[80], unsigned char out32_host[32]);
 
 // Demo: device writes one hit per job using provided work_ids and a base nonce.
 // Writes exactly num_jobs records into out_hits_host.

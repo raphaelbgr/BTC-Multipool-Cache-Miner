@@ -24,6 +24,25 @@ if(EXISTS "${BUILD_CONFIG_FILE}")
   endif()
 endif()
 
+# On Windows with Ninja, force MSVC (cl) and point nvcc at the VS2022 host compiler before project()
+if (WIN32)
+  if (NOT DEFINED CMAKE_C_COMPILER)
+    set(CMAKE_C_COMPILER cl CACHE FILEPATH "MSVC C compiler" FORCE)
+  endif()
+  if (NOT DEFINED CMAKE_CXX_COMPILER)
+    set(CMAKE_CXX_COMPILER cl CACHE FILEPATH "MSVC C++ compiler" FORCE)
+  endif()
+  if (DEFINED ENV{VCToolsInstallDir})
+    file(TO_CMAKE_PATH "$ENV{VCToolsInstallDir}/bin/Hostx64/x64/cl.exe" _CL_PATH)
+    if (EXISTS "${_CL_PATH}")
+      set(CMAKE_CUDA_HOST_COMPILER "${_CL_PATH}" CACHE FILEPATH "CUDA host compiler (cl.exe)" FORCE)
+      message(STATUS "Using CUDA host compiler: ${_CL_PATH}")
+      # Ensure nvcc uses the current Developer Shell environment instead of invoking vcvars
+      set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --use-local-env" CACHE STRING "" FORCE)
+    endif()
+  endif()
+endif()
+
 project(MyCustomBTCMiner LANGUAGES CXX CUDA)
 
 option(ENABLE_CUDA "Build CUDA components" ON)
@@ -33,6 +52,49 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(FetchContent)
+
+# If using MSVC with Ninja, help nvcc find the correct host compiler from the VS2022 environment
+if (MSVC AND WIN32 AND NOT CMAKE_CUDA_HOST_COMPILER)
+  if (DEFINED ENV{VCToolsInstallDir})
+    file(TO_CMAKE_PATH "$ENV{VCToolsInstallDir}/bin/Hostx64/x64/cl.exe" _CL_PATH)
+    if (EXISTS "${_CL_PATH}")
+      set(CMAKE_CUDA_HOST_COMPILER "${_CL_PATH}" CACHE FILEPATH "CUDA host compiler (cl.exe)" FORCE)
+      message(STATUS "Using CUDA host compiler: ${_CL_PATH}")
+    endif()
+  endif()
+endif()
+
+# Ensure standard library include/library paths are visible to MSVC when building with Ninja
+if (MSVC)
+  # Add INCLUDE paths to global C/C++ flags
+  if (DEFINED ENV{INCLUDE})
+    file(TO_CMAKE_PATH "$ENV{INCLUDE}" _MSVC_INCLUDE_PATHS)
+    # Also set standard include dirs so external projects (gtest) see them
+    set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${_MSVC_INCLUDE_PATHS})
+    set(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES ${_MSVC_INCLUDE_PATHS})
+    set(_inc_flags "")
+    foreach(_inc IN LISTS _MSVC_INCLUDE_PATHS)
+      if (EXISTS "${_inc}")
+        string(APPEND _inc_flags " /I\"${_inc}\"")
+      endif()
+    endforeach()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${_inc_flags}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_inc_flags}")
+  endif()
+  # Add LIB paths to global linker flags
+  if (DEFINED ENV{LIB})
+    file(TO_CMAKE_PATH "$ENV{LIB}" _MSVC_LIB_PATHS)
+    set(_lib_flags "")
+    foreach(_lib IN LISTS _MSVC_LIB_PATHS)
+      if (EXISTS "${_lib}")
+        string(APPEND _lib_flags " /LIBPATH:\"${_lib}\"")
+      endif()
+    endforeach()
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${_lib_flags}")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${_lib_flags}")
+    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${_lib_flags}")
+  endif()
+endif()
 
 # GoogleTest
 FetchContent_Declare(

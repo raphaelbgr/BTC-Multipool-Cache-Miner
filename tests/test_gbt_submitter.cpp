@@ -31,4 +31,14 @@ TEST(GBTSubmitter, SynthCoinbaseFlagControlsBuild) {
   EXPECT_TRUE(sub2.hasCoinbase());
 }
 
+TEST(GBTSubmitter, BuildCoinbaseTxWithPayoutAndCommitment) {
+  std::string tx;
+  std::string comm(64, '0');
+  // P2PKH script: OP_DUP OP_HASH160 <20-byte zero> OP_EQUALVERIFY OP_CHECKSIG
+  std::string payout = "76a914" + std::string(40, '0') + "88ac";
+  ASSERT_TRUE(submit::GbtSubmitter::buildCoinbaseTx(1, payout, 5000000000ull, comm, "", &tx));
+  ASSERT_NE(tx.find("76a914"), std::string::npos);
+  ASSERT_NE(tx.find("6a24aa21a9ed"), std::string::npos);
+}
+
 

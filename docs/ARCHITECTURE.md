@@ -69,6 +69,7 @@ Aligned constants and precomputed midstates required for kernel header assembly.
 
 ### Observability
 - Metrics: hashrate per source, accept/reject/stale, kernel timing, occupancy (active blocks/SM, %), per‑SM flush summaries, kernel attributes (regs/shared/TPB), PCIe BW, VRAM usage, predict worker duty cycle.
+ - Tools: optional `cuda_bench` CLI (when built with `-DBUILD_TOOLS=ON`) to sweep `threads_per_block` and `nonces_per_thread`, prints occupancy and estimated kh/s.
 - Logs: structured JSON; per‑hit traces; connection state; retry/backoff reasons.
 
 ### Testing Strategy

@@ -78,6 +78,11 @@ if(BUILD_TOOLS)
     tools/stratum_probe.cpp
   )
   target_link_libraries(stratum_probe PRIVATE miner_core)
+
+  add_executable(cuda_bench
+    tools/cuda_bench.cpp
+  )
+  target_link_libraries(cuda_bench PRIVATE miner_core)
 endif()
 
 add_executable(stratum_registry_runner

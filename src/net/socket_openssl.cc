@@ -117,8 +117,16 @@ class TlsSocketOpenSSL : public ISocket {
     // OpenSSL init
     SSL_load_error_strings(); OpenSSL_add_ssl_algorithms();
     ctx_ = SSL_CTX_new(TLS_client_method()); if (!ctx_) { fd_close(fd); return false; }
+    // Set minimal sane defaults: no compression, enable server cert verification.
+    SSL_CTX_set_options(ctx_, SSL_OP_NO_COMPRESSION);
+    SSL_CTX_set_verify(ctx_, SSL_VERIFY_PEER, nullptr);
+    // Load CA bundle from project certs directory
+    SSL_CTX_load_verify_locations(ctx_, "certs/cacert.pem", nullptr);
     ssl_ = SSL_new(ctx_); if (!ssl_) { SSL_CTX_free(ctx_); ctx_=nullptr; fd_close(fd); return false; }
+    // SNI and hostname verification
     SSL_set_tlsext_host_name(ssl_, host.c_str());
+    X509_VERIFY_PARAM* param = SSL_get0_param(ssl_);
+    X509_VERIFY_PARAM_set1_host(param, host.c_str(), 0);
     SSL_set_fd(ssl_, fd);
 
     // Non-blocking handshake with timeout

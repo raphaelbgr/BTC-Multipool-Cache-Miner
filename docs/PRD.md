@@ -125,7 +125,7 @@ Research/education‑grade Bitcoin SHA‑256d GPU miner that maximizes effective
     - `profile`: viabtc | f2pool | ckpool | nicehash | gbt
     - `cred_mode`: `wallet_as_user` or `account_worker`
     - `endpoints`: `[ { host, port, use_tls } ]`
-    - For GBT: `rpc` (url, use_tls, auth=cookie|userpass, username, password, cookie_path) and `gbt` (poll_ms, rules)
+    - For GBT: `rpc` (url, use_tls, auth=cookie|userpass, username, password, cookie_path) and `gbt` (poll_ms, rules, allow_synth_coinbase, payout_script_hex)
   - Global sections:
     - `cuda`: `hit_ring_capacity`, `desired_threads_per_job`, `nonces_per_thread`
     - `metrics`: `enable_file`, `file_path`, `dump_interval_ms`, `enable_http`, `http_host`, `http_port`

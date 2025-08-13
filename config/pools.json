@@ -9,9 +9,9 @@
       "worker": "001",
       "password": "123",
       "endpoints": [
-        { "host": "btc.viabtc.io", "port": 443,  "use_tls": true  },
-        { "host": "btc.viabtc.io", "port": 3333, "use_tls": false },
-        { "host": "btc.viabtc.io", "port": 25,   "use_tls": false }
+        { "host": "btc.viabtc.com", "port": 3333, "use_tls": false },
+        { "host": "btc.viabtc.com", "port": 443,  "use_tls": true  },
+        { "host": "btc.viabtc.com", "port": 25,   "use_tls": false }
       ]
     },
     {
@@ -20,9 +20,10 @@
       "cred_mode": "account_worker",
       "account": "raphaelbgr",
       "worker": "001",
-      "password": "21235365876986800",
+      "password": "x",
       "endpoints": [
-        { "host": "btcssl.f2pool.com",   "port": 1300, "use_tls": true  },
+        { "host": "btc.f2pool.com",      "port": 1314, "use_tls": false },
+        { "host": "btcssl.f2pool.com",   "port": 443,  "use_tls": true  },
         { "host": "btc.f2pool.com",      "port": 1314, "use_tls": false },
         { "host": "btc-asia.f2pool.com", "port": 1314, "use_tls": false },
         { "host": "btc-euro.f2pool.com", "port": 1314, "use_tls": false }

@@ -1,12 +1,15 @@
 #include "cuda/engine.h"
 #include "cuda/sha256d.cuh"
 #include "cuda/launch_plan.h"
+#include <cstdint>
 #include <vector>
 
 #include <cuda_runtime.h>
 #include <cuda.h>
 
 namespace cuda_engine {
+
+// Use HitRecord from engine.h
 
 __device__ inline unsigned int bswap32(unsigned int v) {
   return ((v & 0x000000FFu) << 24) |
@@ -40,9 +43,9 @@ __global__ void kernel_write_hits(const unsigned long long* work_ids,
 
 // Simple global buffers for a device-side ring
 static __device__ unsigned int g_hit_write_idx = 0;
-static HitRecordDevice* g_hit_buf = nullptr;
-static unsigned int g_hit_cap = 0;
-static DeviceJob* g_jobs = nullptr;
+static __device__ HitRecordDevice* g_hit_buf = nullptr;
+static __device__ unsigned int g_hit_cap = 0;
+static __device__ DeviceJob* g_jobs = nullptr;
 static __device__ __constant__ DeviceJob g_jobs_const[64];
 static __device__ unsigned int g_jobs_const_size = 0;
 static unsigned int g_num_jobs = 0;
@@ -50,6 +53,8 @@ static unsigned int g_num_jobs = 0;
 static __device__ unsigned int g_block_flush_count = 0;
 // Per-SM flush counters (size set at runtime to #SMs). For simplicity use a fixed upper bound.
 static __device__ unsigned int g_sm_flush_counts[128];
+// Host-side mirror to manage lifetime of device jobs buffer
+static DeviceJob* s_device_jobs = nullptr;
 
 __global__ void kernel_init_hit_buf(HitRecordDevice* buf, unsigned int cap) {
   g_hit_buf = buf;
@@ -150,10 +155,10 @@ __global__ void kernel_mine_stub(unsigned int num_jobs, unsigned int nonce_base)
         t1[i*4+2] = (unsigned char)((st[i] >> 8) & 0xFF);
         t1[i*4+3] = (unsigned char)((st[i]) & 0xFF);
       }
-      // Second SHA over 32-byte digest
+      // Second SHA over 32-byte digest (big-endian output)
       unsigned int st2[8];
       #pragma unroll
-      for (int i=0;i<8;++i) st2[i] = cuda_sha256d::kSha256IV[i]; // access constant via namespace if visible
+      for (int i=0;i<8;++i) st2[i] = cuda_sha256d::kSha256IV[i];
       unsigned int w2[16];
       #pragma unroll
       for (int i=0;i<8;++i) {
@@ -562,17 +567,41 @@ __global__ void kernel_hash_one(uint32_t job_index, uint32_t nonce, unsigned cha
   for (int i=0;i<32;++i) out32[i] = digest[i];
 }
 
+__global__ void kernel_hash_header80(const unsigned char* header80_be, unsigned char* out32) {
+  unsigned char digest[32];
+  cuda_sha256d::sha256d_80_be(header80_be, digest);
+  for (int i=0;i<32;++i) out32[i] = digest[i];
+}
+
 bool cuda_engine::computeDeviceHashForJob(uint32_t job_index, uint32_t nonce, unsigned char out32_host[32]) {
 #ifndef __CUDACC__
   (void)job_index; (void)nonce; (void)out32_host; return true;
 #else
-  if (!g_jobs) return false;
+  if (!s_device_jobs) return false;
   unsigned char* d_out = nullptr;
   cudaMalloc(&d_out, 32);
   kernel_hash_one<<<1,1>>>(job_index, nonce, d_out);
   cudaDeviceSynchronize();
   cudaMemcpy(out32_host, d_out, 32, cudaMemcpyDeviceToHost);
   cudaFree(d_out);
+  return true;
+#endif
+}
+
+bool cuda_engine::computeDeviceHashForHeader80(const unsigned char header80_be[80], unsigned char out32_host[32]) {
+#ifndef __CUDACC__
+  (void)header80_be; (void)out32_host; return true;
+#else
+  unsigned char* d_header = nullptr;
+  unsigned char* d_out = nullptr;
+  cudaMalloc(&d_header, 80);
+  cudaMalloc(&d_out, 32);
+  cudaMemcpy(d_header, header80_be, 80, cudaMemcpyHostToDevice);
+  kernel_hash_header80<<<1,1>>>(d_header, d_out);
+  cudaDeviceSynchronize();
+  cudaMemcpy(out32_host, d_out, 32, cudaMemcpyDeviceToHost);
+  cudaFree(d_out);
+  cudaFree(d_header);
   return true;
 #endif
 }
@@ -661,9 +690,11 @@ bool cuda_engine::uploadDeviceJobs(const DeviceJob* jobs_host, uint32_t num_jobs
   (void)jobs_host; (void)num_jobs; return true;
 #else
   if (num_jobs == 0) return false;
-  if (g_jobs) cudaFree(g_jobs);
-  cudaMalloc(&g_jobs, sizeof(DeviceJob) * num_jobs);
-  cudaMemcpy(g_jobs, jobs_host, sizeof(DeviceJob) * num_jobs, cudaMemcpyHostToDevice);
+  if (s_device_jobs) cudaFree(s_device_jobs);
+  // allocate fresh device buffer and publish pointer to device symbol g_jobs
+  cudaMalloc(&s_device_jobs, sizeof(DeviceJob) * num_jobs);
+  cudaMemcpy(s_device_jobs, jobs_host, sizeof(DeviceJob) * num_jobs, cudaMemcpyHostToDevice);
+  cudaMemcpyToSymbol(g_jobs, &s_device_jobs, sizeof(DeviceJob*));
   unsigned int cnum = (num_jobs > 64u) ? 64u : num_jobs;
   cudaMemcpyToSymbol(g_jobs_const, jobs_host, sizeof(DeviceJob) * cnum, 0, cudaMemcpyHostToDevice);
   cudaMemcpyToSymbol(g_jobs_const_size, &cnum, sizeof(unsigned int), 0, cudaMemcpyHostToDevice);
@@ -719,6 +750,11 @@ bool cuda_engine::initDeviceHitBuffer(uint32_t capacity) {
   if (s_device_hit_buf) cudaFree(s_device_hit_buf);
   s_device_hit_cap = capacity;
   cudaMalloc(&s_device_hit_buf, sizeof(HitRecordDevice) * capacity);
+  // publish buffer and cap to device symbols then reset write idx
+  cudaMemcpyToSymbol(g_hit_buf, &s_device_hit_buf, sizeof(HitRecordDevice*));
+  cudaMemcpyToSymbol(g_hit_cap, &capacity, sizeof(unsigned int));
+  unsigned int zero = 0;
+  cudaMemcpyToSymbol(g_hit_write_idx, &zero, sizeof(unsigned int));
   kernel_init_hit_buf<<<1,1>>>(s_device_hit_buf, capacity);
   cudaDeviceSynchronize();
   s_device_drain_offset = 0;

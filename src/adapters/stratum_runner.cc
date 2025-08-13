@@ -9,6 +9,9 @@
 #include "net/stratum_client.h"
 #include "normalize/normalizer.h"
 #include "normalize/endianness.h"
+#include "normalize/coinbase.h"
+#include "normalize/merkle.h"
+#include "submit/cpu_verify.h"
 
 namespace adapters {
 
@@ -214,6 +217,13 @@ void StratumRunner::runLoop() {
             }
             uint8_t mr_be[32]; normalize::compute_merkle_root_be(branch, mr_be);
             std::memcpy(in.merkle_root_be, mr_be, 32);
+            auto bytesToHex = [](const uint8_t* data, size_t len){
+              static const char* k = "0123456789abcdef";
+              std::string s; s.reserve(len*2);
+              for (size_t i=0;i<len;i++){ uint8_t b=data[i]; s.push_back(k[(b>>4)&0xF]); s.push_back(k[b&0xF]); }
+              return s;
+            };
+            std::string mr_hex = bytesToHex(mr_be, 32);
             // clean_jobs flag (param index 7 per Stratum V1)
             bool clean = false;
             try { clean = params[7].get<bool>(); } catch (...) { clean = false; }

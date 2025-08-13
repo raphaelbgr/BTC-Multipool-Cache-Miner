@@ -10,8 +10,8 @@ bool StratumClient::connect() {
   if (use_tls_) {
     sock_ = MakeTlsSocket();
     if (!sock_) {
-      // Fallback to plain if TLS backend unavailable
-      sock_ = MakePlainSocket();
+      // TLS requested but backend unavailable
+      return false;
     }
   } else {
     sock_ = MakePlainSocket();
@@ -24,7 +24,7 @@ void StratumClient::close() { if (sock_) { sock_->close(); sock_.reset(); } }
 bool StratumClient::sendJson(const nlohmann::json& j) {
   if (!sock_) return false;
   std::string line = j.dump();
-  line.push_back('\n');
+  line.append("\r\n");
   const char* data = line.c_str();
   size_t remaining = line.size();
   while (remaining > 0) {

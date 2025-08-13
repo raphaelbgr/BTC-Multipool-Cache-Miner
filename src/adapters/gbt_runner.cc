@@ -16,6 +16,12 @@ GbtRunner::GbtRunner(GbtAdapter* adapter, const config::PoolEntry& pool_cfg)
     if (pool_.gbt.has_value() && pool_.gbt->allow_synth_coinbase) {
       submitter_->setAllowSynthCoinbase(true);
     }
+    if (pool_.gbt.has_value() && !pool_.gbt->payout_script_hex.empty()) {
+      submitter_->setPayoutScriptHex(pool_.gbt->payout_script_hex);
+    }
+    if (pool_.gbt.has_value() && !pool_.gbt->cb_tag.empty()) {
+      submitter_->setCoinbaseTag(pool_.gbt->cb_tag);
+    }
     adapter_->setSubmitter(submitter_);
   }
 }

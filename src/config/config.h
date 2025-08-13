@@ -43,6 +43,7 @@ struct PoolEntry {
     std::vector<std::string> rules; // e.g., ["segwit"]
     std::string cb_tag;             // coinbase tag string, informational
     bool allow_synth_coinbase{false}; // allow building minimal coinbase from default_witness_commitment when coinbasetxn missing
+    std::string payout_script_hex;  // optional raw scriptPubKey (hex) for coinbase payout when coinbasetxn is missing
   };
   std::optional<GbtConfig> gbt;
 

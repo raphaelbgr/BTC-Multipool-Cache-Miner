@@ -26,6 +26,8 @@ class GbtSubmitter {
   }
 
   void setAllowSynthCoinbase(bool allow) { allow_synth_coinbase_ = allow; }
+  void setPayoutScriptHex(std::string hex) { payout_script_hex_ = std::move(hex); }
+  void setCoinbaseTag(std::string tag) { coinbase_tag_ = std::move(tag); }
 
   bool hasCoinbase() const { return !coinbase_hex_.empty(); }
 
@@ -42,10 +44,22 @@ class GbtSubmitter {
   // Not consensus-complete (omits spendable output). Height is encoded per BIP34 in scriptsig.
   static bool buildMinimalWitnessCommitmentCoinbase(uint32_t height_le, const std::string& commitment32_hex, std::string* out_tx_hex);
 
+  // Helper: build a full coinbase tx hex with a spendable payout output of value_sat and an OP_RETURN witness commitment output.
+  static bool buildCoinbaseTx(uint32_t height_le,
+                              const std::string& payout_script_hex,
+                              uint64_t value_sat,
+                              const std::string& commitment32_hex,
+                              const std::string& extra_sig_push_hex,
+                              std::string* out_tx_hex);
+
  private:
   static std::string bytesToHex(const std::vector<uint8_t>& bytes);
   static std::string leHexFromHeaderBE(const uint8_t header80_be[80]);
+  
+  // Exposed for helpers implemented outside the class
+ public:
   static std::string encodeVarIntHex(uint64_t v);
+ private:
 
   net::RpcClient rpc_;
   // Cached pieces
@@ -53,6 +67,8 @@ class GbtSubmitter {
   std::vector<std::string> txs_hex_;      // non-coinbase transactions
   std::optional<std::string> witness_commitment_hex_; // from default_witness_commitment
   bool allow_synth_coinbase_{false};
+  std::string payout_script_hex_;
+  std::string coinbase_tag_;
 };
 
 }  // namespace submit

@@ -5,13 +5,11 @@
 #include <mutex>
 #include <optional>
 #include <vector>
+#include "cuda/engine.h"
 
 namespace cuda_engine {
 
-struct HitRecord {
-  uint64_t work_id{0};
-  uint32_t nonce{0};
-};
+// HitRecord is declared in cuda/engine.h
 
 // Simple device-visible ring buffer header for hits.
 // For now, we allocate this in unified memory or copy from device to host explicitly.

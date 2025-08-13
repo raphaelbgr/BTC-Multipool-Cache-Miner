@@ -32,7 +32,8 @@ int main(int argc, char** argv) {
   std::string host = hostport.substr(0, pos);
   uint16_t port = static_cast<uint16_t>(std::stoi(hostport.substr(pos + 1)));
 
-  net::StratumClient c(host, port, user, pass);
+  bool use_tls = (hostport.find(":443") != std::string::npos);
+  net::StratumClient c(host, port, user, pass, use_tls);
   if (!c.connect()) {
     std::cerr << "Connect failed\n";
     return 2;

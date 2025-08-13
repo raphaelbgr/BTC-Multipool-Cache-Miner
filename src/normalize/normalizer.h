@@ -9,6 +9,8 @@
 #include "normalize/endianness.h"
 #include "normalize/midstate.h"
 #include "normalize/targets.h"
+#include "normalize/coinbase.h"
+#include "normalize/merkle.h"
 #include "registry/types.h"
 
 namespace normalize {

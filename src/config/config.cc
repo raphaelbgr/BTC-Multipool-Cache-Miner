@@ -90,6 +90,7 @@ AppConfig loadFromJsonFile(const std::string& path) {
         }
         if (g.contains("cb_tag")) gc.cb_tag = g["cb_tag"].get<std::string>();
         if (g.contains("allow_synth_coinbase")) gc.allow_synth_coinbase = g["allow_synth_coinbase"].get<bool>();
+        if (g.contains("payout_script_hex")) gc.payout_script_hex = g["payout_script_hex"].get<std::string>();
         e.gbt = gc;
       }
       if (p.contains("policy") && p["policy"].is_object()) {

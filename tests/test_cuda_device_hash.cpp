@@ -3,6 +3,7 @@
 #include "cuda/engine.h"
 #include "normalize/endianness.h"
 #include "submit/cpu_verify.h"
+#include "normalize/midstate.h"
 
 // This test validates that device SHA-256d stub path links and can be invoked through mining stub
 TEST(CUDADeviceHash, MineStubLinksAndRuns) {
@@ -84,23 +85,8 @@ TEST(CUDADeviceHash, RealHeaderGenesisLikeEquality) {
   header[72]=0x1d; header[73]=0x00; header[74]=0xff; header[75]=0xff; // 0x1d00ffff
   header[76]=0x7c; header[77]=0x2b; header[78]=0xac; header[79]=0x1d; // 0x7c2bac1d (placeholder)
 
-  DeviceJob job{};
-  job.version = (unsigned int(header[0])<<24) | (unsigned int(header[1])<<16) | (unsigned int(header[2])<<8) | (unsigned int(header[3]));
-  // prevhash zeros -> LE words already zero
-  // merkle root: convert from BE bytes to LE words expected by device
-  auto mr_le = normalize::be32BytesToLeU32Words(&header[36]);
-  for (int i=0;i<8;++i) job.merkle_root_le[i]=mr_le[i];
-  job.ntime = (unsigned int(header[68])<<24)|(unsigned int(header[69])<<16)|(unsigned int(header[70])<<8)|unsigned int(header[71]);
-  job.nbits = (unsigned int(header[72])<<24)|(unsigned int(header[73])<<16)|(unsigned int(header[74])<<8)|unsigned int(header[75]);
-  for (int i=0;i<8;++i) { job.share_target_le[i]=0xFFFFFFFFu; job.block_target_le[i]=0xFFFFFFFFu; }
-  // precompute midstate for first 64 bytes
-  auto ms = normalize::sha256_midstate_64(header);
-  for (int i=0;i<8;++i) job.midstate_le[i]=ms[i];
-  job.work_id=3ull;
-  ASSERT_TRUE(uploadDeviceJobs(&job, 1));
-  unsigned int nonce = (unsigned int(header[76])<<24)|(unsigned int(header[77])<<16)|(unsigned int(header[78])<<8)|unsigned int(header[79]);
   unsigned char dev_digest[32];
-  ASSERT_TRUE(computeDeviceHashForJob(0, nonce, dev_digest));
+  ASSERT_TRUE(computeDeviceHashForHeader80(header, dev_digest));
   // CPU double SHA
   uint8_t cpu_digest[32];
   submit::sha256(header, 80, cpu_digest);

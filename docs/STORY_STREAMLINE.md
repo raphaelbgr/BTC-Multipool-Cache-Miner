@@ -74,14 +74,20 @@
  - [x] Cache: `CacheManager` and `VramPages` scaffolds with tests
  - [x] PredictabilityWorker: decision engine with tests
 
+- [x] TLS connectivity on Windows: OpenSSL backend enabled via vcpkg; SNI and CRLF in Stratum; CA bundle wired (`certs/cacert.pem`) with hostname verification; config ordered to prefer non‑TLS first with TLS as optional fallback; verified: NiceHash TLS stable, F2Pool plain 1314 stable, ViaBTC plain 3333 stable (TLS 443 connectivity dependent on network route)
+
 ### Next Up
-- Multi-source concurrency is implemented (one runner per pool + optional GBT). Continue refining scheduler backpressure and ensure no starvation.
- - Submit pipeline: acceptance correlation wired (runner → router prune). Size‑based outbox rotation in place; ledger snapshots periodic JSONL.
-- CUDA engine: per‑block shared hit buffers in place; occupancy metrics and occupancy‑aware tuning in place; specialized unrolled kernels added; next: register pressure tuning and per‑SM local buffers refinement.
-- GBT: capture `default_witness_commitment`; optional synthesized minimal OP_RETURN coinbase gated by `gbt.allow_synth_coinbase`; `submitHeader` requires real `coinbasetxn`.
-- Regtest integration tests for GBT end‑to‑end (env‑gated): fetch GBT with real coinbasetxn, mine trivial target, build full block hex, submitblock acceptance.
-- Full coinbase assembly path for configurable payout and fees when node doesn’t provide coinbasetxn (beyond minimal OP_RETURN diagnostic).
-- Kernel performance sweep and documented tuning guidance (threads per block, nonces per thread, unrolling) across common GPUs.
-- Optional: cache/predict worker full implementation for M5 completion.
+- Scheduler/backpressure refinement: stronger EWMA penalties, anti‑starvation guarantees, and health‑based pool weighting.
+- HTTP metrics endpoint (read‑only JSON): expose pool health/backpressure, kernel attrs, occupancy, device mem.
+- GBT regtest e2e: mine trivial target, build full block hex with witness commitment, `submitblock` acceptance; disable coinbase synth by default.
+- CUDA auto‑tune profile: sweep harness + persist per‑GPU tuned params; measure unroll variants and occupancy; docs for tuning.
+- Multi‑GPU: enumerate devices; one engine/scheduler per GPU; fair source allocation.
+- TLS hardening: config flags for verify on/off and custom CA path; consider native Schannel backend on Windows as alternative to OpenSSL.
+- Outbox/Ledger durability: CRC + fsync on append; gzip rotation; faster replay indexing.
+- Submit idempotency: cross‑restart dedup and per‑source submit keys.
+- Pool policy polish: version‑rolling mask negotiation, ntime rolling limits, varDiff tracking/metrics.
+- Hot config reload: env overrides and live reload for pools and tuning knobs.
+- Docs: CUDA tuning guide, ops runbook, pool compatibility notes, Windows build (vcpkg/CA) steps.
+- Performance: reduce global atomics in hit paths; refine shared/local buffers and hit ring sizing.
 
 
