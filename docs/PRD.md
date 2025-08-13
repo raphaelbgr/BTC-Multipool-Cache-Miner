@@ -33,7 +33,7 @@ Research/education‑grade Bitcoin SHA‑256d GPU miner that maximizes effective
    - Stratum specifics implemented:
      - varDiff updates applied via `mining.set_difficulty` → `share_target` distinct from `block_target`.
      - `mining.configure` negotiation for `version-rolling.mask`; mask propagated to normalization (`vmask`).
-     - `mining.notify` parsing honors `clean_jobs`, extranonce sizes, and sets minimal `ntime` rolling caps.
+     - `mining.notify` parsing honors `clean_jobs`, extranonce sizes, and sets minimal `ntime` rolling caps. Coinbase is assembled from `coinb1` + `extranonce1` + `extranonce2` + `coinb2` (with a zeroed `extranonce2` for midstate path) and Merkle root is recomputed from the branch.
    - Automatic recovery on disconnects; respects pool `clean_jobs`; honors rolling/version/ntime caps.
 
 2) Normalization (mandatory before GPU)
@@ -41,7 +41,7 @@ Research/education‑grade Bitcoin SHA‑256d GPU miner that maximizes effective
    - Endianness normalization on `prevhash` and `merkle_root` to kernel‑ready LE.
    - Targets: share_target (varDiff) and block_target (nbits) as LE u32[8].
    - Rolling clamps for version/ntime per source policy; extranonce sizes/packing; full coinbase assembly and merkle root.
-   - Midstate precompute.
+   - Midstate precompute; `header_first64` populated for accurate tail hashing on device.
 
 3) WorkSourceRegistry (continuous testing + hot‑swap)
    - Fixed slots `work[SOURCES]`, `gpuJobs[SOURCES]`; in‑place updates; increment `gen` last; `active=1`; `found_submitted=0`.
@@ -51,13 +51,13 @@ Research/education‑grade Bitcoin SHA‑256d GPU miner that maximizes effective
 4) CUDA Engine (same nonce across all jobs)
    - Grid mapping: y‑dimension = job index; x‑dimension = nonce offsets; micro‑batches (~0.5–3 ms).
    - Per thread: assemble header (job constants + nonce) → double SHA‑256 → compare to share and block targets; record hits in a ring buffer.
-   - Current status: device SHA‑256d implemented (including midstate tail path); `DeviceJob` uploaded per job; device hit ring with host drain; host reconstructs header to CPU‑verify before submit. Further optimization (constant memory, unrolling) TBD.
+   - Current status: device SHA‑256d implemented (including midstate tail path); `DeviceJob` uploaded per job; constant‑memory fast path for up to 64 jobs; device hit ring with host drain; host reconstructs header to CPU‑verify before submit. Simple auto‑tune adjusts `nonces_per_thread` and desired threads/job; further occupancy and unrolling optimization TBD.
    - Constants in __constant__/read‑only memory; minimize branching; round unrolling.
 
 5) Scheduler
 - All sources active; weighted fairness (configurable per source; optional solo bias).
 - Backpressure reduces slices for laggy/rejecting sources; micro‑batch duration auto‑tuned for throughput vs responsiveness.
-- Current status: runner demonstrates fair iteration over active jobs with a shared nonce base increment per loop; scheduler module added with basic per‑source weights (unit‑tested). Backpressure hooks (rejects/latency) to be integrated next.
+- Current status: multi‑source runners per pool, per‑slot registry, routing by `work_id`; per‑source backpressure (rejects/latency) integrated in runner with decay; basic auto‑tuning active.
 
 6) CacheManager (VRAM mandatory)
    - Per‑GPU dynamic target ≈ 85% available VRAM; respect `min_free_mib`; watermarks trigger async promote/evict by page size (MiB).
@@ -70,10 +70,10 @@ Research/education‑grade Bitcoin SHA‑256d GPU miner that maximizes effective
 
 8) SubmitRouter, Ledger & Outbox
    - CPU rebuild and verify header pre‑submit; idempotent routing to the originating adapter.
-   - Persistent O(1) job map (ledger) with mmap snapshot; dedupe jobs; crash‑safe outbox with replay.
+   - Persistent O(1) job map (ledger) with mmap snapshot; dedupe jobs; crash‑safe outbox with replay; rotation by size and optional rotate‑on‑start; acceptance cleanup hook scaffolded.
 
 9) Observability
-   - Metrics: per‑source hashrate, share accept/reject/stale, kernel time, occupancy, PCIe BW, VRAM usage, predict worker activity.
+   - Metrics: per‑source hashrate (EWMA), share accept/reject/stale, kernel time, desired threads and nonces per thread, PCIe/VRAM usage.
    - Structured JSON logs; per‑hit traces; backoff/retry reasons.
 
 10) Configuration
