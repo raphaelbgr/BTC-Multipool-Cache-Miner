@@ -74,11 +74,9 @@
  - [x] PredictabilityWorker: decision engine with tests
 
 ### Next Up
-- Multipool strategy scaffolding (round robin/failovwhat do you think its b
-- SubmitRouter: Outbox/Ledger persistence wiring (file/DB placeholder)
-- CUDA engine: multi-job launch (y=jobs, x=nonce range) and micro-batch auto-tune stubs
-- VRAM CacheManager scaffold and PredictabilityWorker placeholder
- - CUDA engine: micro-batch auto-tune stubs and tests
- - CUDA engine: ring buffer for hits (next)
+- Multi-source concurrency is implemented (one runner per pool + optional GBT). Continue refining scheduler backpressure and ensure no starvation.
+- Submit pipeline: correlate accepted submits to `(work_id, nonce)` to prune Outbox and rotate files; finalize Ledger snapshot format.
+- CUDA engine: occupancy tuning, per-SM local hit buffers to reduce global atomic contention; extend constant-memory usage; auto-tune `threads_per_block` and `nonces_per_thread`.
+- GBT: complete witness commitment path and full block assembly for `submitblock` on hits.
 
 
