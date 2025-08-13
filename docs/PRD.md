@@ -74,6 +74,7 @@ Research/education‑grade Bitcoin SHA‑256d GPU miner that maximizes effective
 
 9) Observability
 - Metrics: per‑source hashrate (EWMA), share accept/reject/stale, kernel time, desired threads and nonces per thread, CUDA mem free/total, PCIe/VRAM usage.
+  - Kernel auto‑tune targets `cuda.budget_ms` per batch; occupancy and per‑SM flush metrics guide tuning.
    - Structured JSON logs; per‑hit traces; backoff/retry reasons.
 
 10) Configuration

@@ -61,6 +61,7 @@
 - [x] Normalizer pieces: midstate utilities and Merkle root computation
 - [x] Submit path: CPU SHA‑256/sha256d utilities and `SubmitRouter` that CPU‑verifies before routing
 - [x] Persistence scaffolding: in‑memory Ledger + Outbox; SubmitRouter hooks; outbox size‑based rotation; periodic ledger snapshots
+- [x] Outbox pruning on acceptance wired from runner; persistent file rewrite on accept
 - [x] Tests green: endianness, targets, registry, logging, metrics, CPU verify, midstate, merkle, submit router
 - [x] Adapters skeleton: `AdapterBase`, `StratumAdapter` façade with basic state machine and ingest/poll
 - [x] GBT path: `GbtAdapter` ingest/poll queue and `GbtRunner` that polls `getblocktemplate` with `rules=["segwit"]` using cookie auth by default; `GbtSubmitter` assembles and calls `submitblock`.
@@ -76,7 +77,11 @@
 ### Next Up
 - Multi-source concurrency is implemented (one runner per pool + optional GBT). Continue refining scheduler backpressure and ensure no starvation.
  - Submit pipeline: acceptance correlation wired (runner → router prune). Size‑based outbox rotation in place; ledger snapshots periodic JSONL.
-- CUDA engine: per‑block shared hit buffers in place; occupancy metrics and occupancy‑aware tuning in place; extend constant‑memory usage; next: unrolling and register pressure tuning, block‑flush counters.
-- GBT: complete witness commitment path and full block assembly for `submitblock` on hits.
+- CUDA engine: per‑block shared hit buffers in place; occupancy metrics and occupancy‑aware tuning in place; specialized unrolled kernels added; next: register pressure tuning and per‑SM local buffers refinement.
+- GBT: capture `default_witness_commitment`; optional synthesized minimal OP_RETURN coinbase gated by `gbt.allow_synth_coinbase`; `submitHeader` requires real `coinbasetxn`.
+- Regtest integration tests for GBT end‑to‑end (env‑gated): fetch GBT with real coinbasetxn, mine trivial target, build full block hex, submitblock acceptance.
+- Full coinbase assembly path for configurable payout and fees when node doesn’t provide coinbasetxn (beyond minimal OP_RETURN diagnostic).
+- Kernel performance sweep and documented tuning guidance (threads per block, nonces per thread, unrolling) across common GPUs.
+- Optional: cache/predict worker full implementation for M5 completion.
 
 

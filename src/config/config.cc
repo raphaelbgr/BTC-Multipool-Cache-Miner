@@ -35,6 +35,7 @@ AppConfig loadFromJsonFile(const std::string& path) {
     if (c.contains("hit_ring_capacity")) cfg.cuda.hit_ring_capacity = c["hit_ring_capacity"].get<int>();
     if (c.contains("desired_threads_per_job")) cfg.cuda.desired_threads_per_job = c["desired_threads_per_job"].get<int>();
     if (c.contains("nonces_per_thread")) cfg.cuda.nonces_per_thread = c["nonces_per_thread"].get<int>();
+    if (c.contains("budget_ms")) cfg.cuda.budget_ms = c["budget_ms"].get<int>();
   }
   if (j.contains("outbox") && j["outbox"].is_object()) {
     const auto& o = j["outbox"];
@@ -88,6 +89,7 @@ AppConfig loadFromJsonFile(const std::string& path) {
           for (const auto& r : g["rules"]) gc.rules.push_back(r.get<std::string>());
         }
         if (g.contains("cb_tag")) gc.cb_tag = g["cb_tag"].get<std::string>();
+        if (g.contains("allow_synth_coinbase")) gc.allow_synth_coinbase = g["allow_synth_coinbase"].get<bool>();
         e.gbt = gc;
       }
       if (p.contains("policy") && p["policy"].is_object()) {

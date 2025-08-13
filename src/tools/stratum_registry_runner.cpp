@@ -237,6 +237,8 @@ int main(int argc, char** argv) {
         // Wire acceptance callback to prune outbox via SubmitRouter (attached later)
         srun->setAcceptedCallback([&](uint64_t wid, uint32_t nonce){
           if (submit_router) submit_router->onAccepted(wid, nonce);
+          // Persist pruning: rewrite outbox file to drop accepted entries
+          outbox.rewriteFile(outbox_path);
         });
         srun->start();
         auto subm = std::make_unique<submit::StratumSubmitter>(srun.get(), creds.first);
@@ -345,7 +347,7 @@ int main(int argc, char** argv) {
   // Auto-tuning knobs
   int desired_threads_per_job = std::max(1, cfg_all.cuda.desired_threads_per_job);
   int nonces_per_thread = std::max(1, cfg_all.cuda.nonces_per_thread);
-  const int budget_ms = 16; // aim for ~16ms batches by default
+  const int budget_ms = std::max(1, cfg_all.cuda.budget_ms); // aim for ~configured ms per batch
   // Report basic CUDA memory info
   {
     uint64_t free_b=0,total_b=0; if (cuda_engine::getDeviceMemoryInfo(&free_b,&total_b)) {
@@ -597,8 +599,16 @@ int main(int argc, char** argv) {
           bool is_block = submit::isHashLEQTarget(h2, ss.item.block_target_le);
           if (is_block && gbt_submitter) {
             // Prefer solo (GBT) for block hits
-            gbt_submitter->submitHeader(header);
-            metrics.increment("submit.blocks_gbt", 1);
+            bool ok = gbt_submitter->submitHeader(header);
+            if (ok) {
+              metrics.increment("submit.blocks_gbt_ok", 1);
+            } else {
+              // If no coinbase available, note as diagnostic-only failure
+              if (!gbt_submitter->hasCoinbase()) {
+                metrics.increment("submit.blocks_gbt_no_cb", 1);
+              }
+              metrics.increment("submit.blocks_gbt_fail", 1);
+            }
           } else {
             submit_router->verifyAndSubmit(header, ss.item.share_target_le, out[i].work_id, out[i].nonce);
             metrics.increment("submit.shares", 1);

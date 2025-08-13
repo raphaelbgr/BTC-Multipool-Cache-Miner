@@ -23,7 +23,7 @@ void GbtSubmitter::updateTemplate(const nlohmann::json& gbt) {
     if (gbt.contains("default_witness_commitment") && gbt["default_witness_commitment"].is_string()) {
       witness_commitment_hex_ = gbt["default_witness_commitment"].get<std::string>();
       // If no coinbasetxn provided, build a minimal coinbase to carry witness commitment for diagnostic runs
-      if (coinbase_hex_.empty()) {
+      if (allow_synth_coinbase_ && coinbase_hex_.empty()) {
         // Height is optional; if available in GBT use it, else use 0
         uint32_t height = 0;
         try { if (gbt.contains("height")) height = static_cast<uint32_t>(gbt["height"].get<int>()); } catch(...) {}
@@ -83,6 +83,10 @@ std::string GbtSubmitter::leHexFromHeaderBE(const uint8_t header80_be[80]) {
 }
 
 bool GbtSubmitter::submitHeader(const uint8_t header80_be[80]) {
+  // For actual submission, require a coinbase transaction to be present
+  if (coinbase_hex_.empty()) {
+    return false;
+  }
   std::string block_hex;
   if (!buildBlockHex(header80_be, &block_hex)) return false;
   nlohmann::json params = nlohmann::json::array();

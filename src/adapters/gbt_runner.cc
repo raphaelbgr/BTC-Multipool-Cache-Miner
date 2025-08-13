@@ -13,6 +13,9 @@ GbtRunner::GbtRunner(GbtAdapter* adapter, const config::PoolEntry& pool_cfg)
     : adapter_(adapter), pool_(pool_cfg) {
   if (pool_.rpc.has_value()) {
     submitter_ = std::make_shared<submit::GbtSubmitter>(*pool_.rpc);
+    if (pool_.gbt.has_value() && pool_.gbt->allow_synth_coinbase) {
+      submitter_->setAllowSynthCoinbase(true);
+    }
     adapter_->setSubmitter(submitter_);
   }
 }

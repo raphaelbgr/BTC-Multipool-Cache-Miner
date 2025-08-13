@@ -25,6 +25,10 @@ class GbtSubmitter {
     }
   }
 
+  void setAllowSynthCoinbase(bool allow) { allow_synth_coinbase_ = allow; }
+
+  bool hasCoinbase() const { return !coinbase_hex_.empty(); }
+
   // Update cached template: coinbase (if provided) and non-coinbase txs
   void updateTemplate(const nlohmann::json& gbt);
 
@@ -48,6 +52,7 @@ class GbtSubmitter {
   std::string coinbase_hex_;              // optional (may be empty)
   std::vector<std::string> txs_hex_;      // non-coinbase transactions
   std::optional<std::string> witness_commitment_hex_; // from default_witness_commitment
+  bool allow_synth_coinbase_{false};
 };
 
 }  // namespace submit
