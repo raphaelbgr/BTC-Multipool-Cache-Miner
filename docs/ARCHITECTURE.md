@@ -14,7 +14,7 @@
 - CudaEngine: per‑nonce, cross‑job kernel. Grid y‑dim = job index; x‑dim = nonce offsets. Short micro‑batches (~0.5–3 ms). Emits hits into a device‑side ring buffer per device, drained by host into a lock‑protected host ring. Device SHA‑256d implemented (midstate path), with `DeviceJob` table uploaded each hot‑swap; constant‑memory fast path for small job sets.
 - Scheduler: fair, weighted policy. Backpressure against sources with rejects/latency (decaying penalty). Tunes micro‑batch duration for responsiveness to hot‑swaps (simple auto‑tune).
 - SubmitRouter: CPU verifies double SHA‑256 on headers before routing shares/blocks to their originating adapter. Idempotent per job.
-- Ledger & Outbox: O(1) in‑RAM job map with mmap snapshotting; crash‑safe append‑only outbox that replays pending hits on startup; size‑based rotation and optional rotate‑on‑start; acceptance cleanup hook for pruning persisted entries.
+- Ledger & Outbox: O(1) in‑RAM job map with mmap snapshotting; crash‑safe append‑only outbox that replays pending hits on startup; size‑based rotation and optional rotate‑on‑start; acceptance cleanup wired from runner to prune persisted entries.
 
 ### Data Models (Kernel‑ready)
 

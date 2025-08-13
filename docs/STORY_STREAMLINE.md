@@ -75,7 +75,7 @@
 
 ### Next Up
 - Multi-source concurrency is implemented (one runner per pool + optional GBT). Continue refining scheduler backpressure and ensure no starvation.
-- Submit pipeline: correlate accepted submits to `(work_id, nonce)` to prune Outbox and rotate files; finalize Ledger snapshot format.
+ - Submit pipeline: acceptance correlation wired (runner → router prune). Next: finalize Ledger snapshot format and rolling rotation policy.
 - CUDA engine: occupancy tuning, per-SM local hit buffers to reduce global atomic contention; extend constant-memory usage; auto-tune `threads_per_block` and `nonces_per_thread`.
 - GBT: complete witness commitment path and full block assembly for `submitblock` on hits.
 

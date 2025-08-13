@@ -70,10 +70,10 @@ Research/education‑grade Bitcoin SHA‑256d GPU miner that maximizes effective
 
 8) SubmitRouter, Ledger & Outbox
    - CPU rebuild and verify header pre‑submit; idempotent routing to the originating adapter.
-   - Persistent O(1) job map (ledger) with mmap snapshot; dedupe jobs; crash‑safe outbox with replay; rotation by size and optional rotate‑on‑start; acceptance cleanup hook scaffolded.
+   - Persistent O(1) job map (ledger) with mmap snapshot; dedupe jobs; crash‑safe outbox with replay; rotation by size and optional rotate‑on‑start; acceptance‑based pruning wired via runner callbacks.
 
 9) Observability
-   - Metrics: per‑source hashrate (EWMA), share accept/reject/stale, kernel time, desired threads and nonces per thread, PCIe/VRAM usage.
+- Metrics: per‑source hashrate (EWMA), share accept/reject/stale, kernel time, desired threads and nonces per thread, CUDA mem free/total, PCIe/VRAM usage.
    - Structured JSON logs; per‑hit traces; backoff/retry reasons.
 
 10) Configuration
