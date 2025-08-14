@@ -78,6 +78,12 @@ struct AppConfig {
     uint64_t file_rotate_interval_sec{0};
   } metrics;
 
+  struct TlsCfg {
+    bool verify{true};
+    std::string ca_file; // optional path to PEM bundle; empty=default
+    bool use_schannel{false}; // reserved for future Windows native TLS
+  } tls;
+
   // CUDA engine configuration
   struct CudaCfg {
     int hit_ring_capacity{1024};

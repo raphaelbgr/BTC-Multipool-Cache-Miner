@@ -9,10 +9,7 @@ namespace net {
 bool StratumClient::connect() {
   if (use_tls_) {
     sock_ = MakeTlsSocket();
-    if (!sock_) {
-      // TLS requested but backend unavailable
-      return false;
-    }
+    if (!sock_) return false;
   } else {
     sock_ = MakePlainSocket();
   }

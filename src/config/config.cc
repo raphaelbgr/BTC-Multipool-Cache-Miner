@@ -39,6 +39,12 @@ AppConfig loadFromJsonFile(const std::string& path) {
     if (c.contains("nonces_per_thread")) cfg.cuda.nonces_per_thread = c["nonces_per_thread"].get<int>();
     if (c.contains("budget_ms")) cfg.cuda.budget_ms = c["budget_ms"].get<int>();
   }
+  if (j.contains("tls") && j["tls"].is_object()) {
+    const auto& t = j["tls"];
+    if (t.contains("verify")) cfg.tls.verify = t["verify"].get<bool>();
+    if (t.contains("ca_file")) cfg.tls.ca_file = t["ca_file"].get<std::string>();
+    if (t.contains("use_schannel")) cfg.tls.use_schannel = t["use_schannel"].get<bool>();
+  }
   if (j.contains("outbox") && j["outbox"].is_object()) {
     const auto& o = j["outbox"];
     if (o.contains("path")) cfg.outbox.path = o["path"].get<std::string>();
