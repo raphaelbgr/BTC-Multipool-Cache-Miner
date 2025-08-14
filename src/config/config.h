@@ -74,6 +74,8 @@ struct AppConfig {
     bool enable_http{false};
     std::string http_host{"127.0.0.1"};
     uint16_t http_port{8080};
+    uint64_t file_max_bytes{10ull * 1024ull * 1024ull};
+    uint64_t file_rotate_interval_sec{0};
   } metrics;
 
   // CUDA engine configuration

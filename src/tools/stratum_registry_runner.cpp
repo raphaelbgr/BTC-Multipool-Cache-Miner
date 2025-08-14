@@ -341,15 +341,30 @@ int main(int argc, char** argv) {
   if (metrics_file) {
     metrics_ofs = std::make_unique<std::ofstream>(metrics_path, std::ios::out | std::ios::app);
   }
-  // HTTP metrics server not available in this build
+  uint64_t metrics_last_rotate_ms = 0;
+  // Optional HTTP metrics server
+  std::unique_ptr<obs::MetricsHttpServer> metrics_http;
+  if (mcfg.metrics.enable_http) {
+    metrics_http = std::make_unique<obs::MetricsHttpServer>(&metrics, mcfg.metrics.http_host.c_str(), mcfg.metrics.http_port);
+    metrics_http->start();
+  }
   // Per-source backpressure tracking
   std::unordered_map<uint32_t, int> last_acc, last_rej;
   std::unordered_map<uint32_t, int> src_penalty;
   const int latency_penalty_ms = std::max(0, cfg_all.scheduler.latency_penalty_ms);
   uint64_t last_backpressure_ms = 0;
-  // Auto-tuning knobs
+  // Auto-tuning knobs (seed from persisted profile if available)
   int desired_threads_per_job = std::max(1, cfg_all.cuda.desired_threads_per_job);
   int nonces_per_thread = std::max(1, cfg_all.cuda.nonces_per_thread);
+  {
+    // Very simple per-device persistence by CUDA device name
+    std::string dev_name = "cuda0"; // TODO: query real device name when multi-GPU added
+    cuda_engine::TuningProfile prof{};
+    if (cuda_engine::loadTuningProfile(dev_name, &prof)) {
+      desired_threads_per_job = static_cast<int>(prof.threads_per_block);
+      nonces_per_thread = static_cast<int>(prof.nonces_per_thread);
+    }
+  }
   const int budget_ms = std::max(1, cfg_all.cuda.budget_ms); // aim for ~configured ms per batch
   // Report basic CUDA memory info
   {
@@ -473,12 +488,17 @@ int main(int argc, char** argv) {
             int dacc = acc - last_acc[sid];
             int drej = rej - last_rej[sid];
             last_acc[sid] = acc; last_rej[sid] = rej;
-            if (drej > dacc) p += 1;              // recent rejects > accepts
+            if (drej > dacc) p += 1;                              // recent rejects > accepts
             if (latency_penalty_ms > 0 && lat > latency_penalty_ms) p += 1; // slow submits
+            // Connection health penalties
+            int cf = sources[sid].stratum_runner->connectFailures();
+            int qd = sources[sid].stratum_runner->quickDisconnects();
+            if (cf > 0) p += 1; if (cf > 3) p += 1; if (cf > 7) p += 1;
+            if (qd > 0) p += 1; if (qd > 3) p += 1;
           }
-          // Decay previous penalty if conditions improved
+          // Decay previous penalty if conditions improved; cap in [0,5]
           int prev = src_penalty[sid];
-          if (p == 0 && prev > 0) prev -= 1; else if (p > 0) prev = std::min(prev + p, 3);
+          if (p == 0 && prev > 0) prev -= 1; else if (p > 0) prev = std::min(prev + p, 5);
           src_penalty[sid] = prev;
           scheduler.source_penalty[sid] = static_cast<uint32_t>(prev);
         }
@@ -572,6 +592,16 @@ int main(int argc, char** argv) {
         }
       }
       nonce_base += 1; // advance to keep testing new nonce across all jobs
+      // Periodically persist tuning
+      static uint64_t last_save_ms = 0;
+      auto now_save = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+      if (now_save - last_save_ms > 10000) {
+        cuda_engine::TuningProfile prof{};
+        prof.threads_per_block = static_cast<uint32_t>(desired_threads_per_job);
+        prof.nonces_per_thread = static_cast<uint32_t>(nonces_per_thread);
+        (void)cuda_engine::saveTuningProfile("cuda0", prof);
+        last_save_ms = now_save;
+      }
       cuda_engine::HitRecord out[64]; uint32_t n = 0;
       if (submit_router && cuda_engine::drainDeviceHits(out, 64, &n) && n > 0) {
         metrics.increment("device.hits", n);
@@ -706,15 +736,56 @@ int main(int argc, char** argv) {
     static uint64_t last_metrics_ms = 0;
     auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
     if (now_ms - last_metrics_ms > metrics_interval_ms) {
+      // Legacy single-runner summary
       if (stratum_runner_ptr) {
         metrics.setGauge("stratum.avg_submit_ms", stratum_runner_ptr->avgSubmitMs());
         metrics.setGauge("stratum.accepted", stratum_runner_ptr->acceptedSubmits());
         metrics.setGauge("stratum.rejected", stratum_runner_ptr->rejectedSubmits());
       }
+      // Per-pool health/penalty metrics
+      for (std::size_t sid = 0; sid < sources.size() && sid < cfg_all.pools.size(); ++sid) {
+        const auto& p = cfg_all.pools[sid];
+        const std::string prefix = std::string("pool.") + p.name + ".";
+        if (sources[sid].kind == SourceKind::Stratum && sources[sid].stratum_runner) {
+          metrics.setGauge(prefix + "connect_failures", sources[sid].stratum_runner->connectFailures());
+          metrics.setGauge(prefix + "quick_disconnects", sources[sid].stratum_runner->quickDisconnects());
+          metrics.setGauge(prefix + "accepted", sources[sid].stratum_runner->acceptedSubmits());
+          metrics.setGauge(prefix + "rejected", sources[sid].stratum_runner->rejectedSubmits());
+          metrics.setGauge(prefix + "avg_submit_ms", sources[sid].stratum_runner->avgSubmitMs());
+        }
+        auto pit = scheduler.source_penalty.find(static_cast<uint32_t>(sid));
+        int pen = (pit != scheduler.source_penalty.end()) ? static_cast<int>(pit->second) : 0;
+        metrics.setGauge(prefix + "penalty", pen);
+        auto wit = scheduler.source_weight.find(static_cast<uint32_t>(sid));
+        int w = (wit != scheduler.source_weight.end()) ? static_cast<int>(wit->second) : 1;
+        metrics.setGauge(prefix + "weight", w);
+      }
       const auto mjson = metrics.snapshot();
       if (metrics_ofs && metrics_ofs->good()) {
         (*metrics_ofs) << mjson.dump() << "\n";
         metrics_ofs->flush();
+        // Rotate metrics file by size/time if configured
+        const uint64_t maxb = static_cast<uint64_t>(mcfg.metrics.file_max_bytes);
+        const uint64_t rotate_s = static_cast<uint64_t>(mcfg.metrics.file_rotate_interval_sec);
+        auto nowmsr = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        bool do_rotate = false;
+        if (maxb > 0) {
+          std::ifstream ifs(metrics_path, std::ios::binary | std::ios::ate);
+          if (ifs) { std::streamsize sz = ifs.tellg(); if (sz >= static_cast<std::streamsize>(maxb)) do_rotate = true; }
+        }
+        if (!do_rotate && rotate_s > 0 && (nowmsr - metrics_last_rotate_ms > rotate_s * 1000ull)) do_rotate = true;
+        if (do_rotate) {
+          auto epoch = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+          std::ostringstream oss; oss << metrics_path << "." << epoch << ".bak";
+          metrics_ofs->close();
+          std::error_code ec; std::filesystem::rename(metrics_path, oss.str(), ec);
+          if (ec) {
+            std::filesystem::copy_file(metrics_path, oss.str(), std::filesystem::copy_options::overwrite_existing, ec);
+            std::ofstream ofs(metrics_path, std::ios::binary | std::ios::trunc);
+          }
+          metrics_ofs = std::make_unique<std::ofstream>(metrics_path, std::ios::out | std::ios::app);
+          metrics_last_rotate_ms = nowmsr;
+        }
       } else {
         std::cout << mjson.dump() << std::endl;
       }

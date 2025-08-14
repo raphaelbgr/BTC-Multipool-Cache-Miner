@@ -77,10 +77,11 @@
 - [x] TLS connectivity on Windows: OpenSSL backend enabled via vcpkg; SNI and CRLF in Stratum; CA bundle wired (`certs/cacert.pem`) with hostname verification; config ordered to prefer non‑TLS first with TLS as optional fallback; verified: NiceHash TLS stable, F2Pool plain 1314 stable, ViaBTC plain 3333 stable (TLS 443 connectivity dependent on network route)
 
 ### Next Up
-- Scheduler/backpressure refinement: stronger EWMA penalties, anti‑starvation guarantees, and health‑based pool weighting.
-- HTTP metrics endpoint (read‑only JSON): expose pool health/backpressure, kernel attrs, occupancy, device mem.
+- Scheduler/backpressure refinement: stronger EWMA penalties, anti‑starvation guarantees, and health‑based pool weighting. [in progress]
+- HTTP metrics endpoint (read‑only JSON): expose pool health/backpressure, kernel attrs, occupancy, device mem. [done]
+- Metrics file rotation: size/time‑based rotation for JSONL file sink, alongside HTTP server. [done]
 - GBT regtest e2e: mine trivial target, build full block hex with witness commitment, `submitblock` acceptance; disable coinbase synth by default.
-- CUDA auto‑tune profile: sweep harness + persist per‑GPU tuned params; measure unroll variants and occupancy; docs for tuning.
+- CUDA auto‑tune profile: sweep harness + persist per‑GPU tuned params; measure unroll variants and occupancy; docs for tuning. [in progress]
 - Multi‑GPU: enumerate devices; one engine/scheduler per GPU; fair source allocation.
 - TLS hardening: config flags for verify on/off and custom CA path; consider native Schannel backend on Windows as alternative to OpenSSL.
 - Outbox/Ledger durability: CRC + fsync on append; gzip rotation; faster replay indexing.

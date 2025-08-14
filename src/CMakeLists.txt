@@ -7,6 +7,7 @@ add_library(miner_core
   normalize/midstate.cc
   normalize/normalizer.cc
   normalize/coinbase.cc
+  cuda/auto_tune.cpp
   store/ledger.h
   store/outbox.h
   registry/work_source_registry.cc

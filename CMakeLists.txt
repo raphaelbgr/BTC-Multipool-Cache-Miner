@@ -137,6 +137,8 @@ add_executable(unit_tests
   tests/test_cuda_auto_tune.cpp
   tests/test_hit_ring.cpp
   tests/test_pool_profiles.cpp
+  tests/test_gbt_regtest_e2e.cpp
+  tests/test_gbt_regtest_pow_submit.cpp
   # cache tests TBD
 )
 target_link_libraries(unit_tests

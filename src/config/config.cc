@@ -29,6 +29,8 @@ AppConfig loadFromJsonFile(const std::string& path) {
     if (m.contains("enable_http")) cfg.metrics.enable_http = m["enable_http"].get<bool>();
     if (m.contains("http_host")) cfg.metrics.http_host = m["http_host"].get<std::string>();
     if (m.contains("http_port")) cfg.metrics.http_port = static_cast<uint16_t>(m["http_port"].get<int>());
+    if (m.contains("file_max_bytes")) cfg.metrics.file_max_bytes = m["file_max_bytes"].get<uint64_t>();
+    if (m.contains("file_rotate_interval_sec")) cfg.metrics.file_rotate_interval_sec = m["file_rotate_interval_sec"].get<uint64_t>();
   }
   if (j.contains("cuda") && j["cuda"].is_object()) {
     const auto& c = j["cuda"];

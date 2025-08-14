@@ -1,5 +1,6 @@
 {
   "log_level": 2,
+  "metrics": { "enable_http": true, "http_host": "127.0.0.1", "http_port": 8080, "dump_interval_ms": 2000 },
   "pools": [
     {
       "name": "viabtc",
